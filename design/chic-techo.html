@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="ja" data-size="m">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2d4a3b">
+<meta name="color-scheme" content="light only">
+<title>のこす手帖 上質な手帖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700&family=Zen+Kaku+Gothic+New:wght@500;700&family=Zen+Maru+Gothic:wght@500;700&family=Klee+One:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────
+   のこす手帖　試作①「上質な手帖」
+   シックな世界：紙・墨・深緑の3色。深緑は表紙・栞・押印・決める操作にだけ使う。
+   明るい世界（巻末の付箋ページ）：白い紙・付箋の黄・テープの珊瑚・墨。
+   ───────────────────────────────────────── */
+:root {
+  /* シック */
+  --paper: #f6f6f2;      /* 紙（墨と 15:1） */
+  --ink: #252321;        /* 墨 */
+  --ink2: #55514c;       /* 薄墨：補足（紙と 7.2:1） */
+  --green: #2d4a3b;      /* 深緑：表紙・栞・押印・主ボタン（紙と 9:1、白文字と 9.7:1） */
+  --green-dk: #233b2f;   /* 表紙の影 */
+  --rule: #cdd1cb;       /* 刷った罫（飾り。文字には使わない） */
+  --tint: #e6ebe5;       /* 選んだ行の地 */
+  --desk: #dddcd6;       /* PC の机 */
+  /* 明るい */
+  --b-page: #ffffff;
+  --b-yellow: #ffd23f;
+  --b-coral: #f26b4f;    /* 墨の文字と 5.2:1 */
+  --b-dot: #ecd9a4;
+
+  --f-min: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --f-sans: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  --f-maru: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Zen Kaku Gothic New", sans-serif;
+  --f-hand: "Klee One", "Zen Maru Gothic", sans-serif;
+  --ease: cubic-bezier(.4, 0, .2, 1);
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .15  0 0 0 0 .14  0 0 0 0 .12  0 0 0 .07 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+html[data-size="l"] { font-size: 21px; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--desk); color: var(--ink); font-family: var(--f-sans); font-weight: 500; font-size: 1rem; line-height: 1.75; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+h1, h2, h3, p, dd, .btn, li { word-break: auto-phrase; text-wrap: pretty; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--green); outline-offset: 3px; }
+.bright :focus-visible { outline-color: var(--ink); }
+[tabindex="-1"]:focus { outline: none; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── 机と端末（PC） ── */
+.stage { min-height: 100vh; display: flex; align-items: center; justify-content: center; gap: 64px; padding: 24px; }
+.phone { flex: none; width: 410px; height: 864px; padding: 10px; border-radius: 50px; background: #2b2926; }
+.app { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 40px; background: var(--paper); isolation: isolate; }
+.panel { width: 290px; display: grid; gap: 20px; align-content: start; }
+.pn-title { font-family: var(--f-min); font-weight: 700; font-size: 1.5rem; line-height: 1.4; }
+.pn-group { display: grid; gap: 6px; }
+.pn-group h2 { font-size: .9rem; font-weight: 700; color: var(--ink2); padding-bottom: 4px; border-bottom: 1px solid var(--ink); }
+.pn-group button { min-height: 48px; text-align: left; padding: 6px 12px; border-radius: 3px; display: flex; gap: 10px; align-items: center; }
+.pn-group button:hover { background: rgba(0,0,0,.05); }
+.pn-group button[aria-current="true"] { background: var(--ink); color: #fff; }
+.pn-group.b button[aria-current="true"] { background: var(--b-yellow); color: var(--ink); }
+.pn-num { font-family: var(--f-min); font-weight: 700; min-width: 1em; }
+.pn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.pn-link { min-height: 48px; padding: 0 14px; border: 1.5px solid var(--ink); border-radius: 3px; font-weight: 700; }
+
+@media (max-width: 759px) {
+  body { background: var(--paper); }
+  .stage { display: block; padding: 0; min-height: 0; }
+  .phone { width: 100%; height: 100vh; height: 100dvh; padding: 0; border-radius: 0; background: none; zoom: 1 !important; }
+  .app { border-radius: 0; }
+  .panel { display: none; }
+}
+
+/* ── 画面 ── */
+.screen {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  background-color: var(--paper); background-image: var(--grain);
+  visibility: hidden; opacity: 0; transition: opacity .22s ease, visibility 0s linear .22s;
+  backface-visibility: hidden; transform-origin: 0 50%;
+}
+.screen.on { visibility: visible; opacity: 1; transition: opacity .22s ease, visibility 0s; }
+.screen.bright { background-color: var(--b-page); background-image: radial-gradient(var(--b-dot) 1.4px, transparent 1.6px); background-size: 22px 22px; background-position: 11px 11px; }
+.scroll { flex: 1; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+.has-tabs .scroll { padding-bottom: 92px; }
+.pad { padding: 0 20px; }
+.top-safe { padding-top: max(18px, env(safe-area-inset-top)); }
+
+/* ── 柱（ページ上の見出し行）：シックな世界のしるし ── */
+.hashira {
+  margin: 0 20px; padding: max(16px, env(safe-area-inset-top)) 0 6px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;
+  border-bottom: 1px solid var(--ink); flex: none;
+}
+.hashira .h-l { font-family: var(--f-min); font-weight: 700; font-size: 1rem; line-height: 1.5; padding-bottom: 6px; }
+.hashira .h-r { font-size: .9rem; color: var(--ink2); padding-bottom: 6px; white-space: nowrap; }
+.hashira .h-btn { min-height: 48px; display: inline-flex; align-items: center; font-weight: 700; font-size: 1rem; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+/* ── ボタン（シック：角は紙の切り口ほど） ── */
+.btn { min-height: 52px; padding: 0 1.15em; border-radius: 3px; border: 1.5px solid var(--ink); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; text-align: center; line-height: 1.35; transition: background-color .15s, color .15s; }
+.btn-main { background: var(--green); border-color: var(--green); color: #fff; }
+.btn-main:hover { background: var(--green-dk); }
+.btn-line:hover { background: rgba(37,35,33,.06); }
+.btn-text { border-color: transparent; padding: 0 .4em; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+.btn-wide { width: 100%; }
+
+/* ── 文字の大きさ ── */
+.size-tg { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--ink2); }
+.size-tg button { min-width: 48px; min-height: 48px; padding: 0 10px; border: 1.5px solid var(--ink); border-radius: 3px; font-weight: 700; color: var(--ink); font-size: 1rem; }
+.size-tg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+/* ══════════ 1. オープニング（革の表紙） ══════════ */
+.intro { background: var(--green); z-index: 30; }
+.cover {
+  position: absolute; inset: 0; transform-origin: 0 50%; backface-visibility: hidden;
+  background-color: var(--green); background-image: var(--grain), var(--grain);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.25), inset 0 0 60px rgba(0,0,0,.28);
+}
+.cover-title { position: absolute; left: 0; right: 40px; top: 34%; text-align: center; font-family: var(--f-min); font-weight: 700; font-size: 2.1rem; letter-spacing: .28em; color: #a9bbaf; text-shadow: 0 -1px 0 rgba(0,0,0,.45), 0 1px 0 rgba(255,255,255,.08); }
+.band { position: absolute; top: 0; bottom: 0; right: 46px; width: 14px; background: #1a2a21; box-shadow: -2px 0 4px rgba(0,0,0,.3); }
+.skip { position: absolute; z-index: 2; top: max(14px, env(safe-area-inset-top)); left: 16px; min-height: 48px; padding: 0 16px; background: var(--green-dk); color: #fff; border: 1.5px solid #c9d6cc; border-radius: 3px; font-weight: 700; }
+.intro.opening .band { animation: bandOff .45s var(--ease) .45s forwards; }
+.intro.opening .cover { animation: coverOpen 1.15s cubic-bezier(.55, .05, .3, 1) .85s forwards; }
+.intro.opening { animation: introOut .25s linear 1.95s forwards; }
+@keyframes bandOff { to { transform: translateX(60px); opacity: 0; } }
+@keyframes coverOpen { 0% { transform: perspective(1500px) rotateY(0); } 100% { transform: perspective(1500px) rotateY(-108deg); } }
+@keyframes introOut { to { opacity: 0; visibility: hidden; } }
+.intro.opening { background: transparent; }
+
+/* ══════════ 入口：扉 ══════════ */
+.start-body { flex: 1; display: grid; grid-template-rows: auto 1fr auto; padding: max(16px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); }
+.start-top { display: flex; justify-content: flex-end; }
+.tobira { display: flex; justify-content: center; align-items: center; padding: 12px 0; }
+.tobira h1 { writing-mode: vertical-rl; font-family: var(--f-min); font-weight: 700; font-size: 2.15rem; line-height: 1.9; letter-spacing: .14em; }
+.colophon { border-top: 1px solid var(--ink); padding-top: 14px; display: grid; gap: 16px; }
+.colophon .name { font-family: var(--f-min); font-weight: 700; font-size: 1.2rem; letter-spacing: .12em; display: flex; justify-content: space-between; align-items: baseline; }
+.colophon .name span { font-family: var(--f-sans); font-weight: 500; font-size: .9rem; letter-spacing: 0; color: var(--ink2); }
+.colophon p { color: var(--ink2); }
+
+/* ══════════ 2. ホーム ══════════ */
+.ribbon {
+  position: absolute; top: 0; right: 6px; width: 13px; background: var(--green); z-index: 3; pointer-events: none;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 9px), 0 100%);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.05);
+}
+.home-ribbon { height: 330px; }
+.today { display: grid; grid-template-columns: auto 1fr; gap: 0 18px; padding: 22px 0 26px; border-bottom: 1px solid var(--rule); margin: 0 20px; }
+.dhead { text-align: center; padding-right: 16px; border-right: 1px solid var(--ink); align-self: start; font-family: var(--f-min); font-weight: 700; line-height: 1.2; }
+.dhead .m { font-size: 1rem; display: block; }
+.dhead .d { font-size: 3.1rem; display: block; line-height: 1.05; letter-spacing: -.02em; }
+.dhead .w { font-family: var(--f-sans); font-weight: 500; font-size: .9rem; color: var(--ink2); display: block; margin-top: 4px; }
+.today-q { display: grid; gap: 14px; align-content: start; padding-right: 10px; }
+.today-q .lead { color: var(--ink2); }
+.q { font-family: var(--f-min); font-weight: 700; font-size: 1.6rem; line-height: 1.45; letter-spacing: .02em; }
+.today-q .btn { justify-self: start; min-width: 7em; }
+
+.tally { margin: 0 20px; padding: 20px 0 22px; border-bottom: 1px solid var(--rule); display: grid; gap: 10px; }
+.tally-n { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.tally-n b { font-family: var(--f-min); font-weight: 700; font-size: 2.1rem; line-height: 1; }
+.tally-n .of { font-family: var(--f-min); font-weight: 700; font-size: 1.15rem; }
+.ruler { display: flex; align-items: flex-end; justify-content: space-between; height: 20px; border-bottom: 1px solid var(--ink); }
+.ruler i { width: 2px; height: 8px; background: var(--rule); transition: height .5s var(--ease), background-color .5s; }
+.ruler i.done { height: 19px; background: var(--green); }
+
+.toc { margin: 0 20px; padding: 20px 0 8px; }
+.toc h2 { font-family: var(--f-min); font-weight: 700; font-size: 1.2rem; letter-spacing: .3em; margin-bottom: 6px; }
+.toc li { display: flex; align-items: baseline; gap: 8px; min-height: 2.6rem; padding-top: .45rem; }
+.toc li .t { flex: none; }
+.toc li .lead-dots { flex: 1; border-bottom: 2px dotted #a7aaa4; transform: translateY(-.3em); min-width: 1em; }
+.toc li .c { flex: none; font-family: var(--f-min); font-weight: 700; }
+.toc li .c small { font-size: .9rem; font-family: var(--f-sans); font-weight: 500; color: var(--ink2); margin-left: 2px; }
+.back-tab {
+  margin: 14px -20px 8px 0; width: calc(100% + 20px); min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 8px 18px; background: var(--b-yellow); border-radius: 3px 14px 14px 3px; font-weight: 700; text-align: left;
+  box-shadow: 0 1px 0 rgba(0,0,0,.12);
+}
+.back-tab .k { font-family: var(--f-min); font-weight: 700; font-size: .9rem; padding: 2px 8px; border: 1.5px solid var(--ink); border-radius: 2px; flex: none; }
+.back-tab .t { flex: 1; font-family: var(--f-maru); font-size: 1.05rem; }
+
+/* ── タブ（目次の見出し） ── */
+.tabs {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 20; display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  background-color: var(--paper); border-top: 1px solid var(--ink); padding: 0 6px max(6px, env(safe-area-inset-bottom));
+  transition: opacity .2s, visibility 0s;
+}
+.tabs.off { opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s linear .2s; }
+.tabs button { min-height: 64px; font-weight: 700; font-size: 1rem; position: relative; line-height: 1.25; padding: 4px 2px 0; }
+.tabs button span { display: inline-block; }
+html[data-size="l"] .tabs button { font-size: .85rem; } /* 大でも 17px 以上。「見せるか」「友だちへ」を1行に保つ */
+.tabs button[aria-current="page"]::before { content: ""; position: absolute; left: 22%; right: 22%; top: -1px; height: 4px; background: var(--green); }
+.tabs button[aria-current="page"] { color: var(--green); }
+.tabs button:not([aria-current="page"]) { font-weight: 500; }
+.tabs .t-back { background: var(--b-yellow); margin: 8px 0 2px 4px; border-radius: 3px 12px 3px 3px; min-height: 54px; font-family: var(--f-maru); font-weight: 700 !important; }
+
+/* ══════════ 3・4. 書く／保存した瞬間 ══════════ */
+.write-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.write-page { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 22px 20px 24px; position: relative; }
+.write-page .q { font-size: 1.7rem; margin-bottom: 22px; padding-right: 18px; }
+.fld { display: grid; gap: 10px; margin-bottom: 22px; }
+.fld > .lb, .fld legend { font-weight: 700; padding: 0; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip input, .opt input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span { min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border: 1.5px solid var(--ink); border-radius: 3px; cursor: pointer; line-height: 1.35; }
+.chip span::before { content: ""; width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 50%; flex: none; }
+.chip input:checked + span { background: var(--tint); font-weight: 700; }
+.chip input:checked + span::before { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 3px var(--tint); }
+.chip input:focus-visible + span, .opt input:focus-visible + span { outline: 3px solid var(--green); outline-offset: 2px; }
+.ruled { width: 100%; min-height: 56px; border: 1px solid #a9ada6; border-bottom: 2px solid var(--ink); background: #fff; padding: 10px 12px 8px; font-size: 1.1rem; border-radius: 3px 3px 0 0; }
+.ruled::placeholder { color: #75706a; }
+.ruled:focus { outline: 3px solid var(--green); outline-offset: 2px; }
+.opts { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.opt span { min-height: 56px; display: flex; align-items: center; gap: 14px; padding: 10px 6px; border-bottom: 1px solid var(--rule); cursor: pointer; line-height: 1.45; }
+.opt span::before { content: ""; width: 22px; height: 22px; flex: none; border: 1.5px solid var(--ink); border-radius: 50%; }
+.opt input:checked + span { background: var(--tint); font-weight: 700; }
+.opt input:checked + span::before { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 5px var(--tint); }
+
+.fair { display: grid; gap: 4px; }
+.fair p { font-family: var(--f-min); font-weight: 700; font-size: 1.3rem; line-height: 1.6; padding: 6px 0 8px; border-bottom: 1px solid var(--rule); }
+.fair p small { display: block; font-family: var(--f-sans); font-weight: 500; font-size: .9rem; color: var(--ink2); }
+
+.actions { flex: none; display: flex; gap: 8px; align-items: center; padding: 12px 16px max(14px, env(safe-area-inset-bottom)); border-top: 1px solid var(--ink); background-color: var(--paper); }
+.actions .grow { flex: 1; }
+
+.w-ribbon { height: 0; }
+.write-wrap.saved .w-ribbon { height: var(--rh, 300px); }
+.w-ribbon.drop { animation: ribbonDrop .7s var(--ease) both; }
+@keyframes ribbonDrop { from { transform: translateY(-100%); } to { transform: none; } }
+
+.seal {
+  width: 76px; height: 76px; border: 2.5px solid var(--green); color: var(--green); border-radius: 4px;
+  display: grid; place-items: center; align-content: center; gap: 0; font-family: var(--f-min); font-weight: 700; line-height: 1.15;
+  transform: rotate(-4deg); filter: url(#ink); flex: none; background: rgba(246, 246, 242, .2);
+}
+.seal .s1 { font-size: 15px; letter-spacing: .02em; }
+.seal .s2 { font-size: 21px; letter-spacing: .08em; }
+.seal-spot { display: flex; justify-content: flex-end; margin-top: 14px; min-height: 76px; }
+.seal-spot .seal { opacity: 0; }
+.seal-spot .seal.shown { opacity: 1; }
+.seal.press { animation: sealPress .3s cubic-bezier(.3, 0, .2, 1) both; }
+@keyframes sealPress { 0% { opacity: 0; transform: rotate(-4deg) scale(1.35); } 60% { opacity: 1; transform: rotate(-4deg) scale(.97); } 100% { opacity: 1; transform: rotate(-4deg) scale(1); } }
+
+.after { flex: none; padding: 18px 20px max(16px, env(safe-area-inset-bottom)); border-top: 1px solid var(--ink); background-color: var(--paper); display: grid; gap: 12px; }
+.after h2 { font-family: var(--f-min); font-weight: 700; font-size: 1.5rem; line-height: 1.4; }
+.after .who { color: var(--ink2); }
+.after .row { display: flex; gap: 10px; flex-wrap: wrap; }
+.after .row .btn { flex: 1 1 auto; }
+.after.wait { pointer-events: none; }
+.empty-msg { flex: none; padding: 12px 20px; border-top: 1px solid var(--ink); background-color: #fff; font-weight: 700; font-size: 1.05rem; }
+.after.show { animation: fadeIn .45s ease both; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ══════════ 5. 誰に・いつ見せるか ══════════ */
+.page-h { font-family: var(--f-min); font-weight: 700; font-size: 1.55rem; line-height: 1.45; padding: 22px 20px 6px; }
+.person { margin: 14px 20px 0; padding-top: 14px; border-top: 1px solid var(--ink); }
+.person h2 { font-family: var(--f-min); font-weight: 700; font-size: 1.3rem; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.person h2 span { font-family: var(--f-sans); font-weight: 500; font-size: .9rem; color: var(--ink2); }
+.share-foot { margin: 22px 20px 0; display: grid; gap: 10px; }
+
+/* 受け渡しシート（見本） */
+.sheet-desk { padding: 18px 16px 24px; }
+.sheet {
+  background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.12), 0 8px 24px rgba(37,35,33,.08); padding: 22px 20px 24px; position: relative;
+}
+.sheet .rule2 { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); height: 6px; margin-bottom: 14px; }
+.sheet h1 { font-family: var(--f-min); font-weight: 700; font-size: 1.45rem; letter-spacing: .1em; }
+.sheet .to { font-family: var(--f-min); font-weight: 700; font-size: 1.1rem; margin-top: 8px; }
+.sheet dl { margin: 16px 0 0; display: grid; grid-template-columns: auto 1fr; gap: 0 14px; }
+.sheet dt { font-weight: 700; padding: 10px 0; border-top: 1px solid var(--rule); white-space: nowrap; }
+.sheet dd { margin: 0; padding: 10px 0; border-top: 1px solid var(--rule); }
+.sheet .sign { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--ink); }
+.sheet .sign p { color: var(--ink2); }
+@media (max-width: 360px) { .sheet dl { grid-template-columns: 1fr; } .sheet dd { border-top: 0; padding-top: 0; } }
+html[data-size="l"] .sheet dl { grid-template-columns: 1fr; }
+html[data-size="l"] .sheet dd { border-top: 0; padding-top: 0; }
+
+/* ══════════ 6. もしものとき ══════════ */
+.date-in { margin: 6px 20px 0; display: grid; gap: 8px; }
+.date-in label { font-weight: 700; }
+.date-in input { min-height: 56px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 6px 12px; background: #fff; font-size: 1.15rem; font-family: var(--f-min); font-weight: 700; width: 100%; }
+.date-in input:focus { outline: 3px solid var(--green); outline-offset: 2px; }
+.duelist { margin: 22px 20px 0; border-top: 1px solid var(--ink); }
+.due { padding: 14px 0 12px; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; }
+.due .when { grid-column: 1 / -1; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.due .date { font-family: var(--f-min); font-weight: 700; font-size: 1.3rem; }
+.due .span { font-size: .9rem; color: var(--ink2); white-space: nowrap; }
+.due .what { font-weight: 700; font-size: 1.05rem; line-height: 1.5; }
+.due .where { color: var(--ink2); font-size: .9rem; }
+.due .ck { grid-row: 2 / span 2; grid-column: 2; align-self: center; }
+.ck { position: relative; display: inline-flex; }
+.ck input { position: absolute; opacity: 0; }
+.ck span { min-height: 48px; min-width: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px; border: 1.5px solid var(--ink); border-radius: 3px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.ck span::before { content: ""; width: 16px; height: 16px; border: 1.5px solid var(--ink); border-radius: 2px; }
+.ck input:checked + span { background: var(--green); border-color: var(--green); color: #fff; }
+.ck input:checked + span::before { border-color: #fff; background: linear-gradient(45deg, transparent 45%, #fff 45%, #fff 60%, transparent 60%), linear-gradient(-45deg, transparent 45%, #fff 45%, #fff 60%, transparent 60%); }
+.ck input:focus-visible + span { outline: 3px solid var(--green); outline-offset: 2px; }
+.due.is-done .what { text-decoration: line-through; text-decoration-thickness: 1.5px; color: var(--ink2); }
+.mosimo-note { margin: 18px 20px 0; color: var(--ink2); }
+html[data-size="l"] .due { grid-template-columns: 1fr; }
+html[data-size="l"] .due .ck { grid-column: 1; grid-row: auto; justify-self: start; margin-top: 6px; }
+
+/* ══════════ 7. 明るい世界：巻末の付箋ページ ══════════ */
+.bright { font-family: var(--f-maru); }
+.b-top { padding: max(14px, env(safe-area-inset-top)) 16px 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex: none; }
+.pill { min-height: 48px; padding: 0 18px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 6px; line-height: 1.3; text-align: center; }
+.pill.ink { background: var(--ink); color: #fff; }
+.pill.yel { background: var(--b-yellow); }
+.tape {
+  display: inline-block; background: var(--b-coral); padding: 8px 22px 9px; font-weight: 700; font-size: 1.25rem; line-height: 1.4;
+  clip-path: polygon(0 6%, 4% 0, 8% 7%, 12% 0, 100% 0, 97% 50%, 100% 100%, 4% 100%, 0 92%, 3% 50%);
+  transform: rotate(-1.5deg); margin: 18px 0 4px 16px;
+}
+.friends-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 18px 16px 4px; }
+.sticky {
+  min-height: 92px; padding: 12px 12px 10px; text-align: left; display: grid; align-content: start; gap: 2px; position: relative;
+  background: var(--b-yellow); box-shadow: 0 2px 0 rgba(0,0,0,.12); border: 2px solid transparent; border-radius: 2px;
+}
+.sticky:nth-child(2) { background: #fff; border-color: var(--ink); }
+.sticky:nth-child(1) { transform: rotate(-1.2deg); }
+.sticky:nth-child(2) { transform: rotate(1deg); }
+.sticky b { font-size: 1.05rem; line-height: 1.35; }
+.sticky small { font-size: .9rem; }
+.sticky[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sticky[aria-pressed="true"]::after { content: "書いています"; position: absolute; right: -6px; bottom: -16px; background: var(--b-coral); font-size: .9rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 2px solid var(--ink); }
+html[data-size="l"] .sticky[aria-pressed="true"]::after { font-size: 16px; }
+.add-friend { margin: 14px 16px 0; min-height: 52px; width: calc(100% - 32px); border: 2px dashed var(--ink); border-radius: 14px; font-weight: 700; background: rgba(255,255,255,.7); }
+.b-form { margin: 18px 16px 0; padding: 18px 16px 20px; background: #fff; border: 2px solid var(--ink); border-radius: 16px; display: grid; gap: 16px; }
+.b-form .fld { margin: 0; }
+.b-form label { font-weight: 700; }
+.b-in { width: 100%; min-height: 52px; border: 2px solid var(--ink); border-radius: 12px; padding: 8px 12px; background: #fff; font-size: 1rem; }
+.b-in:focus, .b-note:focus { outline: 3px solid var(--b-coral); outline-offset: 2px; }
+.b-note { width: 100%; min-height: 8.5em; border: 0; border-radius: 4px; padding: 10px 12px; background: var(--b-yellow); font-family: var(--f-hand); font-weight: 600; font-size: 1.1rem; line-height: 1.85; resize: vertical; }
+.b-note::placeholder, .b-in::placeholder { color: #5f5a52; }
+.b-foot { padding: 18px 16px 28px; display: grid; gap: 10px; }
+
+/* カードの見本 */
+.card-wrap { padding: 26px 22px 8px; }
+.card {
+  position: relative; background: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 28px 20px 22px; transform: rotate(-1deg);
+  box-shadow: 4px 5px 0 rgba(37,35,33,.16);
+}
+.card .t1, .card .t2 { position: absolute; top: -12px; width: 92px; height: 26px; opacity: .92; }
+.card .t1 { left: 18px; background: var(--b-coral); transform: rotate(-6deg); clip-path: polygon(0 10%, 5% 0, 100% 0, 96% 50%, 100% 100%, 0 100%, 4% 50%); }
+.card .t2 { right: 22px; background: var(--b-yellow); transform: rotate(5deg); clip-path: polygon(4% 0, 100% 8%, 96% 50%, 100% 100%, 0 92%, 3% 50%, 0 0); }
+.card .to { font-family: var(--f-hand); font-weight: 600; font-size: 1.45rem; }
+.card .msg { font-family: var(--f-hand); font-weight: 600; font-size: 1.1rem; line-height: 1.95; margin-top: 8px; }
+.card dl { margin: 16px 0 0; padding-top: 12px; border-top: 2px dashed var(--ink); display: grid; gap: 6px; }
+.card dt { font-weight: 700; font-size: .9rem; }
+.card dd { margin: 0 0 6px; }
+.card .from { font-family: var(--f-hand); font-weight: 600; font-size: 1.2rem; text-align: right; margin-top: 10px; min-height: 66px; padding-left: 84px; display: flex; align-items: flex-end; justify-content: flex-end; }
+.card .stk { position: absolute; left: 16px; bottom: 18px; width: 66px; height: 66px; border-radius: 50%; background: var(--b-yellow); border: 2px solid var(--ink); display: grid; place-items: center; transform: rotate(10deg); }
+.card-who { margin: 22px 22px 0; padding: 12px 14px; background: #fff; border-radius: 12px; border: 2px solid var(--ink); }
+
+
+/* ── トースト ── */
+.toast { position: absolute; left: 16px; right: 16px; bottom: 96px; z-index: 40; background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 4px; font-weight: 700; opacity: 0; visibility: hidden; transition: opacity .2s, visibility 0s linear .2s; }
+.toast.on { opacity: 1; visibility: visible; transition: opacity .2s; }
+
+/* ── ページをめくる影 ── */
+.turning { z-index: 25 !important; visibility: visible !important; opacity: 1 !important; box-shadow: 8px 0 24px rgba(0,0,0,.18); }
+
+/* ── 動きを減らす設定：移動・拡大を消し、フェードは残す ── */
+@media (prefers-reduced-motion: reduce) {
+  .intro.opening .band, .intro.opening .cover { animation: none; }
+  .intro.opening { animation: introOut .6s linear 1.2s forwards; }
+  .w-ribbon.drop { animation: fadeIn .5s ease both; }
+  .seal.press { animation: fadeIn .4s ease .3s both; }
+  .ruler i { transition: background-color .4s; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="2.4"/></filter>
+</svg>
+
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="app" id="app">
+
+      <!-- 1. オープニング -->
+      <section class="screen intro" id="s-intro" aria-label="オープニング">
+        <div class="cover" aria-hidden="true"><p class="cover-title">のこす手帖</p><div class="band"></div></div>
+        <button class="skip" type="button" data-go="start">とばす</button>
+      </section>
+
+      <!-- 入口：扉 -->
+      <section class="screen" id="s-start" aria-label="はじめる">
+        <div class="start-body">
+          <div class="start-top"><div class="size-tg" role="group" aria-label="文字の大きさ">文字<button type="button" data-size="m">標準</button><button type="button" data-size="l">大</button></div></div>
+          <div class="tobira"><h1>のこす手帖</h1></div>
+          <div class="colophon">
+            <p class="name">のこす手帖<span>無料・登録なし</span></p>
+            <p>1日に1問、答えるだけ。書いたことは、この端末の中だけに置かれます。</p>
+            <button class="btn btn-main btn-wide" type="button" data-go="home">はじめる</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. ホーム -->
+      <section class="screen has-tabs" id="s-home" aria-label="ホーム">
+        <header class="hashira"><span class="h-l">和子さんの手帖</span><div class="size-tg" role="group" aria-label="文字の大きさ"><button type="button" data-size="m">標準</button><button type="button" data-size="l">大</button></div></header>
+        <div class="scroll" style="position:relative">
+          <div class="ribbon home-ribbon" aria-hidden="true"></div>
+          <div class="today">
+            <p class="dhead" aria-label="10月25日 日曜日"><span class="m">十月</span><span class="d">25</span><span class="w">日曜</span></p>
+            <div class="today-q">
+              <p class="lead">今日の1問</p>
+              <h1 class="q" id="home-q">大切な書類の保管場所</h1>
+              <button class="btn btn-main" type="button" data-go="write">書く</button>
+            </div>
+          </div>
+          <div class="tally">
+            <p class="tally-n"><span>のこした問い</span><b id="tally-n">12</b><span class="of">／46</span></p>
+            <div class="ruler" id="ruler" aria-hidden="true"></div>
+          </div>
+          <div class="toc">
+            <h2>目次</h2>
+            <ul id="toc"></ul>
+            <button class="back-tab" type="button" data-world="friends"><span class="k">巻末</span><span class="t">友だち・趣味の仲間へ</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3・4. 書く／保存した瞬間 -->
+      <section class="screen" id="s-write" aria-label="1問ずつ書く">
+        <header class="hashira"><button class="h-btn" type="button" data-go="home">ホームへ</button><span class="h-r" id="w-cat">わたしのこと 4／5</span></header>
+        <div class="write-wrap" id="write-wrap">
+          <div class="write-page" id="write-page">
+            <div class="ribbon w-ribbon" id="w-ribbon" aria-hidden="true"></div>
+            <h1 class="q" id="w-q" tabindex="-1">大切な書類の保管場所</h1>
+            <form id="w-form" onsubmit="return false"></form>
+            <div class="fair" id="w-fair" hidden></div>
+            <div class="seal-spot"><div class="seal" id="w-seal" aria-hidden="true"><span class="s1">10.25</span><span class="s2">和子</span></div></div>
+          </div>
+          <p class="empty-msg" id="w-empty" role="alert" hidden>まだ空欄です。</p>
+          <div class="actions" id="w-actions">
+            <button class="btn btn-text" type="button" id="w-prev">戻る</button>
+            <span class="grow"></span>
+            <button class="btn btn-line" type="button" id="w-later">あとで</button>
+            <button class="btn btn-main" type="button" id="w-save">保存する</button>
+          </div>
+          <div class="after" id="w-after" hidden>
+            <h2 tabindex="-1" id="w-after-h">1つ、のこしました。</h2>
+            <p class="who" id="w-who"></p>
+            <div class="row">
+              <button class="btn btn-line" type="button" data-go="home">今日はここまで</button>
+              <button class="btn btn-main" type="button" id="w-next">次の問いへ</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. 誰に・いつ見せるか -->
+      <section class="screen has-tabs" id="s-share" aria-label="誰に・いつ見せるか">
+        <header class="hashira"><span class="h-l">誰に見せるか</span><span class="h-r">家族</span></header>
+        <div class="scroll">
+          <h1 class="page-h">誰に、いつ見せるか</h1>
+          <div id="people"></div>
+          <div class="share-foot">
+            <button class="btn btn-line btn-wide" type="button" data-go="sheet">美紀さんの受け渡しシートを見る</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5'. 受け渡しシートの見本 -->
+      <section class="screen" id="s-sheet" aria-label="受け渡しシートの見本">
+        <header class="hashira"><button class="h-btn" type="button" data-go="share">戻る</button><span class="h-r">見本</span></header>
+        <div class="scroll">
+          <div class="sheet-desk">
+            <article class="sheet">
+              <div class="rule2" aria-hidden="true"></div>
+              <h1>受け渡しシート</h1>
+              <p class="to">山田 美紀 様</p>
+              <dl>
+                <dt>見られる時期</dt><dd id="sh-when">今すぐ</dd>
+                <dt>見られる項目</dt><dd>わたしのこと、家族・大切な人、保険・年金、医療・介護、葬儀・お墓</dd>
+                <dt>見られない項目</dt><dd>お金と財産、相続・遺言</dd>
+                <dt>一緒に渡すもの</dt><dd>手帖のファイル（美紀さん用）</dd>
+              </dl>
+              <div class="sign">
+                <p>2026年10月25日<br>山田 和子</p>
+                <div class="seal" aria-hidden="true"><span class="s1">10.25</span><span class="s2">和子</span></div>
+              </div>
+            </article>
+          </div>
+          <div class="share-foot" style="margin-bottom:24px">
+            <button class="btn btn-main btn-wide" type="button" data-toast="見本なので、印刷はしません。">印刷する</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. もしものとき -->
+      <section class="screen has-tabs" id="s-mosimo" aria-label="もしものとき">
+        <header class="hashira"><span class="h-l">もしものとき</span><span class="h-r">家族が読むページ</span></header>
+        <div class="scroll">
+          <h1 class="page-h">期限のある手続き</h1>
+          <div class="date-in">
+            <label for="death">亡くなった日</label>
+            <input type="date" id="death" min="2000-01-01" max="2100-12-31">
+          </div>
+          <ol class="duelist" id="duelist"></ol>
+          <p class="mosimo-note">和子さんの手帖は、ここからは書き換えずに読めます。</p>
+          <div class="share-foot" style="margin-bottom:12px"><button class="btn btn-line btn-wide" type="button" data-toast="見本では、手帖の中身は開きません。">和子さんの手帖を読む</button></div>
+        </div>
+      </section>
+
+      <!-- 7. 明るい世界：友だち・趣味の仲間へ -->
+      <section class="screen bright" id="s-friends" aria-label="友だち・趣味の仲間へ">
+        <div class="b-top"><button class="pill" type="button" data-world="home">手帖にもどる</button></div>
+        <div class="scroll">
+          <h1 class="tape">友だち・趣味の仲間へ</h1>
+          <div class="friends-pick" role="group" aria-label="渡す相手">
+            <button class="sticky" type="button" data-friend="0" aria-pressed="true"><b>佐藤 文子さん</b><small>書道教室</small></button>
+            <button class="sticky" type="button" data-friend="1" aria-pressed="false"><b>旅行の会</b><small>旅行仲間のみなさん</small></button>
+          </div>
+          <button class="add-friend" type="button" data-toast="見本では、人を足せません。">＋ 人を足す</button>
+          <form class="b-form" id="f-form" onsubmit="return false">
+            <div class="fld"><label for="f-msg">ひとこと</label><textarea class="b-note" id="f-msg" rows="4"></textarea></div>
+            <div class="fld"><label for="f-photo">思い出の写真の置き場所</label><input class="b-in" id="f-photo" type="text"></div>
+            <div class="fld"><label for="f-item">形見に渡したい物</label><input class="b-in" id="f-item" type="text"></div>
+          </form>
+          <div class="b-foot"><button class="pill ink" type="button" data-go="card">カードを作る</button></div>
+        </div>
+      </section>
+
+      <!-- 7'. お別れのあとに渡すカード -->
+      <section class="screen bright" id="s-card" aria-label="お別れのあとに渡すカード">
+        <div class="b-top"><button class="pill" type="button" data-go="friends">書き直す</button><button class="pill" type="button" data-world="home">手帖にもどる</button></div>
+        <div class="scroll">
+          <h1 class="tape">お別れのあとに渡すカード</h1>
+          <div class="card-wrap">
+            <article class="card" id="card">
+              <span class="t1" aria-hidden="true"></span><span class="t2" aria-hidden="true"></span>
+              <p class="to" id="c-to">文子さんへ</p>
+              <p class="msg" id="c-msg"></p>
+              <dl>
+                <dt>形見に</dt><dd id="c-item"></dd>
+                <dt>思い出の写真</dt><dd id="c-photo"></dd>
+              </dl>
+              <p class="from">和子より</p>
+              <span class="stk" aria-hidden="true">
+                <svg width="40" height="40" viewBox="0 0 40 40"><path d="M33 4.5 L36 7.5 L21 22.5 L18 19.5 Z" fill="#fff" stroke="#252321" stroke-width="2" stroke-linejoin="round"/><path d="M18 19.5 L21 22.5 L19.6 24 L16.6 21 Z" fill="#f26b4f" stroke="#252321" stroke-width="1.5"/><path d="M16.6 21 L19.6 24 C18.5 29.5 13 34 5 36 C6.5 28.5 11 22.5 16.6 21 Z" fill="#252321"/></svg>
+              </span>
+            </article>
+          </div>
+          <p class="card-who">お別れのあと、長女の美紀さんが渡します。</p>
+          <div class="b-foot"><button class="pill yel" type="button" data-toast="見本なので、印刷はしません。">印刷する</button></div>
+        </div>
+      </section>
+
+      <nav class="tabs off" id="tabs" aria-label="手帖の目次">
+        <button type="button" data-tab="home">ホーム</button>
+        <button type="button" data-tab="share"><span>誰に</span><span>見せるか</span></button>
+        <button type="button" data-tab="mosimo">もしも</button>
+        <button type="button" class="t-back" data-world="friends">友だちへ</button>
+      </nav>
+
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <aside class="panel" aria-label="試作の操作">
+    <p class="pn-title">① 上質な手帖</p>
+    <div class="pn-group">
+      <h2>シックな世界</h2>
+      <button type="button" data-pn="intro"><span class="pn-num">1</span>オープニングと扉</button>
+      <button type="button" data-pn="home"><span class="pn-num">2</span>ホーム</button>
+      <button type="button" data-pn="write"><span class="pn-num">3</span>1問ずつ書く</button>
+      <button type="button" data-pn="moment"><span class="pn-num">4</span>保存した瞬間</button>
+      <button type="button" data-pn="share"><span class="pn-num">5</span>誰に・いつ見せるか</button>
+      <button type="button" data-pn="sheet"><span class="pn-num"></span>受け渡しシートの見本</button>
+      <button type="button" data-pn="mosimo"><span class="pn-num">6</span>もしものとき</button>
+    </div>
+    <div class="pn-group b">
+      <h2>明るい世界</h2>
+      <button type="button" data-pn="friends"><span class="pn-num">7</span>友だち・趣味の仲間へ</button>
+      <button type="button" data-pn="card"><span class="pn-num"></span>カードの見本</button>
+    </div>
+    <div class="size-tg" role="group" aria-label="文字の大きさ">文字<button type="button" data-size="m">標準</button><button type="button" data-size="l">大</button></div>
+    <div class="pn-row"><button type="button" class="pn-link" id="pn-death">もしものときに見本の日付を入れる</button></div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const BRIGHT = new Set(['friends', 'card']);
+  const TABBED = new Set(['home', 'share', 'mosimo']);
+
+  /* ── データ（実際の文言は app/js/questions.js から） ── */
+  const CATS = [
+    ['わたしのこと', 3, 5], ['家族・大切な人', 3, 4], ['お金と財産', 2, 6], ['保険・年金', 2, 5], ['医療・介護', 1, 8],
+    ['葬儀・お墓', 1, 6], ['相続・遺言', 0, 5], ['ペット', 0, 4], ['家族へのことば', 0, 3],
+  ];
+  const QS = [
+    { cat: 0, no: 4, title: '大切な書類の保管場所', type: 'docs' },
+    { cat: 2, no: 3, title: '預貯金の口座', type: 'bank' },
+    { cat: 4, no: 2, title: '回復の見込みがないときの延命治療', type: 'radio',
+      options: ['できるかぎり続けてほしい', '苦痛をやわらげる治療だけにしてほしい', '家族と医師に任せる', 'まだ決められない'] },
+  ];
+  const DOCS = ['通帳・キャッシュカード', '実印・印鑑登録証', 'マイナンバーカード', '年金証書', 'その他'];
+  // 誰がどのカテゴリを読めるか（見本の設定）
+  const TIMING = [['now', '今すぐ'], ['incap', '判断がむずかしくなったら'], ['after', '亡くなったあと'], ['never', '見せない']];
+  const PEOPLE = [{ name: '美紀', rel: '長女', t: 'now' }, { name: '健一', rel: '長男', t: 'after' }];
+  const FRIENDS = [
+    { to: '文子さんへ', msg: '水曜の教室で、いつも隣で墨をすってくれてありがとう。わたしの大筆、文子さんに使ってほしいの。', photo: '居間の本棚、緑のアルバムの2冊目', item: '書道の大筆と硯' },
+    { to: '旅行の会のみなさんへ', msg: '', photo: '', item: '' },
+  ];
+
+  const st = { screen: null, qi: 0, done: 12, saved: false, answers: {}, friend: 0 };
+
+  /* ── 期限の数え方（app/js/logic.js と同じ） ── */
+  const parse = (k) => { const [y, m, d] = k.split('-').map(Number); return { y, m, d }; };
+  const keyUTC = (t) => new Date(t).toISOString().slice(0, 10);
+  const addDays = (k, n) => { const { y, m, d } = parse(k); return keyUTC(Date.UTC(y, m - 1, d + n)); };
+  const monthsDeadline = (k, n) => {
+    const s = addDays(k, 1); const { y, m, d } = parse(s);
+    const last = new Date(Date.UTC(y, m - 1 + n + 1, 0)).getUTCDate();
+    if (d > last) return keyUTC(Date.UTC(y, m - 1 + n, last));
+    return addDays(keyUTC(Date.UTC(y, m - 1 + n, d)), -1);
+  };
+  const diff = (a, b) => { const A = parse(a), B = parse(b); return Math.round((Date.UTC(B.y, B.m - 1, B.d) - Date.UTC(A.y, A.m - 1, A.d)) / 864e5); };
+  const W = ['日', '月', '火', '水', '木', '金', '土'];
+  const fmt = (k, year) => { const { y, m, d } = parse(k); const w = W[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]; return `${year ? y + '年' : ''}${m}月${d}日（${w}）`; };
+  const TODAY = '2026-10-25';
+  const TASKS = [
+    { title: '死亡届を出す', where: '市区町村役場', days: 7, span: '7日以内' },
+    { title: '年金の受給を止める（厚生年金は10日以内、国民年金は14日以内）', where: '年金事務所', days: 10, span: '10日以内' },
+    { title: '相続放棄・限定承認をするか決める', where: '家庭裁判所', months: 3, span: '3か月以内' },
+    { title: '準確定申告をする', where: '亡くなった方の住所地の税務署', months: 4, span: '4か月以内' },
+    { title: '相続税の申告をする（必要な場合）', where: '亡くなった方の住所地の税務署', months: 10, span: '10か月以内' },
+  ];
+  const doneTasks = new Set();
+  function renderDue() {
+    const v = $('#death').value; const ol = $('#duelist');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) { ol.innerHTML = '<li class="due"><p class="what">亡くなった日を入れると、期限の日が出ます。</p></li>'; return; }
+    ol.innerHTML = TASKS.map((t, i) => {
+      const due = t.days ? addDays(v, t.days - 1) : monthsDeadline(v, t.months);
+      const left = diff(TODAY, due);
+      const rest = left > 0 ? `あと${left}日` : left === 0 ? '今日まで' : '期限の日を過ぎました';
+      const on = doneTasks.has(i);
+      return `<li class="due${on ? ' is-done' : ''}">
+        <p class="when"><span class="date">${fmt(due, due.slice(0, 4) !== TODAY.slice(0, 4))}まで</span><span class="span">${t.span}・${rest}</span></p>
+        <p class="what">${t.title}</p>
+        <p class="where">${t.where}</p>
+        <label class="ck"><input type="checkbox" data-task="${i}"${on ? ' checked' : ''}><span>すんだ</span></label>
+      </li>`;
+    }).join('');
+  }
+  $('#death').addEventListener('input', renderDue);
+  $('#duelist').addEventListener('change', (e) => {
+    const i = Number(e.target.dataset.task); if (Number.isNaN(i)) return;
+    e.target.checked ? doneTasks.add(i) : doneTasks.delete(i);
+    e.target.closest('.due').classList.toggle('is-done', e.target.checked);
+  });
+
+  /* ── ホーム ── */
+  function renderHome() {
+    $('#tally-n').textContent = st.done;
+    const r = $('#ruler'); if (!r.children.length) r.innerHTML = '<i></i>'.repeat(46);
+    $$('i', r).forEach((el, i) => el.classList.toggle('done', i < st.done));
+    const savedMe = st.done > 12 ? 1 : 0;
+    $('#toc').innerHTML = CATS.map(([n, d, t], i) => `<li><span class="t">${n}</span><span class="lead-dots" aria-hidden="true"></span><span class="c">${d + (i === 0 ? savedMe : 0)}<small>／${t}</small></span></li>`).join('');
+    $('#home-q').textContent = st.done > 12 ? '預貯金の口座' : '大切な書類の保管場所';
+  }
+
+  /* ── 書く ── */
+  function renderQ() {
+    const q = QS[st.qi]; const [cn, , ct] = CATS[q.cat];
+    $('#w-cat').textContent = `${cn} ${q.no}／${ct}`;
+    $('#w-q').textContent = q.title;
+    const a = st.answers[st.qi] || {};
+    let h = '';
+    if (q.type === 'docs') {
+      h = `<fieldset class="fld"><legend>どの書類ですか</legend><div class="chips">${DOCS.map((d, i) => `<label class="chip"><input type="radio" name="doc" value="${d}"${(a.doc || DOCS[0]) === d ? ' checked' : ''}><span>${d}</span></label>`).join('')}</div></fieldset>
+        <div class="fld"><label class="lb" for="a-place">どこにありますか</label><input class="ruled" id="a-place" type="text" placeholder="例：居間のたんす 右上の引き出し" value="${a.place || ''}"></div>`;
+    } else if (q.type === 'bank') {
+      h = `<div class="fld"><label class="lb" for="a-bank">金融機関の名前</label><input class="ruled" id="a-bank" type="text" placeholder="例：ゆうちょ銀行" value="${a.bank || ''}"></div>
+        <div class="fld"><label class="lb" for="a-branch">支店の名前</label><input class="ruled" id="a-branch" type="text" placeholder="例：松本駅前支店" value="${a.branch || ''}"></div>
+        <p style="color:var(--ink2)">口座番号と暗証番号は書きません。</p>`;
+    } else {
+      h = `<fieldset class="fld"><legend class="vh">${q.title}</legend><div class="opts">${q.options.map((o) => `<label class="opt"><input type="radio" name="opt" value="${o}"${a.opt === o ? ' checked' : ''}><span>${o}</span></label>`).join('')}</div></fieldset>`;
+    }
+    $('#w-form').innerHTML = h;
+    setSaved(false);
+  }
+  function readAnswer() {
+    const q = QS[st.qi]; const f = $('#w-form');
+    if (q.type === 'docs') return { doc: ($('input[name=doc]:checked', f) || {}).value || DOCS[0], place: $('#a-place').value.trim() };
+    if (q.type === 'bank') return { bank: $('#a-bank').value.trim(), branch: $('#a-branch').value.trim() };
+    return { opt: ($('input[name=opt]:checked', f) || {}).value || '' };
+  }
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function fairCopy(a) {
+    const q = QS[st.qi];
+    if (q.type === 'docs') return `<p><small>${esc(a.doc)}</small>${esc(a.place || '（場所はまだ書いていません）')}</p>`;
+    if (q.type === 'bank') return `<p><small>金融機関</small>${esc(a.bank || '（まだ書いていません）')}</p><p><small>支店</small>${esc(a.branch || '（まだ書いていません）')}</p>`;
+    return `<p>${esc(a.opt || '（まだ選んでいません）')}</p>`;
+  }
+  const PHRASE = { now: '今すぐ読めます', incap: '判断がむずかしくなったら読めます', after: '亡くなったあとに読めます', never: 'には見せません' };
+  function whoLine() {
+    return PEOPLE.map((p) => p.t === 'never' ? `${p.name}さんには見せません` : `${p.name}さんは${PHRASE[p.t]}`).join('。') + '。';
+  }
+  function setSaved(on, animate) {
+    st.saved = on;
+    const wrap = $('#write-wrap');
+    wrap.classList.toggle('saved', on);
+    $('#w-form').hidden = on; $('#w-fair').hidden = !on;
+    $('#w-actions').hidden = on; $('#w-after').hidden = !on;
+    const rib = $('#w-ribbon'), seal = $('#w-seal'), after = $('#w-after');
+    rib.classList.remove('drop'); seal.classList.remove('press', 'shown');
+    clearTimeout(st.unlockT); st.busy = false; after.inert = false; after.classList.remove('wait'); $('#w-empty').hidden = true; after.classList.remove('show');
+    if (on) {
+      const page = $('#write-page');
+      wrap.style.setProperty('--rh', Math.max(160, $('.seal-spot', page).offsetTop - 6) + 'px');
+      if (animate) {
+        void rib.offsetWidth;
+        rib.classList.add('drop');
+        setTimeout(() => seal.classList.add('press'), reduce.matches ? 0 : 650);
+        after.classList.add('show');
+        // 演出のあいだは押せない（「保存する」の二度押しで「今日はここまで」を押してしまわないように）
+        st.busy = true; after.inert = true; after.classList.add('wait');
+        clearTimeout(st.unlockT);
+        st.unlockT = setTimeout(() => {
+          st.busy = false; after.inert = false; after.classList.remove('wait');
+          $('#w-after-h').focus({ preventScroll: true });
+        }, reduce.matches ? 500 : 1000);
+      } else seal.classList.add('shown');
+      $('#w-who').textContent = whoLine();
+    }
+  }
+  function save(animate = true) {
+    const a = readAnswer(); st.answers[st.qi] = a;
+    $('#w-fair').innerHTML = fairCopy(a);
+    if (!st.savedOnce?.[st.qi]) { st.savedOnce = { ...(st.savedOnce || {}), [st.qi]: true }; st.done = Math.min(46, st.done + 1); }
+    setSaved(true, animate);
+    renderHome();
+    if (!animate) setTimeout(() => $('#w-after-h').focus({ preventScroll: true }), 50);
+  }
+  function isEmpty(a) {
+    const q = QS[st.qi];
+    if (q.type === 'docs') return !a.place;
+    if (q.type === 'bank') return !a.bank && !a.branch;
+    return !a.opt;
+  }
+  $('#w-save').addEventListener('click', () => {
+    if (st.saved || st.busy) return; // 二度押しは無視
+    if (isEmpty(readAnswer())) { const m = $('#w-empty'); m.hidden = true; void m.offsetWidth; m.hidden = false; return; }
+    save(true);
+  });
+  $('#w-form').addEventListener('input', () => { $('#w-empty').hidden = true; });
+  $('#w-form').addEventListener('change', () => { $('#w-empty').hidden = true; });
+  $('#w-later').addEventListener('click', () => { if (!st.busy) nextQ(); });
+  $('#w-next').addEventListener('click', () => { if (!st.busy) nextQ(); });
+  $('#w-prev').addEventListener('click', () => {
+    if (st.qi === 0) { go('home'); return; }
+    turnPage(() => { st.qi -= 1; renderQ(); }, 'back');
+  });
+  function nextQ() { turnPage(() => { st.qi = (st.qi + 1) % QS.length; renderQ(); }, 'fwd'); }
+
+  // 同じ画面の中でページをめくる（次の問いへ）
+  function turnPage(swap, dir) {
+    const page = $('#s-write');
+    if (reduce.matches) {
+      page.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, fill: 'forwards' }).onfinish = () => {
+        swap(); page.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: 'forwards' });
+        $('#w-q').focus({ preventScroll: true });
+      };
+      return;
+    }
+    const ghost = page.cloneNode(true); ghost.removeAttribute('id'); ghost.setAttribute('aria-hidden', 'true');
+    $$('[id]', ghost).forEach((n) => n.removeAttribute('id'));
+    ghost.classList.add('turning'); ghost.style.pointerEvents = 'none';
+    swap();
+    $('#app').appendChild(ghost);
+    const k = dir === 'back'
+      ? [{ transform: 'perspective(1600px) rotateY(0)', opacity: 1 }, { transform: 'perspective(1600px) translateX(30%) ', opacity: 0 }]
+      : [{ transform: 'perspective(1600px) rotateY(0)' }, { transform: 'perspective(1600px) rotateY(-96deg)' }];
+    ghost.animate(k, { duration: 520, easing: 'cubic-bezier(.45,.05,.3,1)', fill: 'forwards' }).onfinish = () => ghost.remove();
+    $('#w-q').focus({ preventScroll: true });
+  }
+
+  /* ── 見せ方 ── */
+  function renderPeople() {
+    $('#people').innerHTML = PEOPLE.map((p, pi) => `<section class="person" aria-labelledby="p${pi}"><h2 id="p${pi}">${p.name}さん<span>${p.rel}</span></h2>
+      <fieldset><legend class="vh">${p.name}さんに見せる時期</legend><div class="opts">${TIMING.map(([v, l]) => `<label class="opt"><input type="radio" name="t${pi}" value="${v}"${p.t === v ? ' checked' : ''}><span>${l}</span></label>`).join('')}</div></fieldset></section>`).join('');
+  }
+  $('#people').addEventListener('change', (e) => {
+    const m = /^t(\d)$/.exec(e.target.name || ''); if (!m) return;
+    PEOPLE[Number(m[1])].t = e.target.value;
+    $('#sh-when').textContent = TIMING.find(([v]) => v === PEOPLE[0].t)[1];
+  });
+
+  /* ── 友だち ── */
+  function renderFriend() {
+    const f = FRIENDS[st.friend];
+    $$('.sticky').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.friend) === st.friend)));
+    $('#f-msg').value = f.msg; $('#f-photo').value = f.photo; $('#f-item').value = f.item;
+    $('#f-msg').placeholder = '例：旅の写真、いつも撮ってくれてありがとう。';
+    $('#f-photo').placeholder = '例：居間の本棚、緑のアルバム';
+    $('#f-item').placeholder = '例：旅行のアルバム';
+  }
+  function syncFriend() { const f = FRIENDS[st.friend]; f.msg = $('#f-msg').value; f.photo = $('#f-photo').value; f.item = $('#f-item').value; }
+  $('#f-form').addEventListener('input', syncFriend);
+  $$('.sticky').forEach((b) => b.addEventListener('click', () => { syncFriend(); st.friend = Number(b.dataset.friend); renderFriend(); }));
+  function renderCard() {
+    const f = FRIENDS[st.friend];
+    $('#c-to').textContent = f.to;
+    $('#c-msg').textContent = f.msg || '（ひとことは、まだ書いていません）';
+    $('#c-item').textContent = f.item || '（まだ決めていません）';
+    $('#c-photo').textContent = f.photo || '（まだ書いていません）';
+  }
+
+  /* ── 画面の切り替え ── */
+  const ALIAS = { moment: 'write' };
+  function setTabs(id) {
+    const tabs = $('#tabs');
+    tabs.classList.toggle('off', !TABBED.has(id));
+    $('.t-back', tabs).hidden = id === 'mosimo'; // 家族が読むページには明るい世界の札を出さない
+    $$('[data-tab]', tabs).forEach((b) => b.dataset.tab === id ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  }
+  function markPanel(name) { $$('[data-pn]').forEach((b) => b.setAttribute('aria-current', String(b.dataset.pn === name))); }
+  function go(name, opts = {}) {
+    const id = ALIAS[name] || name;
+    if (id === 'card') { syncFriend(); renderCard(); }
+    if (id === 'friends') renderFriend();
+    const prev = st.screen;
+    $$('.screen').forEach((s) => { if (s.id !== 's-' + id && s.id !== 's-intro') s.classList.remove('on'); });
+    if (id !== 'intro') $('#s-intro').classList.remove('on', 'opening');
+    $('#s-' + id).classList.add('on');
+    st.screen = id; setTabs(id); markPanel(name === 'moment' ? 'moment' : id);
+    $('#app').dataset.realm = BRIGHT.has(id) ? 'bright' : 'chic';
+    if (!opts.keepFocus && prev && prev !== id) {
+      const h = $('#s-' + id + ' h1'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+      const sc = $('#s-' + id + ' .scroll'); if (sc) sc.scrollTop = 0;
+    }
+    const u = new URL(location.href); u.searchParams.set('s', name); history.replaceState(null, '', u);
+  }
+
+  // 2つの世界の行き来：ページを大きくめくる（手帖 → 巻末、巻末 → 手帖）
+  function switchWorld(to) {
+    const from = $('#s-' + st.screen);
+    const target = $('#s-' + to);
+    if (reduce.matches || !from) { go(to); return; }
+    const toBright = BRIGHT.has(to);
+    $('#tabs').classList.add('off');
+    if (toBright) {
+      // 手帖のページが左へめくれて、下から巻末の付箋ページが現れる
+      if (to === 'friends') renderFriend();
+      target.classList.add('on'); target.style.zIndex = 1;
+      from.classList.add('turning');
+      from.animate([{ transform: 'perspective(1600px) rotateY(0)' }, { transform: 'perspective(1600px) rotateY(-100deg)' }],
+        { duration: 680, easing: 'cubic-bezier(.5,.05,.3,1)' }).onfinish = () => {
+        from.classList.remove('turning'); target.style.zIndex = ''; go(to);
+      };
+    } else {
+      // 手帖のページが左から戻ってきて、付箋ページの上に重なる
+      if (to === 'home') renderHome();
+      target.classList.add('turning');
+      target.animate([{ transform: 'perspective(1600px) rotateY(-100deg)' }, { transform: 'perspective(1600px) rotateY(0)' }],
+        { duration: 680, easing: 'cubic-bezier(.5,.05,.3,1)' }).onfinish = () => {
+        target.classList.remove('turning'); go(to);
+      };
+    }
+  }
+
+  // オープニング：ゴムが外れ、革の表紙が開く（初回だけ。2.2秒）
+  let introTimer;
+  function playIntro() {
+    const it = $('#s-intro');
+    $('#s-start').classList.add('on');
+    it.classList.remove('opening'); it.classList.add('on'); void it.offsetWidth; it.classList.add('opening');
+    st.screen = 'intro'; setTabs('intro'); markPanel('intro');
+    clearTimeout(introTimer);
+    introTimer = setTimeout(endIntro, reduce.matches ? 1850 : 2250);
+    try { localStorage.setItem('chic-techo-intro', '1'); } catch (e) {}
+    const u = new URL(location.href); u.searchParams.set('s', 'intro'); history.replaceState(null, '', u);
+  }
+  function endIntro() { clearTimeout(introTimer); $('#s-intro').classList.remove('on', 'opening'); go('start'); }
+  $('#s-intro').addEventListener('click', endIntro);
+
+  /* ── 押したとき ── */
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('button[data-go],button[data-tab],button[data-world],button[data-pn],button[data-size],button[data-toast]');
+    if (!t) return;
+    if (t.dataset.size) { setSize(t.dataset.size); return; }
+    if (t.dataset.toast) { toast(t.dataset.toast); return; }
+    if (t.dataset.world) { switchWorld(t.dataset.world); return; }
+    if (t.dataset.tab) { go(t.dataset.tab); return; }
+    if (t.dataset.pn) { openFromPanel(t.dataset.pn); return; }
+    if (t.dataset.go) {
+      if (t.dataset.go === 'start' && st.screen === 'intro') { endIntro(); return; }
+      if (t.dataset.go === 'write') { st.qi = st.done > 12 ? 1 : 0; renderQ(); }
+      if (t.dataset.go === 'home') renderHome();
+      go(t.dataset.go);
+    }
+  });
+  function openFromPanel(n) {
+    if (n === 'intro') { playIntro(); return; }
+    if (n === 'write') { st.qi = 0; renderQ(); }
+    if (n === 'moment') { prepMoment(); go('moment'); save(true); return; }
+    if (BRIGHT.has(n) !== BRIGHT.has(st.screen) && st.screen && st.screen !== 'intro' && st.screen !== 'start') { switchWorld(n); return; }
+    go(n);
+  }
+  function prepMoment() {
+    st.qi = 0; st.answers[0] = { doc: DOCS[0], place: '居間のたんす 右上の引き出し' }; renderQ();
+    $('#a-place').value = '居間のたんす 右上の引き出し';
+  }
+
+  let toastT;
+  function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600); }
+
+  function setSize(s) {
+    document.documentElement.dataset.size = s;
+    $$('button[data-size]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === s)));
+    const u = new URL(location.href); s === 'l' ? u.searchParams.set('size', 'l') : u.searchParams.delete('size'); history.replaceState(null, '', u);
+    if (st.saved) setSaved(true, false);
+  }
+
+  // PC で画面の高さが足りないときは、枠ごと縮める
+  function fit() {
+    const ph = $('#phone');
+    if (innerWidth < 760) { ph.style.zoom = ''; return; }
+    ph.style.zoom = Math.min(1, (innerHeight - 32) / 864);
+  }
+  addEventListener('resize', fit);
+
+  /* ── 起動 ── */
+  const P = new URLSearchParams(location.search);
+  // 試作の見本：?death=2026-10-22 か、PC の横の操作で亡くなった日を入れる（本番は空から始める）
+  const setDeath = (v) => { $('#death').value = v; renderDue(); };
+  if (/^\d{4}-\d{2}-\d{2}$/.test(P.get('death') || '')) setDeath(P.get('death'));
+  $('#pn-death').addEventListener('click', () => { setDeath('2026-10-22'); if (st.screen !== 'mosimo') openFromPanel('mosimo'); });
+  setSize(P.get('size') === 'l' ? 'l' : 'm');
+  renderHome(); renderPeople(); renderDue(); renderQ(); renderFriend(); fit();
+  let first = false; try { first = !localStorage.getItem('chic-techo-intro'); } catch (e) { first = true; }
+  const s = P.get('s');
+  if (s === 'intro' || (!s && first)) playIntro();
+  else if (s === 'moment') { prepMoment(); go('moment'); save(P.get('still') !== '1' ? true : false); }
+  else if (s && $('#s-' + s)) go(s);
+  else go('start');
+})();
+</script>
+</body>
+</html>

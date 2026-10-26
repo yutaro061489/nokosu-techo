@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja" data-font="standard">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="1日1問から書ける終活ノート。無料・登録なし。書いた内容はどこにも送られません。">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="color-scheme" content="light">
+  <title>のこす手帖</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="のこす手帖">
+  <meta property="og:title" content="のこす手帖">
+  <meta property="og:description" content="1日1問。無料・登録なし。書いた内容はどこにも送られません。">
+  <meta property="og:url" content="https://yutaro061489.github.io/nokosu-techo/app/">
+  <meta property="og:image" content="https://yutaro061489.github.io/nokosu-techo/img/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="のこす手帖">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2324344f'/%3E%3Ctext x='16' y='23' font-size='19' text-anchor='middle' fill='%23ffffff' font-family='serif'%3E%E5%B8%96%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="のこす手帖">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">本文へ移動</a>
+
+  <header class="appbar" id="appbar">
+    <div class="appbar-inner">
+      <div class="appbar-left">
+        <a class="nav-back" id="nav-back" href="#/home" hidden><span class="nav-back-icon" aria-hidden="true"></span><span class="nav-back-text"></span></a>
+        <a class="brand" href="#/home" aria-label="のこす手帖 ホームへ">
+          <img class="brand-mark" src="img/ill-note.png" alt="" width="320" height="320">
+          <span class="brand-name">のこす手帖</span>
+        </a>
+      </div>
+      <p class="appbar-title" id="appbar-title" aria-hidden="true"></p>
+      <div class="appbar-tools">
+        <p class="save-status" id="save-status" role="status" aria-live="polite"></p>
+        <button type="button" class="tool-btn" id="font-toggle">
+          <span class="tool-btn-glyph" aria-hidden="true">Aa</span>
+          <span class="tool-btn-text"><span class="tool-btn-word">文字 </span><span class="font-toggle-value">標準</span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="storage-banner" id="storage-banner" role="alert" hidden></div>
+
+  <div class="shell">
+    <nav class="sidenav" id="sidenav" aria-label="メニュー">
+      <ul class="nav-list" id="nav-list"></ul>
+    </nav>
+    <main id="main" class="main" tabindex="-1">
+      <noscript><p>のこす手帖を使うには、JavaScript を有効にしてください。</p></noscript>
+    </main>
+  </div>
+
+
+  <!-- スマホ幅：画面下のタブバー。最後の「メニュー」で全項目のメニューを開く -->
+  <nav class="tabbar" id="tabbar" aria-label="よく使う画面">
+    <div class="tab-links" id="tab-links"></div>
+    <button type="button" class="tab menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="sidenav">
+      <span class="tab-icon menu-icon-slot" aria-hidden="true"></span>
+      <span class="tab-label menu-toggle-label">メニュー</span>
+    </button>
+  </nav>
+
+  <div id="live-region" class="visually-hidden" aria-live="polite"></div>
+  <div id="print-root"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

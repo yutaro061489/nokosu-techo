@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="ja" data-size="std">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<title>のこす手帖 封筒と切手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+<style>
+/* ───────── インクは2色＋紙。濃淡（網）だけで変化をつける ───────── */
+:root{
+  --paper:#FFFFFF;
+  --red:#C8251B;      /* ポストの朱。白地 5.6:1 */
+  --blue:#1F3C9E;     /* 群青。文字・罫線・消印。白地 9.5:1 */
+  --bt:#E6EBF7;       /* 群青の網 12% */
+  --bt2:#D3DCF2;      /* 群青の網 20%（ストックブックの帯） */
+  --rt:#FBE3E0;       /* 朱の網 12% */
+  --ui:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+  --display:"Dela Gothic One","BIZ UDPGothic",sans-serif;
+  --spring:cubic-bezier(.34,1.7,.5,1);
+  color-scheme:light;
+}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+html[data-size="lg"]{font-size:22px}
+*{box-sizing:border-box}
+body{margin:0;background:#F1F3FA;color:var(--blue);font-family:var(--ui);line-height:1.65;min-height:100vh}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:6px}
+h1,h2,.headline,.to,.nm{word-break:auto-phrase}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ───────── 机（PC）：中央にスマホの枠、右に画面の切り替え ───────── */
+.desk{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:40px;padding:24px}
+.phone-slot{position:relative;flex:none}
+.phone{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;background:var(--paper);border:3px solid var(--blue);border-radius:46px;overflow:hidden;isolation:isolate}
+.panel{width:260px;flex:none;display:grid;gap:18px;align-content:start;font-size:16px}
+.panel h1{margin:0;font-family:var(--display);font-weight:400;font-size:22px;line-height:1.35;letter-spacing:.02em}
+.panel h2{margin:0;font-size:16px;font-weight:700}
+.panel ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.panel ol button{width:100%;min-height:48px;text-align:left;padding:8px 14px;border:2px solid var(--blue);border-radius:10px;background:#fff;font-size:16px;font-weight:700;display:flex;gap:10px;align-items:center}
+.panel ol button .n{font-family:var(--display);font-weight:400;min-width:1.6em}
+.panel ol button[aria-current="true"]{background:var(--blue);color:#fff}
+.panel .seg{display:flex;border:2px solid var(--blue);border-radius:10px;overflow:hidden}
+.panel .seg button{flex:1;min-height:48px;border:0;background:#fff;font-size:16px;font-weight:700}
+.panel .seg button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.panel .plain{min-height:48px;border:2px solid var(--red);color:var(--red);background:#fff;border-radius:10px;font-weight:700;font-size:16px}
+@media (max-width:760px){
+  body{background:var(--paper)}
+  .desk{display:block;padding:0}
+  .panel{display:none}
+  .phone-slot{width:100vw !important;height:100dvh !important}
+  .phone{position:fixed;inset:0;width:100%;height:100dvh;border:0;border-radius:0;transform:none !important}
+}
+
+/* ───────── 画面 ───────── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--paper);visibility:hidden;opacity:0}
+.screen.on{visibility:visible;opacity:1}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pad{padding:0 18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 6px 18px;min-height:64px}
+.wordmark{font-family:var(--display);font-size:1.1rem;letter-spacing:.04em;line-height:1}
+.sizebtn{min-height:48px;min-width:48px;padding:0 14px;border:2px solid var(--blue);border-radius:999px;background:#fff;font-weight:700;font-size:.9rem;white-space:nowrap}
+.sizebtn b{font-family:var(--display);font-weight:400;margin-left:.3em}
+
+/* 押すと少しつぶれて、ばねで戻る */
+.press{transition:transform .42s var(--spring)}
+.press:active{transform:scale(.96,.9);transition-duration:.07s;transition-timing-function:ease-out}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:56px;padding:.4em 1.3em;border-radius:14px;border:2.5px solid var(--blue);background:#fff;font-weight:700;font-size:1rem;line-height:1.3;text-align:center}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.ghost{border-color:transparent;background:var(--bt)}
+.btn.wide{width:100%}
+
+/* ───────── 切手 ───────── */
+.stamp{display:block;filter:drop-shadow(0 0 .6px rgba(31,60,158,.55))}
+.slot{display:flex;align-items:center;justify-content:center;border:2px dashed rgba(31,60,158,.62);border-radius:4px;font-family:var(--display);color:var(--blue)}
+
+/* 航空便の縁 */
+.airmail{background:repeating-linear-gradient(-45deg,var(--red) 0 11px,#fff 11px 17px,var(--blue) 17px 28px,#fff 28px 34px);padding:7px;border-radius:6px}
+.airmail>.in{background:#fff;border-radius:2px;height:100%;position:relative}
+
+/* ───────── 1 入口 ───────── */
+#s-start{background:#fff}
+.frame-stripe{position:absolute;left:0;right:0;height:12px;background:repeating-linear-gradient(-45deg,var(--red) 0 11px,#fff 11px 17px,var(--blue) 17px 28px,#fff 28px 34px);z-index:3}
+.frame-stripe.t{top:0}.frame-stripe.b{bottom:0}
+.skip{position:absolute;top:22px;right:14px;z-index:5;min-height:48px;padding:0 18px;border-radius:999px;border:2px solid var(--blue);background:#fff;font-weight:700;font-size:.9rem}
+.start-in{padding:30px 22px 30px}
+.start-in .wordmark{font-size:1.25rem}
+.poster{position:relative;height:330px;margin:14px -22px 6px}
+.poster>*{position:absolute}
+.p-env{left:34px;top:62px;width:316px;height:200px;transform:rotate(-5deg)}
+.p-env .in{display:flex;flex-direction:column;justify-content:flex-end;padding:14px 18px}
+.p-addr{font-size:17px;font-weight:700;line-height:1.5;border-bottom:2px solid var(--blue);padding-bottom:2px;width:62%}
+.p-addr+.p-addr{margin-top:8px}
+.p-s1{right:46px;top:66px;transform:rotate(3deg)}
+.p-s2{left:-14px;top:18px;transform:rotate(-14deg)}
+.p-s3{left:18px;top:236px;transform:rotate(9deg)}
+.p-s4{right:-22px;top:228px;transform:rotate(-8deg)}
+.p-pm{left:80px;top:86px;width:210px;transform:rotate(-8deg)}
+.headline{font-family:var(--display);font-weight:400;font-size:1.72rem;line-height:1.38;margin:8px 0 18px;letter-spacing:.01em}
+.headline span{display:block;overflow:hidden}
+.headline span i{display:block;font-style:normal}
+.rates{margin:0 0 22px;border-top:2px solid var(--blue)}
+.rates div{display:grid;grid-template-columns:4.2em 1fr;gap:.6em;padding:.45em 0;border-bottom:1px solid rgba(31,60,158,.35);align-items:baseline}
+.rates dt{font-weight:700;color:var(--red)}
+.rates dd{margin:0}
+
+/* ───────── 2 ホーム ───────── */
+.hello{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 14px}
+.hello h1{margin:0;font-size:1.3rem;line-height:1.35}
+.today{position:relative;margin:0 0 30px}
+.today .airmail{border-radius:8px}
+.today .in{padding:18px 18px 18px;min-height:250px;display:flex;flex-direction:column}
+.today .label{color:var(--red);font-weight:700;font-size:1rem;margin:0 0 4px}
+.today h2{margin:0 98px 16px 0;font-size:1.45rem;line-height:1.4}
+.today .slotwrap{position:absolute;top:14px;right:14px;width:74px;height:88px}
+.today .slotwrap .slot{width:100%;height:100%}
+.today .slotwrap .ghost-stamp{opacity:.28}
+.today .slotwrap .pm-mini{position:absolute;left:-128px;top:40px;width:150px;pointer-events:none;transform:rotate(-8deg)}
+.today .go{margin-top:auto}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 8px}
+.sec-h h2{margin:0;font-size:1.15rem}
+.count{font-family:var(--display);font-size:1.4rem;line-height:1}
+.count small{font-family:var(--ui);font-weight:700;font-size:.9rem;margin-left:.2em}
+.strip{display:flex;gap:8px;align-items:center;padding:12px 12px;background:var(--bt2);border-top:3px solid rgba(31,60,158,.35);border-radius:4px;width:100%;border-left:0;border-right:0;border-bottom:0;text-align:left;overflow:hidden}
+.strip .more{margin-left:auto;font-weight:700;white-space:nowrap;padding-left:6px}
+.links{margin:26px 0 24px;border-top:2px solid var(--blue)}
+.links button{display:flex;align-items:center;gap:14px;width:100%;min-height:72px;padding:10px 4px;border:0;border-bottom:1px solid rgba(31,60,158,.35);background:none;text-align:left;font-weight:700;font-size:1.05rem;line-height:1.4}
+.links button svg{flex:none}
+.links button .chev{margin-left:auto}
+
+/* タブ */
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--blue);background:#fff;padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{min-height:66px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.84rem;font-weight:700;position:relative;line-height:1.2;padding:6px 2px}
+.tabs button[aria-current="page"]{color:var(--red)}
+.tabs button[aria-current="page"]::before{content:"";position:absolute;top:-2px;left:22%;right:22%;height:5px;background:var(--red);border-radius:0 0 3px 3px}
+
+/* ───────── 3 書く ───────── */
+.whead{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+.back{min-height:48px;min-width:48px;border:0;background:none;display:flex;align-items:center;gap:4px;font-weight:700;padding:0 6px}
+.whead .where{flex:1;font-weight:700;font-size:.95rem;line-height:1.3}
+.whead .tally{display:flex;align-items:center;gap:6px;font-family:var(--display);font-size:1.05rem}
+.wq{padding:6px 18px 0}
+.wq .label{color:var(--red);font-weight:700;margin:0}
+.wq h1{font-size:1.45rem;line-height:1.42;margin:2px 0 6px}
+.wq .hint{margin:0 0 14px}
+.binsen{margin:0 14px 24px;padding:16px 16px 18px 26px;background:#fff;border:2px solid var(--blue);border-radius:4px;position:relative;
+  background-image:linear-gradient(90deg,transparent 15px,rgba(200,37,27,.55) 15px 17px,transparent 17px),repeating-linear-gradient(180deg,transparent 0 calc(2.1em - 1px),rgba(31,60,158,.28) calc(2.1em - 1px) 2.1em)}
+.field{display:grid;gap:4px;margin:0 0 14px}
+.field>label,.field>.lab{font-weight:700}
+.field input[type=text],.field input[type=date],.field textarea{width:100%;min-height:56px;padding:12px 14px;border:2px solid var(--blue);border-radius:8px;background:#fff;font-size:1.05rem;line-height:1.5}
+.field textarea{min-height:120px;resize:vertical}
+.field ::placeholder{color:#5A6BAF;opacity:1}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:52px;padding:8px 14px;border:2px solid var(--blue);border-radius:999px;background:#fff;font-weight:700;display:inline-flex;align-items:center;gap:6px;text-align:left;line-height:1.35}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{background:var(--blue);color:#fff}
+.chip .mk{width:1.1em;height:1.1em;flex:none;border:2px solid currentColor;border-radius:50%;display:inline-grid;place-items:center}
+.chip[aria-pressed="true"] .mk::after,.chip[aria-checked="true"] .mk::after{content:"";width:.45em;height:.7em;border:solid currentColor;border-width:0 3px 3px 0;transform:translateY(-.08em) rotate(45deg)}
+.wfoot{display:grid;grid-template-columns:1fr 1fr 1.5fr;gap:8px;padding:10px 12px calc(12px + env(safe-area-inset-bottom));border-top:2px solid var(--blue);background:#fff}
+.wfoot .btn{padding:.3em .5em}
+.tally .num{display:inline-block}
+
+/* ───────── 4 封をする ───────── */
+#s-seal{background:#fff;overflow:hidden}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:safe center;padding:40px 18px 40px;overflow-y:auto}
+.env-wrap{perspective:900px;width:300px;height:240px;position:relative;flex:none;margin-top:110px}
+.env{position:absolute;left:0;top:44px;width:300px;height:196px;transform-style:preserve-3d}
+.env .back,.env .front{position:absolute;inset:0}
+.env .back .inside{position:absolute;inset:0;background:var(--bt);border:2px solid var(--blue);border-radius:6px}
+.letter{position:absolute;left:22px;right:22px;top:-150px;height:200px;background:#fff;border:2px solid var(--blue);border-radius:3px;padding:12px 14px 12px 22px;font-size:15px;line-height:1.6;overflow:hidden;
+  background-image:linear-gradient(90deg,transparent 11px,rgba(200,37,27,.55) 11px 13px,transparent 13px),repeating-linear-gradient(180deg,transparent 0 23px,rgba(31,60,158,.25) 23px 24px)}
+.letter b{display:block;font-size:15px}
+.letter p{margin:2px 0 0;font-size:16px}
+.pocket,.flap{position:absolute;left:0;top:0;width:300px;height:196px;pointer-events:none}
+.flap{transform-origin:50% 0;transform:scaleY(-1)}
+.env .front{display:none}
+.env .front .airmail{height:100%;border-radius:8px}
+.env .front .in{padding:16px 16px 14px;display:flex;flex-direction:column;justify-content:flex-end}
+.to{font-size:17px;line-height:1.45;font-weight:700;border-bottom:2px solid var(--blue);padding:4px 0 2px;width:100%;display:flex;justify-content:space-between;gap:6px}
+.to span{color:var(--red);font-size:16px;white-space:nowrap}
+.env .stamp-on{position:absolute;right:16px;top:14px;opacity:0}
+.env .pm-on{position:absolute;left:70px;top:30px;width:170px;opacity:0;pointer-events:none}
+.seal-done{text-align:center;margin-top:30px;opacity:0;max-width:340px}
+.seal-done h1{font-family:var(--display);font-weight:400;font-size:1.75rem;line-height:1.35;margin:0 0 6px}
+.seal-done p{margin:0 0 22px;font-size:1.05rem}
+.seal-done p b{font-family:var(--display);font-weight:400;font-size:1.3em;color:var(--red)}
+.seal-done .row{display:grid;gap:10px}
+
+/* ───────── 切手帳 ───────── */
+.page-h{padding:6px 18px 4px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.page-h h1{margin:0;font-size:1.4rem;line-height:1.3}
+.book{padding:6px 14px 30px}
+.cat{margin:16px 0 0}
+.cat-h{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;margin:0 4px 6px}
+.cat-h .c{font-family:var(--display);font-weight:400}
+.pocketrow{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:var(--bt2);border-top:3px solid rgba(31,60,158,.35);border-radius:4px}
+.pocketrow button{border:0;background:none;padding:0;min-width:48px;min-height:48px}
+.pocketrow .slot{width:50px;height:60px;font-size:18px;background:rgba(255,255,255,.55)}
+
+/* ───────── 5 誰に・いつ ───────── */
+.people{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:8px 14px 4px}
+.person{min-height:96px;border:2.5px solid var(--blue);border-radius:6px;background:#fff;text-align:left;padding:10px 12px;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+.person .zip{display:flex;gap:3px;margin-bottom:6px}
+.person .zip i{width:11px;height:15px;border:1.5px solid var(--red);display:block}
+.person b{font-size:1.05rem;line-height:1.3}
+.person small{font-size:.88rem;font-weight:700}
+.person[aria-pressed="true"]{border-color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.person[aria-pressed="true"]::after{content:"選択中";position:absolute;bottom:8px;right:8px;font-size:.85rem;font-weight:700;background:var(--red);color:#fff;padding:1px 8px;border-radius:999px}
+.who-line{padding:14px 18px 6px;margin:0;font-weight:700}
+.rows{margin:0 14px;border-top:2px solid var(--blue)}
+.rows button{display:flex;align-items:center;gap:12px;width:100%;min-height:68px;padding:8px 4px;border:0;border-bottom:1px solid rgba(31,60,158,.35);background:none;text-align:left;line-height:1.35}
+.rows .nmw{flex:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px}
+.rows .nm{font-weight:700}
+.when{display:inline-block;border:2px solid currentColor;border-radius:4px;padding:2px 8px;font-weight:700;font-size:.9rem;white-space:nowrap;transform:rotate(-2deg)}
+.when.now{color:var(--red)}
+.when.never{color:#3D4F8F;border-style:dashed}
+.sheet-btn{padding:20px 14px 30px}
+
+.overlay{position:absolute;inset:0;z-index:20;display:none}
+.overlay.on{display:block}
+.overlay .dim{position:absolute;inset:0;background:rgba(31,60,158,.38)}
+.bsheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:3px solid var(--blue);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:88%;overflow:auto}
+.bsheet h2{font-size:1.15rem;margin:0 0 12px;line-height:1.45}
+.opt{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:8px 14px;margin:0 0 8px;border:2px solid var(--blue);border-radius:10px;background:#fff;text-align:left;font-weight:700;line-height:1.35}
+.opt .mk{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--blue);flex:none;display:grid;place-items:center}
+.opt[aria-checked="true"]{background:var(--blue);color:#fff}
+.opt[aria-checked="true"] .mk{border-color:#fff}
+.opt[aria-checked="true"] .mk::after{content:"";width:8px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+
+/* 受け渡しシート見本 */
+.paper{margin:8px 14px 18px;border:2px solid var(--blue);background:#fff;padding:18px 16px 16px;position:relative}
+.paper::before{content:"";position:absolute;left:-2px;right:-2px;top:-10px;height:10px;background:radial-gradient(circle at 6px 10px,#fff 4px,transparent 4.5px) 0 0/12px 10px repeat-x}
+.paper h2{margin:0 0 2px;font-size:1.25rem}
+.paper .addr{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;border-bottom:2px solid var(--blue);padding-bottom:6px;margin-bottom:12px}
+.paper .addr b{font-size:1.15rem}
+.paper .box{border:2.5px solid var(--red);color:var(--red);font-weight:700;padding:2px 8px;transform:rotate(-3deg);font-size:.9rem;white-space:nowrap}
+.paper dl{margin:0}
+.paper dt{font-weight:700;margin:12px 0 2px;display:flex;align-items:center;gap:8px}
+.paper dd{margin:0;padding-left:.2em}
+.paper .fill{margin-top:16px;border-top:1px solid rgba(31,60,158,.4);padding-top:10px}
+.paper .fill span{display:block;border-bottom:1.5px dashed var(--blue);height:2em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 30px}
+
+/* ───────── 6 もしものとき（落ち着いて） ───────── */
+#s-moshimo .lead{margin:0 18px 14px}
+.dateform{margin:0 14px 10px;padding:14px;background:var(--bt);border-radius:8px}
+.dateform .btn{margin-top:4px}
+.group{margin:22px 14px 0}
+.group h2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:1.1rem;margin:0;padding:0 2px 6px;border-bottom:2px solid var(--blue)}
+.group h2 span{font-size:.95rem}
+.task{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:64px;padding:12px 2px;border:0;border-bottom:1px solid rgba(31,60,158,.3);background:none;text-align:left;line-height:1.5}
+.task .box{width:30px;height:30px;flex:none;border:2.5px solid var(--blue);border-radius:6px;display:grid;place-items:center;margin-top:1px}
+.task[aria-checked="true"] .box{background:var(--blue)}
+.task[aria-checked="true"] .box::after{content:"";width:8px;height:14px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+.task .t{font-weight:700;display:block}
+.task .w{display:block;font-size:.9rem}
+.task .done{display:none;font-weight:700;font-size:.85rem;border:1.5px solid currentColor;border-radius:4px;padding:0 6px;margin-left:6px}
+.task[aria-checked="true"] .done{display:inline-block}
+.readbtn{margin:24px 14px 34px}
+
+/* トースト */
+.toast{position:absolute;left:14px;right:14px;bottom:90px;z-index:30;background:var(--blue);color:#fff;padding:14px 16px;border-radius:10px;font-weight:700;display:none;line-height:1.5}
+.toast.on{display:block}
+
+@media (prefers-reduced-motion:reduce){
+  .press,.press:active{transition:none;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- 共通の定義：目打ち（切手のギザギザ）と網点 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <mask id="perf" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="120">
+      <rect width="100" height="120" fill="#fff"/>
+      <g id="perf-holes" fill="#000"></g>
+    </mask>
+    <pattern id="dots" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1.05" fill="#1F3C9E" opacity=".24"/>
+    </pattern>
+    <pattern id="dotsR" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1.05" fill="#C8251B" opacity=".26"/>
+    </pattern>
+  </defs>
+</svg>
+
+<div class="desk">
+  <div class="phone-slot" id="slot">
+    <div class="phone" id="phone">
+
+      <!-- 1 入口 -->
+      <section class="screen" id="s-start" aria-label="はじめる">
+        <div class="frame-stripe t" aria-hidden="true"></div>
+        <button class="skip press" id="skip" hidden>とばす</button>
+        <div class="scroll">
+          <div class="start-in">
+            <div class="wordmark">のこす手帖</div>
+            <div class="poster" aria-hidden="true">
+              <div class="p-s2" data-k="stamp"></div>
+              <div class="p-env airmail" data-k="env"><div class="in">
+                <div class="p-addr">山田 美紀 様</div>
+                <div class="p-addr">山田 健一 様</div>
+              </div></div>
+              <div class="p-s1" data-k="stamp"></div>
+              <div class="p-s3" data-k="stamp"></div>
+              <div class="p-s4" data-k="stamp"></div>
+              <div class="p-pm" data-k="pm"></div>
+            </div>
+            <h1 class="headline"><span><i>きょうの1問が、</i></span><span><i>家族への1通に。</i></span></h1>
+            <div class="after-head">
+              <dl class="rates">
+                <div><dt>料金</dt><dd>無料</dd></div>
+                <div><dt>登録</dt><dd>いりません</dd></div>
+                <div><dt>送信</dt><dd>しません。書いたことは、この端末の中だけ</dd></div>
+              </dl>
+              <button class="btn red wide press" data-go="home">はじめる</button>
+            </div>
+          </div>
+        </div>
+        <div class="frame-stripe b" aria-hidden="true"></div>
+      </section>
+
+      <!-- 2 ホーム -->
+      <section class="screen" id="s-home" aria-label="ホーム">
+        <div class="topbar">
+          <div class="wordmark">のこす手帖</div>
+          <button class="sizebtn press" data-size-toggle>文字<b>大</b></button>
+        </div>
+        <div class="scroll"><div class="pad">
+          <div class="hello">
+            <h1>山田 和子さん</h1>
+            <div id="home-pm" aria-hidden="true" style="width:120px"></div>
+          </div>
+          <div class="today" id="today"></div>
+          <div class="sec-h"><h2>切手帳</h2><div class="count" id="home-count"></div></div>
+          <button class="strip press" id="home-strip" data-go="stock" aria-label="切手帳を開く"></button>
+          <div class="links">
+            <button data-go="addr" class="press">
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="8" width="34" height="24" rx="2" fill="none" stroke="#1F3C9E" stroke-width="2.5"/><rect x="7" y="12" width="5" height="6" fill="none" stroke="#C8251B" stroke-width="1.6"/><rect x="13" y="12" width="5" height="6" fill="none" stroke="#C8251B" stroke-width="1.6"/><path d="M8 24h18M8 28h12" stroke="#1F3C9E" stroke-width="2.5"/></svg>
+              <span>誰に・いつ見せるか</span>
+              <svg class="chev" width="14" height="22" viewBox="0 0 14 22" aria-hidden="true"><path d="M3 3l8 8-8 8" fill="none" stroke="#1F3C9E" stroke-width="3"/></svg>
+            </button>
+            <button data-go="moshimo" class="press">
+              <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="7" width="30" height="28" rx="2" fill="none" stroke="#1F3C9E" stroke-width="2.5"/><path d="M5 14h30M12 4v6M28 4v6" stroke="#1F3C9E" stroke-width="2.5"/><path d="M11 22l3 3 6-6" fill="none" stroke="#1F3C9E" stroke-width="2.5"/></svg>
+              <span>もしものとき</span>
+              <svg class="chev" width="14" height="22" viewBox="0 0 14 22" aria-hidden="true"><path d="M3 3l8 8-8 8" fill="none" stroke="#1F3C9E" stroke-width="3"/></svg>
+            </button>
+          </div>
+        </div></div>
+        <nav class="tabs" data-tabs></nav>
+      </section>
+
+      <!-- 3 書く -->
+      <section class="screen" id="s-write" aria-label="1問ずつ書く">
+        <div class="whead">
+          <button class="back press" data-act="w-back" aria-label="戻る"><svg width="14" height="22" viewBox="0 0 14 22" aria-hidden="true"><path d="M11 3L3 11l8 8" fill="none" stroke="#1F3C9E" stroke-width="3"/></svg></button>
+          <div class="where" id="w-where"></div>
+          <div class="tally" id="w-tally" aria-live="polite"></div>
+        </div>
+        <div class="scroll" id="w-scroll">
+          <div class="wq">
+            <p class="label" id="w-label"></p>
+            <h1 id="w-title"></h1>
+            <p class="hint" id="w-hint"></p>
+          </div>
+          <div class="binsen" id="w-form"></div>
+        </div>
+        <div class="wfoot">
+          <button class="btn press" data-act="w-back">戻る</button>
+          <button class="btn ghost press" data-act="w-later">あとで</button>
+          <button class="btn red press" data-act="w-save" id="w-save">保存する</button>
+        </div>
+      </section>
+
+      <!-- 4 封をする -->
+      <section class="screen" id="s-seal" aria-label="保存しました">
+        <div class="frame-stripe t" aria-hidden="true"></div>
+        <div class="stage">
+          <div class="env-wrap" aria-hidden="true">
+            <div class="env" id="env">
+              <div class="back">
+                <div class="inside"></div>
+                <div class="letter" id="letter"></div>
+                <svg class="pocket" viewBox="0 0 300 196"><path d="M1.5 1.5 L150 104 L298.5 1.5 V194.5 H1.5 Z" fill="#fff" stroke="#1F3C9E" stroke-width="2.5" stroke-linejoin="round"/><path d="M1.5 194.5 L118 86 M298.5 194.5 L182 86" stroke="#1F3C9E" stroke-width="1.5" opacity=".5"/></svg>
+                <svg class="flap" id="flap" viewBox="0 0 300 196"><path d="M1.5 1.5 L150 116 L298.5 1.5 Z" fill="#fff" stroke="#1F3C9E" stroke-width="2.5" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="front">
+                <div class="airmail"><div class="in" id="env-to"></div></div>
+                <div class="stamp-on" id="stamp-on"></div>
+                <div class="pm-on" id="pm-on"></div>
+              </div>
+            </div>
+          </div>
+          <div class="seal-done" id="seal-done" role="status">
+            <h1>1通、のこしました。</h1>
+            <p>切手帳の <b id="seal-n">13</b> 枚目です。</p>
+            <div class="row">
+              <button class="btn red wide press" data-act="next-q">もう1問書く</button>
+              <button class="btn wide press" data-go="home">ホームへ</button>
+            </div>
+          </div>
+        </div>
+        <div class="frame-stripe b" aria-hidden="true"></div>
+      </section>
+
+      <!-- 切手帳 -->
+      <section class="screen" id="s-stock" aria-label="切手帳">
+        <div class="topbar">
+          <div class="wordmark">のこす手帖</div>
+          <button class="sizebtn press" data-size-toggle>文字<b>大</b></button>
+        </div>
+        <div class="page-h"><h1>切手帳</h1><div class="count" id="stock-count"></div></div>
+        <div class="scroll"><div class="book" id="book"></div></div>
+        <nav class="tabs" data-tabs></nav>
+      </section>
+
+      <!-- 5 誰に・いつ見せるか -->
+      <section class="screen" id="s-addr" aria-label="誰に・いつ見せるか">
+        <div class="topbar">
+          <div class="wordmark">のこす手帖</div>
+          <button class="sizebtn press" data-size-toggle>文字<b>大</b></button>
+        </div>
+        <div class="page-h"><h1>誰に・いつ見せるか</h1></div>
+        <div class="scroll">
+          <div class="people" id="people"></div>
+          <p class="who-line" id="who-line"></p>
+          <div class="rows" id="addr-rows"></div>
+          <div class="sheet-btn"><button class="btn blue wide press" data-go="sheet">受け渡しシートの見本</button></div>
+        </div>
+        <nav class="tabs" data-tabs></nav>
+      </section>
+
+      <!-- 5b 受け渡しシート -->
+      <section class="screen" id="s-sheet" aria-label="受け渡しシートの見本">
+        <div class="whead">
+          <button class="back press" data-go="addr" aria-label="戻る"><svg width="14" height="22" viewBox="0 0 14 22" aria-hidden="true"><path d="M11 3L3 11l8 8" fill="none" stroke="#1F3C9E" stroke-width="3"/></svg></button>
+          <div class="where">受け渡しシートの見本</div>
+        </div>
+        <div class="scroll">
+          <div class="paper" id="paper"></div>
+          <div class="two">
+            <button class="btn red press" data-act="print">印刷する</button>
+            <button class="btn press" data-act="file">ファイルで渡す</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 もしものとき -->
+      <section class="screen" id="s-moshimo" aria-label="もしものとき">
+        <div class="topbar">
+          <div class="wordmark">のこす手帖</div>
+          <button class="sizebtn press" data-size-toggle>文字<b>大</b></button>
+        </div>
+        <div class="page-h"><h1>もしものとき</h1></div>
+        <div class="scroll">
+          <p class="lead">和子さんの手帖を、書き換えずに読めます。</p>
+          <form class="dateform" id="dateform">
+            <div class="field">
+              <label for="death">亡くなった日</label>
+              <input type="date" id="death" required>
+            </div>
+            <button class="btn blue wide press" type="submit">期限を出す</button>
+          </form>
+          <div id="tasks" aria-live="polite"></div>
+          <div class="readbtn"><button class="btn wide press" data-act="read">手帖を読む</button></div>
+        </div>
+        <nav class="tabs" data-tabs></nav>
+      </section>
+
+      <div class="overlay" id="ov"><div class="dim" data-act="close-ov"></div><div class="bsheet" id="bsheet" role="dialog" aria-modal="true" aria-labelledby="bs-h"></div></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <aside class="panel" aria-label="試作の操作">
+    <h1>のこす手帖<br>試作B 封筒と切手</h1>
+    <div>
+      <h2 style="margin-bottom:8px">画面</h2>
+      <ol id="nav">
+        <li><button data-p="start"><span class="n">1</span>入口</button></li>
+        <li><button data-p="home"><span class="n">2</span>ホーム</button></li>
+        <li><button data-p="write"><span class="n">3</span>1問ずつ書く</button></li>
+        <li><button data-p="seal"><span class="n">4</span>保存した瞬間</button></li>
+        <li><button data-p="addr"><span class="n">5</span>誰に・いつ見せるか</button></li>
+        <li><button data-p="sheet"><span class="n">5</span>受け渡しシート</button></li>
+        <li><button data-p="moshimo"><span class="n">6</span>もしものとき</button></li>
+        <li><button data-p="stock"><span class="n">+</span>切手帳</button></li>
+      </ol>
+    </div>
+    <div>
+      <h2 style="margin-bottom:8px">文字の大きさ</h2>
+      <div class="seg"><button data-size="std" aria-pressed="true">標準</button><button data-size="lg" aria-pressed="false">大</button></div>
+    </div>
+    <button class="plain" id="replay">オープニングをもう一度</button>
+  </aside>
+</div>
+
+<script>
+(() => {
+'use strict';
+const R = '#C8251B', B = '#1F3C9E', BT = '#E6EBF7', RT = '#FBE3E0';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* 目打ちの穴 */
+(() => {
+  const g = $('#perf-holes'); let h = '';
+  for (let x = 4; x <= 96; x += 8) h += `<circle cx="${x}" cy="0" r="3.4"/><circle cx="${x}" cy="120" r="3.4"/>`;
+  for (let y = 4; y <= 116; y += 8) h += `<circle cx="0" cy="${y}" r="3.4"/><circle cx="100" cy="${y}" r="3.4"/>`;
+  g.innerHTML = h;
+})();
+
+/* ───────── 本物のデータ（app/js/questions.js より） ───────── */
+const CATS = [
+  { id: 'me', name: 'わたしのこと' }, { id: 'family', name: '家族・大切な人' }, { id: 'money', name: 'お金と財産' },
+  { id: 'insurance', name: '保険・年金' }, { id: 'medical', name: '医療・介護' }, { id: 'funeral', name: '葬儀・お墓' },
+  { id: 'will', name: '相続・遺言' }, { id: 'pet', name: 'ペット' }, { id: 'words', name: '家族へのことば' },
+];
+const catName = (id) => CATS.find((c) => c.id === id).name;
+const PEOPLE_OPTS = ['山田 美紀さん（長女）', '山田 健一さん（長男）'];
+const Q = [
+  ['me', 'fields', 'お名前と生年月日', '戸籍に書かれている漢字で書いておくと、手続きのときに確かめやすくなります。', ['氏名', '生年月日']],
+  ['me', 'text', '本籍地はどこですか', '相続では、生まれてからの戸籍をすべて集めます。都道府県と市区町村だけでも助かります。', '例：長野県松本市'],
+  ['me', 'radio', 'いまの暮らし方', '世帯主の変更届が必要かどうかの目安になります。', ['ひとりで暮らしている', '配偶者と暮らしている', '子どもの家族と暮らしている', '施設で暮らしている', 'その他']],
+  ['me', 'docs', '大切な書類の保管場所', '「どの引き出しか」だけで十分です。番号は書かなくてかまいません。', ['マイナンバーカード', '通帳・キャッシュカード', '年金証書・基礎年金番号通知書', '実印・印鑑登録証', '不動産の権利証（登記識別情報）', 'その他']],
+  ['me', 'textarea', '自分史のメモ（好きなもの・大事にしてきたこと）', '書きたいときに、少しずつ。ひとことでもかまいません。'],
+  ['family', 'fields', '連絡してほしい家族・大切な人', '名前と続柄だけでも登録できます。', ['お名前', '続柄']],
+  ['family', 'radio', '入院や急なときに、まず連絡してほしい人', '登録した人から選びます。', PEOPLE_OPTS],
+  ['family', 'radio', '亡くなったことを知らせてほしい範囲', '家族葬にしたい場合も、知らせる範囲を決めておくと家族が迷いません。', ['家族・親族だけ', '親しい友人まで', '年賀状をやりとりしている人まで', '家族に任せる']],
+  ['family', 'check', '知らせてほしい人の連絡先がわかるもの', '置き場所がわかれば、家族が連絡先を探せます。', ['年賀状・はがきの束', 'スマホの連絡先', '住所録・手帳', 'パソコンの住所録', '特にない']],
+  ['money', 'fields', '預貯金の口座', '「〇〇銀行に口座がある」だけで十分です。口座番号・暗証番号は書かないでください。', ['金融機関名', '支店名']],
+  ['money', 'fields', '株式・投資信託などの口座', '証券会社の名前だけでもかまいません。ネット証券は郵便物が届かないことがあるので特に大切です。', ['証券会社・金融機関']],
+  ['money', 'check', '持っている不動産', '固定資産税の通知書の保管場所を書いておくと、家族が調べやすくなります。', ['自宅（土地・建物）', '自宅（マンション）', '自宅以外の土地', '貸している建物', '持っていない']],
+  ['money', 'check', '借入れ・保証人', '借入れや保証人は、家族が「相続放棄」をするかの判断（3か月以内）に関わります。ない場合も「ない」と残しておきましょう。', ['ない', '住宅ローン', '自動車ローン', 'カードローン・キャッシング', '誰かの保証人になっている', 'その他']],
+  ['money', 'fields', 'クレジットカード', 'カード会社の名前だけで大丈夫です。カード番号は書かないでください。', ['カード会社・カード名']],
+  ['money', 'textarea', '貴金属・美術品・貸金庫など', 'あるかどうかと、置いてある場所だけで十分です。'],
+  ['insurance', 'fields', '入っている保険・共済', '保険会社の名前と、保険証券の場所がわかれば請求できます。生命保険の請求は3年以内が目安です。', ['保険会社・共済', '保険証券の保管場所']],
+  ['insurance', 'check', '受け取っている年金', '亡くなったあとは年金の受給を止める届けが必要です（厚生年金は10日以内、国民年金は14日以内）。', ['国民年金（老齢基礎年金）', '厚生年金', '共済年金', '企業年金・個人年金', 'まだ受け取っていない']],
+  ['insurance', 'text', '年金証書・基礎年金番号がわかる書類の保管場所', '番号そのものは書かず、置き場所だけを書きます。', '例：居間の書類箱'],
+  ['insurance', 'radio', '加入している健康保険', '亡くなったあと、資格喪失の届けを出す先がわかります。', ['国民健康保険', '後期高齢者医療制度', '勤め先の健康保険', '家族の扶養に入っている', 'わからない']],
+  ['insurance', 'radio', '介護保険の認定', '認定を受けていなくても、65歳以上なら介護保険証が届いています。', ['受けていない', '要支援', '要介護', 'わからない']],
+  ['medical', 'fields', 'かかりつけの医療機関', '病院の名前だけでも大丈夫です。', ['病院・診療所の名前', '電話番号']],
+  ['medical', 'textarea', '持病・飲んでいる薬', '「お薬手帳は台所の棚」のように、置き場所だけでも役に立ちます。'],
+  ['medical', 'text', 'アレルギー', '薬や食べ物のアレルギーがあれば。ない場合は「なし」と書いておきます。', ''],
+  ['medical', 'radio', '病名や余命を知らせてほしいか', '気持ちが変わったら、いつでも書き直せます。', ['病名も余命も知りたい', '病名だけ知りたい', '家族に任せる', '知りたくない', 'まだ決められない']],
+  ['medical', 'radio', '回復の見込みがないときの延命治療', '家族や医療者と話し合う「人生会議（ACP）」のきっかけにしてください。', ['できるかぎり続けてほしい', '苦痛をやわらげる治療だけにしてほしい', '家族と医師に任せる', 'まだ決められない']],
+  ['medical', 'radio', '臓器提供の意思', '正式な意思表示は、マイナンバーカード・運転免許証・資格確認書の意思表示欄、意思表示カード、インターネットでの登録でできます。', ['提供したい', '提供しない', 'カード・免許証などに記入済み', '決めていない']],
+  ['medical', 'radio', '介護が必要になったら、どこで過ごしたいか', '理想を書いておくだけで大丈夫です。', ['できるだけ自宅で', '施設で', '家族と相談して決めたい', '決めていない']],
+  ['medical', 'radio', '判断がむずかしくなったとき、医療の相談をしてほしい人', '病院から意思を聞かれたときに、代わりに話してほしい人です。', PEOPLE_OPTS],
+  ['funeral', 'radio', '希望する葬儀のかたち', '迷っていれば「家族に任せる」でかまいません。', ['一般葬（広く知らせる）', '家族葬（身内と親しい人だけ）', '一日葬（通夜をしない）', '火葬式・直葬（式をしない）', '家族に任せる']],
+  ['funeral', 'radio', '宗教・宗派', '仏教なら宗派も書いておくと、お寺との相談がスムーズです。', ['仏教', '神道', 'キリスト教', '無宗教', 'わからない']],
+  ['funeral', 'fields', '菩提寺・教会などの連絡先', '付き合いのあるお寺や教会があれば。名前だけでも大丈夫です。', ['お寺・教会などの名前', '電話番号']],
+  ['funeral', 'radio', '葬儀社の会員・互助会への加入', '会員証の場所も書いておくと、積立金を使い忘れずにすみます。', ['入っている', '入っていない', 'わからない']],
+  ['funeral', 'text', '遺影に使ってほしい写真', '「〇年の旅行の写真」「アルバムの最初のページ」のように書きます。', ''],
+  ['funeral', 'radio', 'お墓・納骨の希望', '墓じまいを考えている場合は「決めていない」にしてメモを残しても大丈夫です。', ['先祖代々のお墓に入る', '購入済みのお墓がある', '樹木葬・納骨堂', '散骨', '決めていない']],
+  ['will', 'radio', '遺言書はありますか', 'この手帖には法的効力がありません。財産の分け方は遺言書で決めます。', ['自筆で書いた遺言書がある', '公正証書遺言がある', 'これから書く予定', '書いていない']],
+  ['will', 'radio', '遺言書の保管方法', '法務局の「自筆証書遺言書保管制度」を使うと、家庭裁判所の検認が不要になります。', ['法務局の保管制度を利用している', '公証役場に原本がある（公正証書遺言）', '自宅に保管している', '専門家に預けている', '遺言書はない']],
+  ['will', 'text', '遺言書（または保管証・正本）の置き場所', '自宅で見つかった自筆の遺言書は、開封せずに家庭裁判所で検認を受けます。', ''],
+  ['will', 'text', '相談している専門家・遺言執行者', '事務所名だけでも大丈夫です。', '例：〇〇司法書士事務所'],
+  ['will', 'textarea', '財産について家族に伝えておきたい気持ち', 'ここに書いた内容に法的効力はありません。分け方を決めたい場合は遺言書を作ってください。'],
+  ['pet', 'fields', '一緒に暮らしている動物', '名前と種類だけでも登録できます。', ['名前', '種類']],
+  ['pet', 'radio', '世話をお願いしたい人', '引き受けてもらえるか、事前に話しておけると安心です。', PEOPLE_OPTS],
+  ['pet', 'textarea', 'ごはん・薬・くせなど', 'いつものごはんの銘柄や、苦手なことなど。'],
+  ['pet', 'radio', 'ペット保険', '', ['入っている', '入っていない', 'ペットはいない']],
+  ['words', 'textarea', '家族に伝えたい感謝', '特定の人に宛てた手紙は「手紙」の画面で書けます。'],
+  ['words', 'textarea', '覚えていてほしいこと', '家の言い伝え、得意料理の作り方、なんでも。'],
+  ['words', 'textarea', '形見分けの希望', '「時計は長男に」など。法的効力はないので、高価なものは遺言書に書いてください。'],
+].map(([cat, type, title, hint, extra], i) => ({ i, cat, type, title, hint, extra }));
+Q.forEach((q) => { q.n = Q.filter((x) => x.cat === q.cat && x.i <= q.i).length; });
+const TOTAL = Q.length; // 46
+
+/* 見本の答え（架空：山田 和子さん） */
+const SAMPLE = {
+  0: '山田 和子（やまだ かずこ）／昭和26年4月3日', 1: '長野県松本市', 2: 'ひとりで暮らしている', 4: '庭の山野草と、朝のラジオ体操。',
+  5: '山田 美紀（長女）、山田 健一（長男）', 6: '山田 美紀さん（長女）', 11: '自宅（土地・建物）', 12: 'ない',
+  15: 'ひまわり生命／証券は居間の書類箱', 20: '松本中央クリニック', 39: 'ミケ（三毛猫）', 43: '毎朝の電話、ありがとう。',
+};
+
+/* ───────── 状態 ───────── */
+const S = {
+  done: new Map(Object.entries(SAMPLE).map(([k, v]) => [Number(k), v])),
+  order: [0, 1, 5, 11, 2, 15, 39, 6, 20, 4, 12, 43], // 書いた順（最近が後ろ）
+  today: 3, todaySaved: false,
+  cur: 3, mode: 'today', trail: [],
+  person: 0,
+  stages: [
+    { me: 'now', family: 'now', money: 'incapacity', insurance: 'incapacity', medical: 'now', funeral: 'after', will: 'after', pet: 'now', words: 'after' },
+    { me: 'after', family: 'after', money: 'after', insurance: 'after', medical: 'incapacity', funeral: 'after', will: 'after', pet: 'never', words: 'after' },
+  ],
+  checked: new Set(),
+  screen: null,
+};
+const PEOPLE = [{ name: '山田 美紀', rel: '長女', short: '美紀' }, { name: '山田 健一', rel: '長男', short: '健一' }];
+const STAGES = [
+  { id: 'now', label: '今すぐ' }, { id: 'incapacity', label: '判断がむずかしくなったら' },
+  { id: 'after', label: '亡くなったあと' }, { id: 'never', label: '見せない' },
+];
+const stageLabel = (id) => STAGES.find((s) => s.id === id).label;
+
+/* ───────── 切手の図柄（カテゴリごとに描き分け） ───────── */
+const ART = {
+  me: { bg: BT, g: `<rect x="20" y="82" width="60" height="14" rx="2" fill="${R}"/><path d="M24 89h52" stroke="#fff" stroke-width="2"/>
+    <path d="M26 62L15 55M74 62l11-7" stroke="${B}" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="37" cy="64" r="11" fill="#fff" stroke="${B}" stroke-width="4"/><circle cx="63" cy="64" r="11" fill="#fff" stroke="${B}" stroke-width="4"/>
+    <path d="M47.5 62q2.5-4 5 0" stroke="${B}" stroke-width="3.5" fill="none"/>` },
+  family: { bg: RT, g: `<path d="M20 56h30l-3.5 32q-.6 5-5 5H28.5q-4.4 0-5-5z" fill="${B}"/><rect x="21" y="64" width="28" height="4" fill="#fff"/>
+    <path d="M54 66h27l-3 22q-.6 5-5 5H62q-4.4 0-5-5z" fill="${R}"/><circle cx="61" cy="76" r="2" fill="#fff"/><circle cx="68" cy="80" r="2" fill="#fff"/><circle cx="74" cy="75" r="2" fill="#fff"/>
+    <path d="M14 96h72" stroke="${B}" stroke-width="3"/>` },
+  money: { bg: '#fff', dots: 'dots', g: `<path d="M46 60v-5M54 60v-5" stroke="${B}" stroke-width="3"/><circle cx="45" cy="51" r="5" fill="${B}"/><circle cx="55" cy="51" r="5" fill="${B}"/>
+    <path d="M22 62h56q7 0 7 8v15q0 11-13 11H28q-13 0-13-11V70q0-8 7-8z" fill="${R}"/><path d="M20 62h60" stroke="${B}" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M24 76h52" stroke="#fff" stroke-width="2" stroke-dasharray="3 3"/>` },
+  insurance: { bg: RT, g: `<path d="M50 42v-7" stroke="${B}" stroke-width="3" stroke-linecap="round"/>
+    <path d="M14 72Q20 40 50 40T86 72Q78 66 68 72Q59 66 50 72Q41 66 32 72Q23 66 14 72z" fill="${B}"/>
+    <path d="M50 72v24q0 7-7 7t-7-7" stroke="${R}" stroke-width="4.5" fill="none" stroke-linecap="round"/>` },
+  medical: { bg: BT, g: `<g transform="rotate(-35 50 70)"><rect x="16" y="57" width="68" height="26" rx="13" fill="${R}"/><rect x="39" y="57" width="22" height="26" fill="#fff"/>
+    <g fill="${B}"><circle cx="44" cy="64" r="1.8"/><circle cx="56" cy="64" r="1.8"/><circle cx="50" cy="70" r="1.8"/><circle cx="44" cy="76" r="1.8"/><circle cx="56" cy="76" r="1.8"/></g></g>` },
+  funeral: { bg: '#fff', dots: 'dotsR', g: `<path d="M50 72Q47 58 53 44" stroke="${B}" stroke-width="3" fill="none"/><path d="M50 62q10-9 15-2q-8 7-15 2z" fill="${B}"/>
+    <path d="M44 74q-11 6-11 16q0 9 9 9h16q9 0 9-9q0-10-11-16v-6H44z" fill="${B}"/><path d="M38 84h24" stroke="#fff" stroke-width="2"/>
+    <circle cx="53" cy="40" r="9" fill="${R}"/><circle cx="53" cy="40" r="3.2" fill="#fff"/>` },
+  will: { bg: RT, g: `<circle cx="33" cy="62" r="12" fill="none" stroke="${B}" stroke-width="6"/><rect x="44" y="59" width="40" height="6" fill="${B}"/>
+    <rect x="70" y="64" width="5" height="11" fill="${B}"/><rect x="78" y="64" width="5" height="8" fill="${B}"/>
+    <path d="M33 74v14" stroke="${R}" stroke-width="3"/><path d="M33 86l-6 12h12z" fill="${R}"/>` },
+  pet: { bg: BT, g: `<path d="M66 95q15 0 15-12q0-8-7-8" stroke="${R}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M34 99q-6-25 9-35h14q15 10 9 35z" fill="${R}"/><path d="M38 47l2-15 10 10zM62 47l-2-15-10 10z" fill="${R}"/><circle cx="50" cy="53" r="13" fill="${R}"/>
+    <circle cx="45" cy="52" r="2.2" fill="#fff"/><circle cx="55" cy="52" r="2.2" fill="#fff"/><path d="M41 65h18" stroke="${B}" stroke-width="3.5"/>` },
+  words: { bg: '#fff', dots: 'dots', g: `<path d="M37 34h26l4 26q-6 16-17 30q-11-14-17-30z" fill="${B}"/><path d="M50 58v30" stroke="#fff" stroke-width="2.2"/><circle cx="50" cy="57" r="4" fill="#fff"/>
+    <path d="M14 101q8-7 16 0t16 0t16 0t16 0" stroke="${R}" stroke-width="3" fill="none" stroke-linecap="round"/>` },
+};
+function stampSVG(cat, n, w = 74) {
+  const a = ART[cat];
+  const h = Math.round(w * 1.2);
+  return `<svg class="stamp" width="${w}" height="${h}" viewBox="0 0 100 120" aria-hidden="true"><g mask="url(#perf)">
+    <rect width="100" height="120" fill="#fff"/>
+    <rect x="8" y="8" width="84" height="104" fill="${a.bg}"/>${a.dots ? `<rect x="8" y="8" width="84" height="104" fill="url(#${a.dots})"/>` : ''}
+    <rect x="8" y="8" width="84" height="104" fill="none" stroke="${B}" stroke-width="1.5"/>
+    ${a.g}
+    <text x="14" y="30" font-family="Dela Gothic One, sans-serif" font-size="19" fill="${B}">${n}</text></g></svg>`;
+}
+function postmarkSVG(w = 190, left = false, waves = true, date = pmDate()) {
+  const cx = left ? 141 : 55, wx = left ? 2 : 108;
+  const wave = [34, 50, 66, 82].map((y) => `M${wx} ${y}q11-8 22 0t22 0t22 0t20 0`).join('');
+  return `<svg width="${w}" height="${Math.round(w * 0.56)}" viewBox="0 0 196 110" aria-hidden="true" style="display:block">
+    <g fill="none" stroke="${B}" stroke-width="3" stroke-linecap="round">
+      <circle cx="${cx}" cy="55" r="47"/><path d="M${cx - 43} 41h86M${cx - 43} 69h86"/>
+      ${waves ? `<path class="wave" d="${wave}"/>` : ''}
+    </g>
+    <g fill="${B}" font-family="BIZ UDPGothic, sans-serif" font-weight="700" text-anchor="middle">
+      <text x="${cx}" y="33" font-size="15">のこす手帖</text><text x="${cx}" y="62" font-size="21" font-family="Dela Gothic One, sans-serif" font-weight="400">${date}</text><text x="${cx}" y="88" font-size="15">家族へ</text>
+    </g></svg>`;
+}
+function pmDate() {
+  const d = new Date(); const y = d.getFullYear() - 2018; // 令和
+  return `${y}.${d.getMonth() + 1}.${d.getDate()}`;
+}
+
+/* ───────── 画面の切り替え ───────── */
+const SCREENS = ['start', 'home', 'write', 'seal', 'stock', 'addr', 'sheet', 'moshimo'];
+const TAB_OF = { home: 'home', stock: 'stock', addr: 'addr', sheet: 'addr', moshimo: 'moshimo' };
+function go(name, opts = {}) {
+  if (!SCREENS.includes(name)) return;
+  const prev = S.screen && $('#s-' + S.screen);
+  const next = $('#s-' + name);
+  RENDER[name] && RENDER[name](opts);
+  hideToast();
+  if (prev && prev !== next) {
+    prev.classList.remove('on');
+  }
+  next.classList.add('on');
+  if (prev !== next) {
+    const kf = reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }];
+    next.animate(kf, { duration: 240, easing: 'cubic-bezier(.2,.7,.2,1)' });
+    const sc = $('.scroll', next); if (sc && !opts.keepScroll) sc.scrollTop = 0;
+  }
+  S.screen = name;
+  $$('#nav button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.p === name)));
+  $$('[data-tabs] button').forEach((b) => { if (b.dataset.go === TAB_OF[name]) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+}
+
+const TAB_ICONS = {
+  home: `<svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><rect x="2" y="4" width="26" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M2.5 5l12.5 9 12.5-9" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>`,
+  stock: `<svg width="26" height="28" viewBox="0 0 26 28" aria-hidden="true"><path d="M3 3h20v22H3z" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 2.2"/><rect x="7.5" y="7.5" width="11" height="13" fill="currentColor"/></svg>`,
+  addr: `<svg width="30" height="26" viewBox="0 0 30 26" aria-hidden="true"><rect x="2" y="3" width="26" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M7 12h16M7 17h11" stroke="currentColor" stroke-width="2.5"/></svg>`,
+  moshimo: `<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="5" width="22" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M3 11h22M9 2v5M19 2v5" stroke="currentColor" stroke-width="2.5"/></svg>`,
+};
+$$('[data-tabs]').forEach((t) => {
+  t.setAttribute('aria-label', '主な画面');
+  t.innerHTML = [['home', 'ホーム'], ['stock', '切手帳'], ['addr', '誰に・いつ'], ['moshimo', 'もしも']]
+    .map(([k, l]) => `<button class="press" data-go="${k}">${TAB_ICONS[k]}<span>${l}</span></button>`).join('');
+});
+
+/* ───────── 描画 ───────── */
+const RENDER = {
+  home() {
+    const t = Q[S.today];
+    const saved = S.todaySaved;
+    $('#home-pm').innerHTML = postmarkSVG(120);
+    $('#today').innerHTML = `<div class="airmail"><div class="in">
+        <p class="label">${saved ? '今日の1問は書きました' : '今日の1問'}</p>
+        <h2>${esc(t.title)}</h2>
+        <div class="slotwrap">${saved ? stampSVG(t.cat, t.n, 74) + `<div class="pm-mini">${postmarkSVG(150, true, false)}</div>` : `<div class="slot"><div class="ghost-stamp">${stampSVG(t.cat, t.n, 62)}</div></div>`}</div>
+        <div class="go">${saved
+          ? `<button class="btn blue wide press" data-act="next-q">もう1問書く</button>`
+          : `<button class="btn red wide press" data-act="write-today">書く</button>`}</div>
+      </div></div>`;
+    $('#home-count').innerHTML = `${S.done.size}<small>／${TOTAL}通</small>`;
+    const last = S.order.slice(-4);
+    $('#home-strip').innerHTML = last.map((i) => stampSVG(Q[i].cat, Q[i].n, 52)).join('') +
+      (saved ? '' : `<span class="slot" style="width:52px;height:62px;font-size:18px">${S.done.size + 1}</span>`) +
+      `<span class="more">ひらく</span>`;
+  },
+  write() { renderWrite(); },
+  seal() {},
+  stock() {
+    $('#stock-count').innerHTML = `${S.done.size}<small>／${TOTAL}通</small>`;
+    $('#book').innerHTML = CATS.map((c) => {
+      const qs = Q.filter((q) => q.cat === c.id);
+      const n = qs.filter((q) => S.done.has(q.i)).length;
+      return `<div class="cat"><div class="cat-h"><span>${c.name}</span><span class="c">${n}／${qs.length}</span></div>
+        <div class="pocketrow">${qs.map((q) => S.done.has(q.i)
+          ? `<button class="press" data-act="peek" data-q="${q.i}" aria-label="${esc(c.name)} ${q.n}、${esc(q.title)}、書きました">${stampSVG(q.cat, q.n, 50)}</button>`
+          : `<button class="press" data-act="open-q" data-q="${q.i}" aria-label="${esc(c.name)} ${q.n}、${esc(q.title)}、まだ書いていません"><span class="slot">${q.n}</span></button>`).join('')}</div></div>`;
+    }).join('');
+  },
+  addr() {
+    $('#people').innerHTML = PEOPLE.map((p, i) => `<button class="person press" data-act="person" data-i="${i}" aria-pressed="${i === S.person}">
+      <span class="zip" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>${p.name} 様</b><small>${p.rel}</small></button>`).join('');
+    const p = PEOPLE[S.person];
+    $('#who-line').textContent = `${p.short}さんに、いつ見せるか`;
+    $('#addr-rows').innerHTML = CATS.map((c) => {
+      const st = S.stages[S.person][c.id];
+      return `<button class="press" data-act="stage" data-c="${c.id}" aria-label="${c.name}：${stageLabel(st)}。変える">
+        ${stampSVG(c.id, Q.filter((q) => q.cat === c.id).length, 36)}<span class="nmw"><span class="nm">${c.name}</span><span class="when ${st}">${stageLabel(st)}</span></span></button>`;
+    }).join('');
+  },
+  sheet() {
+    const p = PEOPLE[S.person]; const st = S.stages[S.person];
+    const by = (id) => CATS.filter((c) => st[c.id] === id).map((c) => c.name).join('、') || 'なし';
+    $('#paper').innerHTML = `<h2>受け渡しシート</h2>
+      <div class="addr"><div><b>${p.name} 様</b>（${p.rel}）へ<br>山田 和子より</div><span class="box">配達日指定</span></div>
+      <dl>${STAGES.map((s) => `<dt><span class="when ${s.id}">${s.label}</span></dt><dd>${by(s.id)}</dd>`).join('')}</dl>
+      <div class="fill">手帖のファイルの置き場所<span></span></div>
+      <div class="fill">渡した日<span></span></div>`;
+  },
+  moshimo() {
+    const inp = $('#death');
+    if (!inp.value) { const d = new Date(); d.setDate(d.getDate() - 3); inp.value = keyOf(d); }
+  },
+  start() {},
+};
+
+/* 書く画面 */
+function renderWrite() {
+  const q = Q[S.cur];
+  const qs = Q.filter((x) => x.cat === q.cat);
+  $('#w-where').textContent = `${catName(q.cat)}　${q.n}／${qs.length}問目`;
+  $('#w-tally').innerHTML = `<span class="num" id="w-num">${S.done.size}</span><small style="font-family:var(--ui);font-weight:700;font-size:.85rem">通</small>`;
+  $('#w-label').textContent = S.mode === 'today' ? '今日の1問' : '';
+  $('#w-label').hidden = S.mode !== 'today';
+  $('#w-title').textContent = q.title;
+  $('#w-hint').textContent = q.hint; $('#w-hint').hidden = !q.hint;
+  const save = $('#w-save'); save.textContent = S.mode === 'today' ? '保存する' : '次へ';
+  const f = $('#w-form');
+  const id = (k) => `f${q.i}_${k}`;
+  let h = '';
+  if (q.type === 'docs') {
+    h = `<div class="field"><span class="lab" id="${id('l')}">書類</span><div class="chips" role="radiogroup" aria-labelledby="${id('l')}">${q.extra.map((o, k) => `<button type="button" class="chip press" role="radio" aria-checked="${k === 1}" data-chip="one"><span class="mk" aria-hidden="true"></span>${o}</button>`).join('')}</div></div>
+      <div class="field"><label for="${id('p')}">保管場所</label><input type="text" id="${id('p')}" value="居間のたんす 右上の引き出し" placeholder="例：居間のたんす 右上の引き出し"></div>`;
+  } else if (q.type === 'fields') {
+    h = q.extra.map((l, k) => `<div class="field"><label for="${id(k)}">${l}</label><input type="text" id="${id(k)}"></div>`).join('');
+  } else if (q.type === 'text') {
+    h = `<div class="field"><label for="${id('t')}">答え</label><input type="text" id="${id('t')}" placeholder="${esc(q.extra || '')}"></div>`;
+  } else if (q.type === 'textarea') {
+    h = `<div class="field"><label for="${id('t')}">答え</label><textarea id="${id('t')}"></textarea></div>`;
+  } else {
+    const one = q.type === 'radio';
+    h = `<div class="field"><span class="lab" id="${id('l')}">${one ? 'ひとつ選ぶ' : 'いくつでも選ぶ'}</span><div class="chips" role="${one ? 'radiogroup' : 'group'}" aria-labelledby="${id('l')}">${q.extra.map((o) => `<button type="button" class="chip press" role="${one ? 'radio' : 'checkbox'}" aria-checked="false" data-chip="${one ? 'one' : 'many'}"><span class="mk" aria-hidden="true"></span>${esc(o)}</button>`).join('')}</div></div>`;
+  }
+  f.innerHTML = h;
+}
+function readAnswer() {
+  const f = $('#w-form');
+  const picked = $$('.chip[aria-checked="true"]', f).map((c) => c.textContent.trim());
+  const vals = $$('input,textarea', f).map((e) => e.value.trim()).filter(Boolean);
+  return [...picked, ...vals].join('／');
+}
+function nextUnanswered(from) {
+  for (let k = 1; k <= TOTAL; k++) { const i = (from + k) % TOTAL; if (!S.done.has(i)) return i; }
+  return -1;
+}
+
+/* ───────── いちばん大事な瞬間：封をして、切手を貼り、消印を押す ───────── */
+let sealing = false;
+async function seal(answer) {
+  if (sealing) return; sealing = true;
+  const q = Q[S.today];
+  const first = !S.todaySaved;
+  if (first) { S.done.set(q.i, answer || SAMPLE[q.i] || ''); S.order.push(q.i); S.todaySaved = true; }
+  const st0 = S.stages[0][q.cat], st1 = S.stages[1][q.cat];
+  // 部品をそろえる
+  $('#letter').innerHTML = `<b>${esc(q.title)}</b><p>${esc(S.done.get(q.i) || '')}</p>`;
+  $('#env-to').innerHTML = `<div class="to">山田 美紀 様<span>${stageLabel(st0)}</span></div><div class="to" style="margin-top:6px">山田 健一 様<span>${stageLabel(st1)}</span></div>`;
+  $('#stamp-on').innerHTML = stampSVG(q.cat, q.n, 70);
+  $('#pm-on').innerHTML = postmarkSVG(170, true);
+  $('#seal-n').textContent = S.done.size;
+  const env = $('#env'), back = $('.back', env), front = $('.front', env), letter = $('#letter'), flap = $('#flap');
+  const stamp = $('#stamp-on'), pm = $('#pm-on'), done = $('#seal-done');
+  [env, letter, flap, stamp, pm, done, back, front].forEach((e) => e.getAnimations().forEach((a) => a.cancel()));
+  back.style.display = ''; front.style.display = 'none';
+  letter.style.transform = ''; flap.style.transform = ''; stamp.style.opacity = '0'; pm.style.opacity = '0'; done.style.opacity = '0';
+  go('seal');
+  const A = (el, kf, o) => el.animate(kf, { fill: 'forwards', ...o }).finished;
+
+  if (reduce.matches) {
+    // 移動・拡大はせず、フェードだけで「封をした」状態へ
+    letter.style.transform = 'translateY(150px)'; flap.style.transform = 'scaleY(1)';
+    await A(back, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 500 });
+    back.style.display = 'none'; front.style.display = 'block';
+    await A(front, [{ opacity: 0 }, { opacity: 1 }], { duration: 350 });
+    stamp.style.opacity = '1'; await A(stamp, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+    pm.style.opacity = '1'; await A(pm, [{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+    await A(done, [{ opacity: 0 }, { opacity: 1 }], { duration: 350 });
+    done.style.opacity = '1'; sealing = false; $('button', done).focus({ preventScroll: true }); return;
+  }
+  await new Promise((r) => setTimeout(r, 180));
+  // 1 便箋が封筒に入る
+  await A(letter, [{ transform: 'translateY(0)' }, { transform: 'translateY(150px)' }], { duration: 560, easing: 'cubic-bezier(.55,0,.25,1)' });
+  // 2 ふたが閉じる
+  await A(flap, [{ transform: 'scaleY(-1)' }, { transform: 'scaleY(1)' }], { duration: 340, easing: 'cubic-bezier(.6,0,.3,1)' });
+  // 3 封筒を返して表へ
+  await A(env, [{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }], { duration: 200, easing: 'ease-in' });
+  back.style.display = 'none'; front.style.display = 'block';
+  await A(env, [{ transform: 'rotateY(-90deg)' }, { transform: 'rotateY(0)' }], { duration: 260, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  // 4 切手を貼る
+  stamp.style.opacity = '1';
+  await A(stamp, [
+    { transform: 'translate(-40px,-70px) scale(1.8) rotate(-16deg)', opacity: 0 },
+    { opacity: 1, offset: .35 },
+    { transform: 'translate(0,0) scale(.9) rotate(-1deg)', offset: .72 },
+    { transform: 'translate(0,0) scale(1) rotate(-3deg)', opacity: 1 }], { duration: 440, easing: 'cubic-bezier(.3,.6,.3,1)' });
+  // 5 消印を「ポン」
+  pm.style.opacity = '1';
+  if (navigator.vibrate) { try { navigator.vibrate(18); } catch (e) {} }
+  const waves = $$('.wave', pm);
+  waves.forEach((w) => { w.style.strokeDasharray = '400'; });
+  await Promise.all([
+    A(pm, [{ transform: 'scale(1.45)', opacity: 0 }, { transform: 'scale(.95)', opacity: 1, offset: .5 }, { transform: 'scale(1)', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.5,0,.3,1)' }),
+    A(env, [{ transform: 'scale(1)' }, { transform: 'scale(1.03,.94)', offset: .35 }, { transform: 'scale(1)' }], { duration: 380, delay: 120, easing: 'ease-out' }),
+    ...waves.map((w) => A(w, [{ strokeDashoffset: 400 }, { strokeDashoffset: 0 }], { duration: 420, delay: 90, easing: 'ease-out' })),
+  ]);
+  // 6 ひとこと
+  await A(done, [{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.2,.7,.2,1)' });
+  done.style.opacity = '1';
+  sealing = false;
+  $('button', done).focus({ preventScroll: true });
+}
+
+/* 続けて書くときの「次へ」：数が1つ増えて、ばねで弾む */
+function saveAndNext() {
+  const q = Q[S.cur];
+  if (!S.done.has(q.i)) { S.done.set(q.i, readAnswer() || '（見本）'); S.order.push(q.i); }
+  const num = $('#w-num'); if (num) num.textContent = S.done.size;
+  if (!reduce.matches) $('#w-tally').animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)', offset: .3 }, { transform: 'scale(1)' }], { duration: 420, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+  const nx = nextUnanswered(q.i);
+  if (nx < 0) { toast('46問すべて書きました。'); go('home'); return; }
+  S.trail.push(S.cur); S.cur = nx;
+  setTimeout(() => {
+    renderWrite();
+    const sc = $('#w-scroll'); sc.scrollTop = 0;
+    sc.animate(reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'translateX(24px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
+  }, reduce.matches ? 0 : 160);
+}
+
+/* ───────── もしものとき：期限（app/js/logic.js と同じ数え方） ───────── */
+const pad = (n) => String(n).padStart(2, '0');
+const keyOf = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parse = (k) => { const [y, m, d] = k.split('-').map(Number); return { y, m, d }; };
+const fromUTC = (t) => { const d = new Date(t); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; };
+const addDays = (k, n) => { const { y, m, d } = parse(k); return fromUTC(Date.UTC(y, m - 1, d + n)); };
+function monthsDeadline(k, n) {
+  const s = addDays(k, 1); const { y, m, d } = parse(s);
+  const last = new Date(Date.UTC(y, m - 1 + n + 1, 0)).getUTCDate();
+  if (d > last) return fromUTC(Date.UTC(y, m - 1 + n, last));
+  return addDays(fromUTC(Date.UTC(y, m - 1 + n, d)), -1);
+}
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+const ja = (k) => { const { y, m, d } = parse(k); return `${y}年${m}月${d}日（${WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}）`; };
+const GROUPS = [
+  { label: '7日以内', due: (k) => addDays(k, 6), tasks: [['死亡届を出す', '市区町村役場。葬儀社が代わりに出してくれることもあります'], ['火葬許可を申請する', '市区町村役場（死亡届と同時に）']] },
+  { label: '14日以内', due: (k) => addDays(k, 13), tasks: [['年金の受給を止める', `年金事務所。厚生年金は10日以内（${'{p10}'}まで）`], ['健康保険の資格喪失の手続きをする', '市区町村役場'], ['世帯主の変更届を出す', '市区町村役場。残る世帯員が2人以上のとき']] },
+  { label: '3か月以内', due: (k) => monthsDeadline(k, 3), tasks: [['相続放棄・限定承認をするか決める', '家庭裁判所']] },
+  { label: '4か月以内', due: (k) => monthsDeadline(k, 4), tasks: [['準確定申告をする', '亡くなった方の住所地の税務署']] },
+  { label: '10か月以内', due: (k) => monthsDeadline(k, 10), tasks: [['相続税の申告と納付をする（必要な場合）', '亡くなった方の住所地の税務署']] },
+];
+function renderTasks(k) {
+  const p10 = ja(addDays(k, 9)).replace(/^\d+年/, '');
+  $('#tasks').innerHTML = GROUPS.map((g, gi) => `<section class="group"><h2>${g.label}<span>${ja(g.due(k))}まで</span></h2>
+    ${g.tasks.map(([t, w], ti) => { const id = `${gi}-${ti}`; return `<button class="task" role="checkbox" aria-checked="${S.checked.has(id)}" data-act="task" data-id="${id}">
+      <span class="box" aria-hidden="true"></span><span><span class="t">${t}<span class="done">済み</span></span><span class="w">${w.replace('{p10}', p10)}</span></span></button>`; }).join('')}</section>`).join('');
+}
+
+/* ───────── 入口のオープニング（3秒以内・初回だけ・とばせる） ───────── */
+let opening = [];
+function buildPoster() {
+  const p = $('#s-start .poster');
+  $('.p-s1', p).innerHTML = stampSVG('words', 3, 86);
+  $('.p-s2', p).innerHTML = stampSVG('money', 1, 92);
+  $('.p-s3', p).innerHTML = stampSVG('pet', 1, 80);
+  $('.p-s4', p).innerHTML = stampSVG('insurance', 2, 84);
+  $('.p-pm', p).innerHTML = postmarkSVG(210, true);
+}
+function playOpening() {
+  go('start');
+  const scr = $('#s-start'); const skip = $('#skip');
+  opening.forEach((a) => a.cancel()); opening = [];
+  skip.hidden = false;
+  const add = (el, kf, o) => { const a = el.animate(kf, { fill: 'backwards', easing: 'cubic-bezier(.2,.8,.2,1)', ...o }); opening.push(a); return a; };
+  const env = $('.p-env', scr), pm = $('.p-pm', scr);
+  const heads = $$('.headline i', scr), after = $('.after-head', scr), stripes = $$('.frame-stripe', scr);
+  const drops = [['.p-s2', 300, -14], ['.p-s1', 520, 3], ['.p-s3', 740, 9], ['.p-s4', 940, -8]];
+  if (reduce.matches) {
+    add(env, [{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
+    drops.forEach(([s, t]) => add($(s, scr), [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: t }));
+    add(pm, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 1150 });
+    heads.forEach((h, i) => add(h, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 1450 + i * 150 }));
+    add(after, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 2000 });
+  } else {
+    stripes.forEach((s, i) => add(s, [{ transform: `translateX(${i ? '' : '-'}100%)` }, { transform: 'none' }], { duration: 420 }));
+    add(env, [{ transform: 'translate(120px,260px) rotate(18deg)', opacity: 0 }, { opacity: 1, offset: .3 }, { transform: 'rotate(-5deg)', opacity: 1 }], { duration: 560, delay: 60, easing: 'cubic-bezier(.2,.9,.25,1.08)' });
+    drops.forEach(([s, t, r]) => add($(s, scr), [
+      { transform: `scale(1.9) rotate(${r - 20}deg)`, opacity: 0 }, { opacity: 1, offset: .3 },
+      { transform: `scale(.9) rotate(${r}deg)`, offset: .7 }, { transform: `scale(1) rotate(${r}deg)`, opacity: 1 }], { duration: 340, delay: t, easing: 'cubic-bezier(.4,0,.3,1)' }));
+    add(pm, [{ transform: 'scale(1.5) rotate(-8deg)', opacity: 0 }, { transform: 'scale(.95) rotate(-8deg)', opacity: 1, offset: .5 }, { transform: 'scale(1) rotate(-8deg)', opacity: 1 }], { duration: 300, delay: 1180, easing: 'cubic-bezier(.5,0,.3,1)' });
+    add($('.poster', scr), [{ transform: 'none' }, { transform: 'translateY(4px) scaleY(.985)', offset: .4 }, { transform: 'none' }], { duration: 300, delay: 1260, fill: 'none' });
+    heads.forEach((h, i) => add(h, [{ transform: 'translateY(105%)' }, { transform: 'none' }], { duration: 480, delay: 1480 + i * 140 }));
+    add(after, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 2080 });
+  }
+  const end = () => { skip.hidden = true; try { localStorage.setItem('nokosu-post-opened', '1'); } catch (e) {} };
+  Promise.all(opening.map((a) => a.finished)).then(end, () => {});
+  if (opening.length) opening[opening.length - 1].finished.then(end, () => {});
+}
+function skipOpening() { opening.forEach((a) => { try { a.finish(); } catch (e) {} }); $('#skip').hidden = true; try { localStorage.setItem('nokosu-post-opened', '1'); } catch (e) {} }
+
+/* ───────── 下から出るシート（時期を選ぶ） ───────── */
+let lastFocus = null;
+function openStageSheet(cat) {
+  lastFocus = document.activeElement;
+  const p = PEOPLE[S.person]; const cur = S.stages[S.person][cat];
+  $('#bsheet').innerHTML = `<h2 id="bs-h">${catName(cat)}を、${p.short}さんに<br>いつ見せますか</h2>
+    <div role="radiogroup" aria-labelledby="bs-h">${STAGES.map((s) => `<button class="opt press" role="radio" aria-checked="${s.id === cur}" data-act="pick-stage" data-c="${cat}" data-s="${s.id}"><span class="mk" aria-hidden="true"></span>${s.label}</button>`).join('')}</div>
+    <button class="btn wide press" data-act="close-ov" style="margin-top:4px">閉じる</button>`;
+  const ov = $('#ov'); ov.classList.add('on');
+  $('.bsheet', ov).animate(reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  $('.dim', ov).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250 });
+  $('.opt[aria-checked="true"]', ov)?.focus();
+}
+function closeSheet() { $('#ov').classList.remove('on'); lastFocus && lastFocus.focus && lastFocus.focus(); }
+
+function peek(i) {
+  lastFocus = document.activeElement;
+  const q = Q[i];
+  $('#bsheet').innerHTML = `<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:10px">${stampSVG(q.cat, q.n, 64)}<div><p style="margin:0;font-weight:700">${catName(q.cat)}</p><h2 id="bs-h" style="margin:0">${esc(q.title)}</h2></div></div>
+    <div class="binsen" style="margin:0 0 14px"><p style="margin:0">${esc(S.done.get(i) || '')}</p></div>
+    <button class="btn wide press" data-act="close-ov">閉じる</button>`;
+  $('#ov').classList.add('on');
+  $('#bsheet').animate(reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  $('#bsheet .btn').focus();
+}
+
+/* トースト（3秒で消える） */
+let toastT = 0;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(hideToast, 3000); }
+function hideToast() { $('#toast').classList.remove('on'); }
+
+/* 文字の大きさ */
+function setSize(sz) {
+  document.documentElement.dataset.size = sz;
+  $$('.panel .seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === sz)));
+  $$('[data-size-toggle]').forEach((b) => { b.innerHTML = sz === 'lg' ? '文字<b>標準</b>' : '文字<b>大</b>'; b.setAttribute('aria-label', sz === 'lg' ? '文字を標準にする' : '文字を大きくする'); });
+  try { localStorage.setItem('nokosu-post-size', sz); } catch (e) {}
+}
+
+/* ───────── 操作 ───────── */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, [data-act]');
+  if (!t) return;
+  if (t.dataset.go) { go(t.dataset.go); return; }
+  if (t.hasAttribute('data-size-toggle')) { setSize(document.documentElement.dataset.size === 'lg' ? 'std' : 'lg'); return; }
+  if (t.dataset.size) { setSize(t.dataset.size); return; }
+  if (t.dataset.chip) {
+    const grp = t.parentElement;
+    if (t.dataset.chip === 'one') $$('.chip', grp).forEach((c) => c.setAttribute('aria-checked', String(c === t)));
+    else t.setAttribute('aria-checked', String(t.getAttribute('aria-checked') !== 'true'));
+    return;
+  }
+  if (t.dataset.p) { panelGo(t.dataset.p); return; }
+  switch (t.dataset.act) {
+    case 'write-today': S.mode = 'today'; S.cur = S.today; S.trail = []; go('write'); break;
+    case 'next-q': { const nx = nextUnanswered(S.today); if (nx < 0) { go('home'); break; } S.mode = 'more'; S.trail = []; S.cur = nx; go('write'); break; }
+    case 'open-q': S.mode = Number(t.dataset.q) === S.today && !S.todaySaved ? 'today' : 'more'; S.cur = Number(t.dataset.q); S.trail = []; go('write'); break;
+    case 'w-save':
+      if (S.mode === 'today') seal(readAnswer()); else saveAndNext();
+      break;
+    case 'w-back':
+      if (S.trail.length) { S.cur = S.trail.pop(); renderWrite(); } else go('home');
+      break;
+    case 'w-later': toast('この問いは、あとで書く問いに入れました。'); setTimeout(() => go(S.mode === 'today' ? 'home' : 'home'), 900); break;
+    case 'person': S.person = Number(t.dataset.i); RENDER.addr(); $$('.person')[S.person].focus(); break;
+    case 'stage': openStageSheet(t.dataset.c); break;
+    case 'pick-stage': {
+      S.stages[S.person][t.dataset.c] = t.dataset.s;
+      $$('.opt', $('#bsheet')).forEach((o) => o.setAttribute('aria-checked', String(o === t)));
+      RENDER.addr();
+      setTimeout(() => { closeSheet(); const r = $(`#addr-rows [data-c="${t.dataset.c}"]`); r && r.focus(); }, reduce.matches ? 150 : 260);
+      break;
+    }
+    case 'close-ov': closeSheet(); break;
+    case 'peek': peek(Number(t.dataset.q)); break;
+    case 'print': toast('見本なので、印刷はしません。'); break;
+    case 'file': toast('見本なので、ファイルは作りません。'); break;
+    case 'read': toast('見本なので、手帖はここまでです。'); break;
+    case 'task': { const id = t.dataset.id; const on = !S.checked.has(id); on ? S.checked.add(id) : S.checked.delete(id); t.setAttribute('aria-checked', String(on)); break; }
+  }
+});
+$('#skip').addEventListener('click', (e) => { e.stopPropagation(); skipOpening(); });
+$('#s-start').addEventListener('pointerdown', (e) => { if (!$('#skip').hidden && !e.target.closest('#skip')) skipOpening(); });
+$('#replay').addEventListener('click', () => playOpening());
+$('#dateform').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#death').value; if (v) renderTasks(v); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#ov').classList.contains('on')) closeSheet(); });
+
+function panelGo(p) {
+  if (p === 'start') { buildPoster(); go('start'); return; }
+  if (p === 'write') { S.mode = S.todaySaved ? 'more' : 'today'; S.cur = S.todaySaved ? nextUnanswered(S.today) : S.today; S.trail = []; go('write'); return; }
+  if (p === 'seal') { S.mode = 'today'; S.cur = S.today; seal(S.done.get(S.today) || '通帳・キャッシュカード／居間のたんす 右上の引き出し'); return; }
+  go(p);
+}
+
+/* PC：スマホの枠を画面の高さに合わせて縮める */
+function fit() {
+  const slot = $('#slot'), ph = $('#phone');
+  if (innerWidth <= 760) { slot.style.width = ''; slot.style.height = ''; ph.style.transform = ''; return; }
+  const s = Math.min(1, (innerHeight - 40) / 850);
+  slot.style.width = 390 * s + 'px'; slot.style.height = 844 * s + 'px';
+  ph.style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+/* はじめ */
+let sz = 'std'; try { sz = localStorage.getItem('nokosu-post-size') || 'std'; } catch (e) {}
+const qs = new URLSearchParams(location.search);
+if (qs.get('size')) sz = qs.get('size');
+setSize(sz);
+buildPoster();
+const startAt = qs.get('s');
+let seen = false; try { seen = localStorage.getItem('nokosu-post-opened') === '1'; } catch (e) {}
+if (startAt) { if (startAt === 'opening') playOpening(); else panelGo(startAt); }
+else if (!seen) playOpening();
+else go('start');
+if (qs.get('task') && startAt === 'moshimo') { $('#dateform').requestSubmit(); }
+})();
+</script>
+</body>
+</html>

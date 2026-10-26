@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>のこす手帖　デザイン3案</title>
+<style>
+  :root { --bg: #ffffff; --ink: #121715; --sub: #56605c; --line: #dde2e0; --face: #f3f5f4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif; }
+  header { max-width: 1320px; margin: 0 auto; padding: 32px 20px 8px; }
+  h1 { margin: 0 0 4px; font-size: 1.9rem; font-weight: 800; letter-spacing: 0.01em; }
+  header p { margin: 0; color: var(--sub); }
+  main { max-width: 1320px; margin: 0 auto; padding: 16px 20px 48px; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 392px), 1fr)); justify-items: center; }
+  article { display: grid; gap: 12px; align-content: start; width: min(392px, 100%); }
+  h2 { margin: 0; font-size: 1.3rem; font-weight: 700; }
+  /* スマホと同じ幅（390×844）で見せる */
+  .frame { width: 392px; max-width: 100%; height: 846px; border: 1px solid var(--line); border-radius: 28px; overflow: hidden; background: var(--face); }
+  .frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+  a.open { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 700; text-decoration: none; justify-self: start; }
+  a.open:focus-visible { outline: 3px solid #087a5e; outline-offset: 3px; }
+  .round { max-width: 1320px; margin: 24px auto 0; padding: 0 20px; }
+  .round-title { margin: 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 1.15rem; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>のこす手帖　デザイン案</h1>
+  <p>どれも押して最後まで進めます。大きく見るときは「ひらく」から。</p>
+</header>
+<section class="round">
+  <h2 class="round-title">2回目　シックな3案（友だち・趣味の仲間への画面だけ明るく）</h2>
+</section>
+<main>
+  <article>
+    <h2>① 上質な手帖</h2>
+    <div class="frame"><iframe src="chic-techo.html" title="① 上質な手帖 の試作" loading="lazy"></iframe></div>
+    <a class="open" href="chic-techo.html">ひらく</a>
+  </article>
+  <article>
+    <h2>② 美術館の図録</h2>
+    <div class="frame"><iframe src="chic-gallery.html" title="② 美術館の図録 の試作" loading="lazy"></iframe></div>
+    <a class="open" href="chic-gallery.html">ひらく</a>
+  </article>
+  <article>
+    <h2>③ 和紙と墨</h2>
+    <div class="frame"><iframe src="chic-washi.html" title="③ 和紙と墨 の試作" loading="lazy"></iframe></div>
+    <a class="open" href="chic-washi.html">ひらく</a>
+  </article>
+</main>
+<section class="round">
+  <h2 class="round-title">1回目　ポップな3案</h2>
+</section>
+<main>
+  <article>
+    <h2>A　付箋とスタンプ</h2>
+    <div class="frame"><iframe src="sticker.html" title="A 付箋とスタンプ の試作" loading="lazy"></iframe></div>
+    <a class="open" href="sticker.html">ひらく</a>
+  </article>
+  <article>
+    <h2>B　封筒と切手</h2>
+    <div class="frame"><iframe src="post.html" title="B 封筒と切手 の試作" loading="lazy"></iframe></div>
+    <a class="open" href="post.html">ひらく</a>
+  </article>
+  <article>
+    <h2>C　大きな文字の広告</h2>
+    <div class="frame"><iframe src="poster.html" title="C 大きな文字の広告 の試作" loading="lazy"></iframe></div>
+    <a class="open" href="poster.html">ひらく</a>
+  </article>
+</main>
+</body>
+</html>

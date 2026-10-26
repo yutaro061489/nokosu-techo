@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="ja" data-size="m">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFFFFF">
+<title>のこす手帖　図録</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600;700&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* ───────── 色と書体 ─────────
+   シックな世界（展覧会の図録）
+     紙   #FFFFFF … 図録のページ
+     壁   #EFEEEA … 展示室の壁。保存した答えを掛ける面と、PC の机
+     墨   #1E1D1B … 文字・罫・主ボタン（白地 16.6:1）
+     薄墨 #57554F … 補足の文字だけ（白地 7.4:1、壁地 6.4:1）
+     蘇芳 #7A2B38 … 差し色1色。出品番号・今日の印・選んだ人（白地 9.6:1）
+     罫   #C8C6BF … 飾りの細線だけ（文字には使わない）
+     淡蘇芳 #F4EAE8 … 紙の色。保存した答えを刷った紙・選んだ選択肢の地（墨の文字 14.6:1）
+   明るい世界（ミュージアムショップのポストカード売り場）
+     2色だけ：レモン #FFE066（売り場の地）と 朱 #E8452C（カードに刷った版。文字には使わない）
+     カードは白い紙に墨と朱の2色刷り。角を1か所切り落とし、紙の厚みの線と、朱の版のずれで印刷物に見せる
+     文字はどれも墨（レモン地 14.3:1、白地 16.6:1）
+   書体
+     見出し・問い・答え … しっぽり明朝 B1（太め 600/700。本文には使わない）
+     本文・ボタン・入力 … BIZ UDPゴシック（UD 書体）
+     明るい世界の見出し … Zen 丸ゴシック 900
+*/
+:root{
+  --kami:#FFFFFF; --kabe:#EFEEEA; --sumi:#1E1D1B; --usu:#57554F; --suou:#7A2B38; --kei:#C8C6BF;
+  --lemon:#FFE066; --shu:#E8452C; --toki:#F4EAE8;
+  --min:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --got:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+  --maru:"Zen Maru Gothic","BIZ UDPGothic","Hiragino Maru Gothic ProN",sans-serif;
+  --dk:1;               /* 大きな文字の倍率（文字「大」で上がる） */
+  --slow:cubic-bezier(.25,.1,.25,1);
+}
+html{font-size:17px;-webkit-text-size-adjust:100%}
+html[data-size="l"]{font-size:21px;--dk:1.14}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--kabe);color:var(--sumi);font-family:var(--got);line-height:1.7;line-break:strict;overflow-wrap:anywhere;font-feature-settings:"palt" 0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--suou);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ───────── 置き場所：スマホは全面、PC は枠＋横の切り替え ───────── */
+.panel{display:none}
+.app{position:fixed;inset:0;overflow:hidden;background:var(--kami);container-type:inline-size;isolation:isolate;perspective:1600px}
+@media (min-width:820px) and (min-height:560px){
+  .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:72px;padding:20px}
+  .device-wrap{flex:none;width:calc(406px * var(--sc,1));height:calc(860px * var(--sc,1))}
+  .device{width:406px;height:860px;padding:8px;background:var(--sumi);border-radius:52px;transform:scale(var(--sc,1));transform-origin:0 0}
+  .app{position:relative;inset:auto;width:390px;height:844px;border-radius:44px}
+  .panel{display:block;width:280px;font-size:16px;line-height:1.55}
+}
+.p-title{font-family:var(--min);font-weight:700;font-size:28px;line-height:1.3;margin:0}
+.p-sub{margin:4px 0 26px;font-size:16px;color:var(--usu)}
+.p-h{font-weight:700;margin:22px 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+.p-h i{display:inline-block;width:14px;height:14px;border:1.5px solid var(--sumi)}
+.p-h.chic i{background:var(--kami)}
+.p-h.bright i{background:var(--lemon)}
+.p-nav{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.p-nav button{width:100%;min-height:48px;display:flex;align-items:center;gap:12px;padding:6px 12px;border:1.5px solid var(--usu);background:var(--kami);text-align:left;font-size:16px;border-radius:2px}
+.p-nav.bright button{background:var(--lemon);border-color:var(--sumi);border-radius:12px}
+.p-nav button b{font-family:var(--min);min-width:1em}
+.p-nav button[aria-current="page"]{border-color:var(--sumi);box-shadow:inset 4px 0 0 var(--sumi),inset -4px 0 0 var(--sumi);font-weight:700}
+.p-check{display:flex;align-items:center;gap:10px;min-height:48px;cursor:pointer;margin-top:10px}
+.p-check input{width:24px;height:24px;accent-color:var(--sumi)}
+
+/* ───────── 画面の骨組み ───────── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--kami);color:var(--sumi);backface-visibility:hidden;transform-origin:0 50%}
+.screen[hidden],.layer[hidden]{display:none}
+.bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:72px;padding:max(12px,env(safe-area-inset-top)) 5cqi 8px 7cqi;border-bottom:1px solid var(--kei)}
+.logo{font-family:var(--min);font-weight:700;font-size:1.12rem;line-height:1.2;white-space:nowrap;letter-spacing:.06em}
+.bar .btn{flex:none;white-space:nowrap}
+.layer .bar .logo{white-space:normal;min-width:0}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 7cqi 32px;overscroll-behavior:contain}
+
+/* 文字の大きさ */
+.size{display:flex;align-items:center;gap:4px}
+.size-l{font-size:.9rem;margin-right:4px;color:var(--usu)}
+.size button{min-width:50px;min-height:48px;padding:0 8px;border:1.5px solid var(--sumi);background:var(--kami);font-size:.9rem;line-height:1.2;border-radius:2px}
+.size button[aria-pressed="true"]{background:var(--sumi);color:var(--kami);font-weight:700}
+
+/* ボタン（シック）：角はほとんど立てる。押すと色が反転するだけ */
+.btn{min-height:56px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:.4em 1.1em;border:1.5px solid var(--sumi);border-radius:2px;background:var(--kami);color:var(--sumi);font-size:1.05rem;line-height:1.35;text-align:center;transition:background-color .2s,color .2s}
+.btn.primary{background:var(--sumi);color:var(--kami);font-weight:700}
+.btn:active{background:var(--usu);color:var(--kami)}
+.btn.plain{border-color:transparent;padding-inline:.4em;min-height:48px;text-decoration:underline;text-underline-offset:.25em;text-decoration-thickness:1px;background:transparent}
+.btn.plain:active{background:var(--kabe);color:var(--sumi)}
+
+/* 見出し（明朝は見出しにだけ） */
+.h-min{font-family:var(--min);font-weight:700;margin:0;line-height:1.45;letter-spacing:.04em;word-break:auto-phrase;text-wrap:pretty}
+.h-page{font-size:calc(7.4cqi * var(--dk));margin-top:30px}
+.lede{margin:0;color:var(--usu);font-size:.95rem}
+
+/* 下のタブ */
+.tabs{flex:none;display:grid;grid-template-columns:repeat(3,1fr);background:var(--kami);border-top:1px solid var(--sumi);padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{min-height:62px;border:0;background:none;font-size:min(.95rem,4.6cqi);line-height:1.25;padding:6px 2px 4px;border-top:4px solid transparent}
+.tabs button[aria-current="page"]{border-top-color:var(--sumi);font-weight:700}
+.tabs button:focus-visible{outline-offset:-6px}
+
+/* 現れ方：シックな世界はゆっくり現れて止まるだけ（移動しない） */
+.screen.enter{animation:fadeIn .45s var(--slow) both}
+.screen.enter .rise{animation:fadeIn .7s var(--slow) both;animation-delay:calc(120ms + var(--i,0) * 110ms)}
+
+/* ───────── 1. 入口 ───────── */
+.scr-start .bar{border-bottom:0}
+.scr-start .scroll{display:flex;flex-direction:column;padding-top:4px}
+.title-wall{flex:1 0 auto;display:flex;justify-content:flex-end;padding:3cqi 2cqi 6cqi 0;min-height:56cqi}
+.tate{writing-mode:vertical-rl;font-family:var(--min);font-weight:700;font-size:11.4cqw;line-height:1.65;letter-spacing:.14em;margin:0;white-space:nowrap}
+.tate span{display:block}
+.tate span:nth-child(2){padding-top:2.2em}
+.start-foot{display:grid;gap:12px}
+.start-logo{font-family:var(--min);font-weight:700;font-size:1.5rem;letter-spacing:.1em;margin:0;line-height:1.3}
+.fact{margin:0 0 6px;font-size:.95rem;color:var(--usu)}
+.start-foot .btn.primary{min-height:62px;font-size:1.15rem}
+.skip{display:none}
+.scr-start.playing .skip{display:inline-flex}
+.scr-start.playing .bar .size{display:none}
+.scr-start.playing .tate span{animation:fadeIn 1s var(--slow) both}
+.scr-start.playing .tate span:nth-child(1){animation-delay:.25s}
+.scr-start.playing .tate span:nth-child(2){animation-delay:1.05s}
+.scr-start.playing .start-foot{animation:fadeIn .6s var(--slow) 2.1s both}
+
+/* ───────── 2. ホーム ───────── */
+.today{margin-top:26px;padding:22px 0 26px;border-top:1.5px solid var(--sumi);border-bottom:1px solid var(--kei);position:relative}
+.today-k{margin:0 0 10px;font-size:.95rem;display:flex;gap:1em;align-items:baseline}
+.today-k b{color:var(--suou)}
+.today-q{font-size:calc(8.2cqi * var(--dk));line-height:1.45;margin:0 0 6px}
+.today-c{margin:0 0 22px;color:var(--usu);font-size:.95rem}
+.today .btn{width:100%;min-height:60px;font-size:1.1rem}
+.mokuji{margin-top:30px}
+.mk-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;border-bottom:1.5px solid var(--sumi);padding-bottom:6px}
+.mk-head h2{font-size:1.3rem}
+.mk-head p{margin:0;font-size:.95rem}
+.mk-head p b{font-size:1.15rem}
+.mk{list-style:none;margin:0;padding:0}
+.mk li{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;padding:11px 0;border-bottom:1px solid var(--kei)}
+.mk .nm{font-size:1rem}
+.mk .ct{font-size:1rem;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.mk .ct b{font-weight:700}
+.mk .pl{grid-column:1 / -1;display:flex;gap:4px}
+.mk .pl i{width:12px;height:12px;border:1.5px solid var(--sumi)}
+.mk .pl i.on{background:var(--sumi)}
+.mk .pl i.new{background:var(--suou);border-color:var(--suou)}
+/* ショップへの入口：ここだけ色がのぞく */
+.shop-in{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:16px;width:100%;margin-top:34px;padding:18px 16px;border:1.5px solid var(--sumi);background:var(--kabe);text-align:left;min-height:96px;border-radius:2px}
+.shop-in .mini{position:relative;width:86px;height:64px}
+.shop-in .mini i{position:absolute;width:46px;height:62px;border:1.5px solid var(--sumi);border-radius:0}
+.shop-in .mini i:nth-child(1){left:0;top:2px;background:var(--lemon);transform:rotate(-8deg)}
+.shop-in .mini i:nth-child(2){left:20px;top:0;background:var(--kami);transform:rotate(2deg)}
+.shop-in .mini i:nth-child(3){left:40px;top:3px;background:var(--shu);transform:rotate(9deg)}
+.shop-in b{display:block;font-size:1.05rem;line-height:1.4}
+.shop-in .sub{display:block;font-size:.95rem;color:var(--usu)}
+.shop-in > span{display:block}
+
+/* ───────── 3. 1問ずつ書く ───────── */
+.w-pos{font-size:.95rem;text-align:right;line-height:1.35}
+.w-pos b{font-family:var(--min);font-weight:700;font-size:1.15rem;color:var(--suou)}
+.w-q{font-size:calc(8.2cqi * var(--dk));margin-top:30px;line-height:1.45}
+.field{margin-top:28px;display:grid;gap:10px}
+.lbl{font-weight:700;font-size:1rem;line-height:1.5;padding:0;margin:0}
+.input{width:100%;min-height:64px;padding:12px 14px;border:1.5px solid var(--sumi);border-radius:2px;background:var(--kami);font-size:1.1rem;line-height:1.55;resize:vertical}
+.input::placeholder{color:#6E6C66}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:0 16px;border:1.5px solid var(--usu);border-radius:2px;background:var(--kami);font-size:.95rem}
+.chip:active{border-color:var(--sumi)}
+.hint{margin:0;font-size:.95rem;color:var(--usu)}
+.err{margin:0;font-weight:700;color:var(--suou);padding:4px 0}
+.err::before{content:"";display:inline-block;width:.7em;height:.7em;background:var(--suou);margin-right:.5em;vertical-align:.05em}
+fieldset.opts{border:0;margin:28px 0 0;padding:0;display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:14px;min-height:60px;padding:10px 14px;border:1.5px solid var(--usu);border-radius:2px;background:var(--kami);line-height:1.45;cursor:pointer}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .box{flex:none;width:24px;height:24px;border:1.5px solid var(--sumi);border-radius:50%;display:grid;place-items:center}
+.opt:has(input:checked){border-color:var(--sumi);box-shadow:inset 0 0 0 1px var(--sumi);background:var(--toki);font-weight:700}
+.opt:has(input:checked) .box::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--sumi)}
+.opt:has(input:focus-visible){outline:3px solid var(--suou);outline-offset:3px}
+.actions{flex:none;display:flex;gap:10px;padding:12px 7cqi calc(12px + env(safe-area-inset-bottom));background:var(--kami);border-top:1px solid var(--sumi)}
+.actions .btn{flex:1}
+.actions .btn.primary{flex:1.6}
+
+/* ───────── 4. 保存した瞬間：答えが額に収まる ───────── */
+.scr-saved{background:var(--kabe)}
+.scr-saved .bar{border-bottom-color:transparent}
+.scr-saved .scroll{display:flex;flex-direction:column;justify-content:center;padding-top:8px}
+.frame{position:relative;margin:0 2cqi;background:var(--kami);padding:6cqi 5cqi;border:1px solid var(--kei)}
+.frame .work{background:var(--toki);border:1.5px solid var(--suou);padding:8cqi 4cqi;overflow:hidden}
+.work{position:relative;margin:0;font-family:var(--min);font-weight:700;text-align:center;line-height:1.6;font-size:var(--f);letter-spacing:.08em;min-height:3.2em;display:flex;flex-direction:column;align-items:center;justify-content:center;word-break:auto-phrase}
+.work span{display:block}
+.work.tight span{white-space:nowrap}
+.caption{margin:22px 2cqi 0 auto;width:fit-content;max-width:78%;font-size:.95rem;line-height:1.55}
+.caption .no{font-family:var(--min);font-weight:700;font-size:1.3rem;color:var(--suou);display:block;line-height:1.3}
+.caption .ti{font-weight:700;display:block;font-size:1rem;word-break:auto-phrase}
+.caption span{display:block}
+.s-msg{font-size:calc(7.6cqi * var(--dk));margin-top:30px}
+/* 演出の順番：額 → 答えが詰まって収まる → ラベル → 見出し → ボタン */
+.scr-saved.enter .frame{animation:frameIn .9s var(--slow) .15s both}
+.scr-saved.enter .work{animation:fadeIn .9s var(--slow) .45s both}
+.scr-saved.enter .work.tight{animation:settle 1.1s var(--slow) .45s both}
+.scr-saved.enter .caption{animation:fadeIn .7s var(--slow) 1.35s both}
+.scr-saved.enter .s-msg{animation:fadeIn .7s var(--slow) 1.7s both}
+.scr-saved.enter .actions{animation:showAct .5s var(--slow) 2.05s both}
+.scr-saved .actions{background:var(--kabe);flex-wrap:wrap}
+.scr-saved .actions .btn{flex:1 1 9em;padding-inline:.6em}
+
+/* ───────── 5. 誰に・いつ見せるか ───────── */
+.people{display:grid;grid-template-columns:1fr 1fr;margin-top:24px;border:1.5px solid var(--sumi)}
+.person{min-height:72px;border:0;background:var(--kami);font-size:1.1rem;line-height:1.3;padding:8px;border-radius:0}
+.person + .person{border-left:1.5px solid var(--sumi)}
+.person small{display:block;font-size:.9rem;color:var(--usu)}
+.person[aria-pressed="true"]{background:var(--sumi);color:var(--kami);font-weight:700}
+.person[aria-pressed="true"] small{color:var(--kami)}
+.rows{list-style:none;margin:18px 0 0;padding:0}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;padding:8px 0;border-bottom:1px solid var(--kei)}
+.row .cat{font-size:1rem}
+.stage-btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:6px 12px;border:1.5px solid var(--sumi);border-radius:2px;background:var(--kami);font-size:.95rem;line-height:1.3;text-align:left;margin-left:auto}
+.shp{flex:none;width:20px;height:20px}
+.s-note{margin:20px 0 12px;font-size:.95rem}
+.wide{width:100%}
+
+/* ───────── 6. もしものとき（動かさない） ───────── */
+.scr-mosimo.enter{animation:fadeIn .25s ease both}
+.date{width:100%;min-height:60px;padding:8px 14px;border:1.5px solid var(--sumi);border-radius:2px;background:var(--kami);font-size:1.15rem;font-weight:700}
+.m-read{margin-top:14px;width:100%}
+.pg{margin-top:28px}
+.pg-h{margin:0;font-family:var(--min);font-weight:700;font-size:1.2rem;padding-bottom:6px;border-bottom:1.5px solid var(--sumi)}
+.pg ul{list-style:none;margin:0;padding:0}
+.proc{border-bottom:1px solid var(--kei);padding:8px 0}
+.proc label{display:grid;grid-template-columns:48px 1fr;gap:2px 8px;align-items:start;cursor:pointer;min-height:48px}
+.proc input{position:absolute;opacity:0;pointer-events:none}
+.ck{grid-row:1 / span 3;width:28px;height:28px;margin:10px;border:1.5px solid var(--sumi);border-radius:2px;display:grid;place-items:center}
+.proc input:checked + .ck{background:var(--sumi)}
+.proc input:checked + .ck::after{content:"";width:12px;height:7px;border:2.5px solid var(--kami);border-top:0;border-right:0;transform:translate(0,-2px) rotate(-45deg)}
+.proc input:focus-visible + .ck{outline:3px solid var(--suou);outline-offset:3px}
+.p-t{line-height:1.5;padding-top:10px}
+.p-w{grid-column:2;font-size:.9rem;color:var(--usu)}
+.p-d{grid-column:2;font-weight:700;font-size:1rem}
+.p-d .left{font-weight:400;margin-left:.6em}
+.proc.done .p-t{text-decoration:line-through;text-decoration-thickness:1.5px}
+.proc.done .p-t::after{content:"（済）";text-decoration:none;display:inline-block;margin-left:.3em}
+.m-empty{margin:22px 0 0;padding:14px 16px;background:var(--kabe)}
+.m-note{margin:24px 0 0;font-size:.9rem;color:var(--usu)}
+
+/* ───────── 重なる面（シック） ───────── */
+.layer{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(30,29,27,.5)}
+.pick{background:var(--kami);border-top:1.5px solid var(--sumi);padding:22px 7cqi calc(18px + env(safe-area-inset-bottom));display:grid;gap:8px;animation:fadeIn .3s var(--slow) both}
+.pick-t{margin:0 0 6px;font-weight:700;font-size:1.05rem}
+.pick-o{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 14px;border:1.5px solid var(--usu);border-radius:2px;background:var(--kami);text-align:left;line-height:1.35}
+.pick-o[aria-pressed="true"]{border-color:var(--sumi);box-shadow:inset 0 0 0 1px var(--sumi);background:var(--toki);font-weight:700}
+.pick-o[aria-pressed="true"]::after{content:"選んでいます";margin-left:auto;font-size:.9rem;font-weight:400}
+.layer.full{justify-content:flex-start;background:var(--kabe);animation:fadeIn .35s var(--slow) both}
+.layer.full .bar{background:var(--kabe)}
+.layer.full .scroll{padding-top:20px}
+.sheet{background:var(--kami);padding:26px 7cqi 22px;margin:0 0 20px;border:1px solid var(--kei)}
+.sh-k{margin:0;font-size:.95rem;color:var(--usu)}
+.sh-name{font-family:var(--min);font-weight:700;font-size:calc(7cqi * var(--dk));line-height:1.4;margin:6px 0 2px}
+.sh-from{margin:0 0 6px;font-size:.95rem}
+.sh-s h3{display:flex;align-items:center;gap:8px;margin:18px 0 4px;font-size:1rem;border-bottom:1px solid var(--sumi);padding-bottom:4px}
+.sh-s ul{margin:0;padding:0;list-style:none}
+.sh-s li{line-height:1.6;padding:3px 0}
+.sh-foot{margin:18px 0 0;font-size:.9rem;color:var(--usu)}
+.ho-act{display:grid;gap:10px}
+.book-h{font-size:calc(7cqi * var(--dk));margin:0}
+.book-note{margin:6px 0 0;font-size:.95rem;color:var(--usu)}
+.book-list{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:14px}
+.book-list li{background:var(--kami);padding:16px 18px;border:1px solid var(--kei)}
+.book-list .ans{font-family:var(--min);font-weight:700;font-size:1.2rem;line-height:1.55;margin:0 0 8px}
+.book-list .lab{margin:0;font-size:.95rem;line-height:1.5}
+.book-list .lab b{color:var(--suou);font-family:var(--min);margin-right:.5em}
+.toast{position:absolute;left:7cqi;right:7cqi;bottom:84px;z-index:40;margin:0;padding:12px 16px;background:var(--sumi);color:var(--kami);text-align:center;opacity:0;pointer-events:none;transition:opacity .3s;border-radius:2px}
+.toast.show{opacity:1}
+
+/* ───────── 7. 明るい世界：ミュージアムショップのポストカード売り場 ───────── */
+.w-bright{background:var(--lemon)}
+.w-bright .bar{border-bottom:2px solid var(--sumi);background:var(--lemon)}
+.w-bright .logo{font-family:var(--maru);font-weight:900;letter-spacing:.02em}
+.w-bright .btn,.w-bright .size button,.w-bright .chip,.w-bright .input{border-radius:14px;border-width:2px}
+.w-bright .btn{font-weight:700;background:var(--kami)}
+.w-bright .btn.primary{background:var(--sumi);color:var(--lemon)}
+.w-bright .btn.plain{background:transparent}
+.w-bright .size button[aria-pressed="true"]{color:var(--lemon)}
+.w-bright :focus-visible{outline-color:var(--sumi)}
+.h-maru{font-family:var(--maru);font-weight:900;margin:0;line-height:1.35;letter-spacing:.01em;word-break:auto-phrase}
+.f-h{font-size:calc(8.2cqi * var(--dk));margin-top:24px}
+.rack{display:grid;grid-template-columns:1fr 1fr;gap:22px 16px;margin-top:24px;padding:0 4px}
+.pcw{transform:rotate(var(--r,0deg));filter:drop-shadow(0 2px 0 var(--kami)) drop-shadow(0 1.5px 0 var(--sumi))}
+.pcw:has(:focus-visible){outline:3px solid var(--sumi);outline-offset:5px}
+.pc{--cut:18px;display:block;width:100%;padding:2px;border:0;border-radius:0;background:var(--sumi);text-align:left;line-height:1.35;clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,0 100%);transition:transform .2s ease-out}
+.pc:focus-visible{outline:none}
+.pc:active{transform:scale(.97)}
+.pc-in{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:172px;padding:14px 12px 12px;background:var(--kami);clip-path:polygon(0 0,calc(100% - var(--cut) + .8px) 0,100% calc(var(--cut) - .8px),100% 100%,0 100%)}
+.pc .gl{width:52px;height:52px;margin-bottom:auto}
+.pc .nm{font-family:var(--maru);font-weight:900;font-size:min(1.15rem,5.4cqi);margin-top:10px;white-space:nowrap}
+.pc .rl{font-size:.9rem}
+.pc .st{font-size:.9rem;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.pc .st i{width:12px;height:12px;border:2px solid var(--sumi);border-radius:50%}
+.pc .st i.on{background:var(--sumi)}
+.pc-add{display:flex;flex-direction:column;width:100%;min-height:176px;gap:6px;border:2px dashed var(--sumi);border-radius:0;background:transparent;align-items:center;justify-content:center;font-weight:700;font-size:1rem}
+.pc-add .plus{width:40px;height:40px}
+.f-note{margin:20px 0 0;font-size:.95rem}
+.w-bright .actions{background:var(--lemon);border-top:2px solid var(--sumi)}
+.fe-rel{display:inline-block;margin-top:10px;padding:4px 12px;border:2px solid var(--sumi);border-radius:999px;background:var(--kami);font-size:.95rem;font-weight:700}
+.w-bright .lbl{font-size:1.05rem}
+.w-bright .chip{background:var(--kami);border-color:var(--sumi)}
+.screen.w-bright.enter{animation:popIn .4s cubic-bezier(.3,1.3,.5,1) both}
+/* カードの見本 */
+.layer.cardview{justify-content:flex-start;background:var(--lemon);animation:fadeIn .3s both}
+.layer.cardview .bar{background:var(--lemon);border-bottom:2px solid var(--sumi)}
+.cv-wrap{perspective:1200px;margin-top:22px}
+.card{position:relative;display:grid;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.card.back{transform:rotateY(180deg)}
+.face{--cut:22px;grid-area:1 / 1;backface-visibility:hidden;padding:2px;background:var(--sumi);display:flex;min-height:260px;clip-path:polygon(0 0,calc(100% - var(--cut)) 0,100% var(--cut),100% 100%,0 100%)}
+.face.b{transform:rotateY(180deg)}
+.pp{position:relative;flex:1;display:flex;flex-direction:column;background:var(--kami);padding:30px 28px 26px;clip-path:polygon(0 0,calc(100% - var(--cut) + .8px) 0,100% calc(var(--cut) - .8px),100% 100%,0 100%)}
+.pp > *{position:relative}
+/* 2色刷り：朱の版が墨の版から少しずれて刷られた罫 */
+.pp::before,.pp::after{content:"";position:absolute;inset:12px;pointer-events:none}
+.pp::before{border:2px solid var(--shu);transform:translate(3px,2px)}
+.pp::after{border:1px solid var(--sumi)}
+.fa-to{margin:0;font-size:.95rem;font-weight:700}
+.fa-name{font-family:var(--maru);font-weight:900;font-size:calc(8.6cqi * var(--dk));line-height:1.3;margin:2px 0 12px;word-break:auto-phrase}
+.fa-word{margin:0;font-size:1.15rem;line-height:1.75;font-weight:700}
+.fa-word.empty{font-weight:400}
+.fa-from{margin:auto 0 0;padding-top:14px;font-size:.95rem;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.fa-gl{flex:none;width:52px;height:52px}
+.fb-stamp{position:absolute;right:26px;top:26px;width:64px;height:76px;border:2px dashed var(--sumi);display:grid;place-items:center;background:var(--kami)}
+.fb-stamp svg{width:44px;height:44px}
+.fb-k{margin:0;font-size:.95rem;font-weight:700;padding-right:84px}
+.fb dl{margin:12px 0 0;padding-right:4px}
+.fb dt{font-size:.95rem;font-weight:700;margin-top:10px;padding-right:80px}
+.fb dt:first-child{margin-top:0}
+.fb dd{margin:2px 0 0;font-size:1.05rem;line-height:1.55;padding-bottom:8px;border-bottom:2px dotted var(--sumi)}
+.cv-act{display:grid;gap:10px;margin-top:26px}
+.cv-act .btn{width:100%}
+
+/* ───────── 世界の切り替え：図録のページをめくると、色のある見返しが出る ───────── */
+.screen.turn-out{animation:turnOut .8s cubic-bezier(.45,.05,.3,1) both;z-index:5;pointer-events:none}
+.screen.turn-in{animation:turnIn .8s cubic-bezier(.45,.05,.3,1) both;z-index:5;pointer-events:none}
+.screen.turn-out::after,.screen.turn-in::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(30,29,27,0) 40%,rgba(30,29,27,.22));pointer-events:none}
+.screen.turn-out::after{animation:shadeIn .8s both}
+.screen.turn-in::after{animation:shadeOut .8s both}
+.screen.under{z-index:1}
+.screen.cross-fade{animation:fadeIn .4s ease both;z-index:5}
+
+/* ───────── 動き ───────── */
+@keyframes fadeIn{from{opacity:0}}
+@keyframes showAct{from{opacity:0;visibility:hidden}to{opacity:1;visibility:visible}}
+@keyframes popIn{from{opacity:0;transform:scale(.965)}}
+@keyframes frameIn{from{opacity:0;clip-path:inset(4% 4% 4% 4%)}to{opacity:1;clip-path:inset(0)}}
+@keyframes settle{0%{opacity:0;letter-spacing:.24em}35%{opacity:1}100%{opacity:1;letter-spacing:.08em}}
+@keyframes turnOut{from{transform:rotateY(0)}to{transform:rotateY(-100deg)}}
+@keyframes turnIn{from{transform:rotateY(-100deg)}to{transform:rotateY(0)}}
+@keyframes shadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shadeOut{from{opacity:1}to{opacity:0}}
+
+/* 動きを減らす：移動・拡大・回転を消し、フェードは残す */
+html.rm .screen.w-bright.enter{animation:fadeIn .3s ease both}
+html.rm .scr-saved.enter .work,html.rm .scr-saved.enter .work.tight{animation:fadeIn .6s ease .3s both;letter-spacing:.08em}
+html.rm .scr-saved.enter .frame{animation:fadeIn .5s ease both}
+html.rm .pcw{transform:none}
+html.rm .pc{transition:none}
+html.rm .card{transition:none}
+html.rm .card.back{transform:none}
+html.rm .card.back .face.f{visibility:hidden}
+html.rm .face.b{transform:none;visibility:hidden}
+html.rm .card.back .face.b{visibility:visible;animation:fadeIn .3s both}
+html.rm .card:not(.back) .face.f{animation:fadeIn .3s both}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="panel" aria-label="試作の操作">
+    <p class="p-title">のこす手帖</p>
+    <p class="p-sub">図録の案（2回目）</p>
+    <nav aria-label="画面の切り替え">
+      <p class="p-h chic"><i aria-hidden="true"></i>シックな世界（図録）</p>
+      <ol class="p-nav">
+        <li><button data-go="start"><b>1</b>入口（オープニング）</button></li>
+        <li><button data-go="home"><b>2</b>ホーム</button></li>
+        <li><button data-go="write"><b>3</b>1問ずつ書く</button></li>
+        <li><button data-go="saved"><b>4</b>保存した瞬間</button></li>
+        <li><button data-go="share"><b>5</b>誰に・いつ見せるか</button></li>
+        <li><button data-go="mosimo"><b>6</b>もしものとき</button></li>
+      </ol>
+      <p class="p-h bright"><i aria-hidden="true"></i>明るい世界（売り場）</p>
+      <ol class="p-nav bright">
+        <li><button data-go="friends"><b>7</b>友だち・趣味の仲間へ</button></li>
+        <li><button data-act="panel-card"><b>7</b>カードの見本</button></li>
+      </ol>
+    </nav>
+    <p class="p-h" id="pSize">文字の大きさ</p>
+    <div class="size" role="group" aria-labelledby="pSize">
+      <button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button>
+    </div>
+    <label class="p-check"><input type="checkbox" id="rmToggle">動きを減らして見る</label>
+  </aside>
+
+  <div class="device-wrap"><div class="device">
+  <main class="app" id="app">
+
+    <!-- 1. 入口 -->
+    <section class="screen scr-start w-chic" data-screen="start" data-world="chic" hidden>
+      <div class="bar">
+        <span></span>
+        <button class="btn plain skip" data-act="skip">とばす</button>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <div class="title-wall">
+          <h1 class="tate" tabindex="-1" data-focus aria-label="のこす手帖"><span aria-hidden="true">のこす</span><span aria-hidden="true">手帖</span></h1>
+        </div>
+        <div class="start-foot">
+          <p class="start-logo">のこす手帖</p>
+          <p class="fact">無料、登録なし。中身はこのスマホの中だけ。</p>
+          <button class="btn primary" id="startBtn" data-go="home">はじめる</button>
+          <button class="btn" data-go="mosimo">もしものとき（ご家族の方）</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ホーム -->
+    <section class="screen scr-home w-chic" data-screen="home" data-world="chic" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="h-min h-page rise" style="--i:0" tabindex="-1" data-focus>山田 和子の手帖</h1>
+        <section class="today rise" style="--i:1" aria-labelledby="homeQ">
+          <p class="today-k"><b>今日の1問</b><span id="homeDate"></span></p>
+          <h2 class="h-min today-q" id="homeQ"></h2>
+          <p class="today-c" id="homeC"></p>
+          <button class="btn primary" id="homeBtn" data-act="today">答える</button>
+        </section>
+        <section class="mokuji rise" style="--i:2" aria-labelledby="mkH">
+          <div class="mk-head"><h2 class="h-min" id="mkH">目次</h2><p id="mkTotal"></p></div>
+          <ul class="mk" id="mk"></ul>
+        </section>
+        <button class="shop-in rise" style="--i:3" data-go="friends">
+          <span class="mini" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span><b>友だち・趣味の仲間へ</b><span class="sub" id="shopCount"></span></span>
+        </button>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 3. 1問ずつ書く -->
+    <section class="screen scr-write w-chic" data-screen="write" data-world="chic" hidden>
+      <div class="bar">
+        <button class="btn plain" data-act="back">ホームへ</button>
+        <span class="w-pos" id="wPos"></span>
+      </div>
+      <div class="scroll">
+        <h1 class="h-min w-q rise" id="wQ" tabindex="-1" data-focus></h1>
+        <div id="wField" class="rise" style="--i:1"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" data-act="later">あとで</button>
+        <button class="btn primary" data-act="save">保存する</button>
+      </div>
+    </section>
+
+    <!-- 4. 保存した瞬間 -->
+    <section class="screen scr-saved w-chic" data-screen="saved" data-world="chic" hidden>
+      <div class="bar"><span class="logo">のこす手帖</span></div>
+      <div class="scroll">
+        <div class="frame"><p class="work" id="work"></p></div>
+        <p class="caption" id="caption"></p>
+        <h1 class="h-min s-msg" id="sMsg" tabindex="-1" data-focus>のこしました。</h1>
+      </div>
+      <div class="actions" id="sAct">
+        <button class="btn" data-go="home">今日はここまで</button>
+        <button class="btn primary" data-act="next">次の1問へ</button>
+      </div>
+    </section>
+
+    <!-- 5. 誰に・いつ見せるか -->
+    <section class="screen scr-share w-chic" data-screen="share" data-world="chic" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="h-min h-page rise" tabindex="-1" data-focus>誰に、いつ見せるか</h1>
+        <div class="people rise" style="--i:1" role="group" aria-label="見せる人" id="people"></div>
+        <ul class="rows rise" style="--i:2" id="rows"></ul>
+        <p class="s-note">このスマホを開ける人は、全部読めます。</p>
+        <button class="btn primary wide" data-act="handover" id="hoBtn">受け渡しシートを見る</button>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 6. もしものとき -->
+    <section class="screen scr-mosimo w-chic" data-screen="mosimo" data-world="chic" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="h-min h-page" tabindex="-1" data-focus>もしものとき</h1>
+        <div class="field">
+          <label class="lbl" for="dd">亡くなった日</label>
+          <input class="date" type="date" id="dd">
+        </div>
+        <button class="btn m-read" data-act="book">和子さんの手帖を読む</button>
+        <div id="procs"></div>
+        <p class="m-note">期限は一般的な目安です。数え方は届け先に確かめてください。</p>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 7. 友だち・趣味の仲間へ（明るい世界） -->
+    <section class="screen scr-friends w-bright" data-screen="friends" data-world="bright" hidden>
+      <div class="bar">
+        <button class="btn plain" data-act="leave">手帖に戻る</button>
+        <div class="size" role="group" aria-label="文字の大きさ"><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="h-maru f-h" tabindex="-1" data-focus>友だち・趣味の仲間へ</h1>
+        <div class="rack" id="rack"></div>
+        <p class="f-note">カードは、お別れのあとに美紀さん（長女）が渡します。</p>
+      </div>
+    </section>
+
+    <!-- 7. 友だちごとに書く（明るい世界） -->
+    <section class="screen scr-fedit w-bright" data-screen="fedit" data-world="bright" hidden>
+      <div class="bar">
+        <button class="btn plain" data-go="friends">一覧に戻る</button>
+        <span class="logo" aria-hidden="true">カードを作る</span>
+      </div>
+      <div class="scroll">
+        <h1 class="h-maru f-h" id="feName" tabindex="-1" data-focus></h1>
+        <span class="fe-rel" id="feRel"></span>
+        <div class="field">
+          <label class="lbl" for="feWord">ひとこと</label>
+          <textarea class="input" id="feWord" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label class="lbl" for="fePhoto">思い出の写真の置き場所</label>
+          <textarea class="input" id="fePhoto" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label class="lbl" for="feGift">形見に渡したい物</label>
+          <input class="input" id="feGift" type="text">
+          <div class="chips" role="group" aria-label="よくある物" id="feChips"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" data-act="card" style="flex:1">カードを見る</button>
+      </div>
+    </section>
+
+    <!-- 時期を選ぶ -->
+    <div class="layer" id="picker" hidden>
+      <div class="pick" role="dialog" aria-modal="true" aria-labelledby="pickT">
+        <p class="pick-t" id="pickT"></p>
+        <div id="pickO" style="display:grid;gap:8px"></div>
+        <button class="btn" data-act="close">閉じる</button>
+      </div>
+    </div>
+
+    <!-- 受け渡しシートの見本 -->
+    <div class="layer full" id="handover" hidden role="dialog" aria-modal="true" aria-labelledby="hoT">
+      <div class="bar"><span class="logo">受け渡しシートの見本</span><button class="btn" data-act="close">閉じる</button></div>
+      <div class="scroll" tabindex="0" aria-label="受け渡しシートの見本">
+        <article class="sheet" id="sheet"></article>
+        <div class="ho-act">
+          <button class="btn primary" data-act="print">受け渡しシートを印刷</button>
+          <button class="btn" data-act="file">ファイルで渡す</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 手帖を読む（書き換えない） -->
+    <div class="layer full" id="book" hidden role="dialog" aria-modal="true" aria-labelledby="bookT">
+      <div class="bar"><span class="logo">のこす手帖</span><button class="btn" data-act="close">閉じる</button></div>
+      <div class="scroll" tabindex="0" aria-label="和子さんの手帖の中身">
+        <h2 class="h-min book-h" id="bookT">和子さんの手帖</h2>
+        <p class="book-note">読むだけの表示です。書き換えはできません。</p>
+        <ul class="book-list" id="bookList"></ul>
+      </div>
+    </div>
+
+    <!-- カードの見本（明るい世界） -->
+    <div class="layer cardview" id="cardview" hidden role="dialog" aria-modal="true" aria-labelledby="cvT">
+      <div class="bar"><span class="logo" id="cvT" style="font-family:var(--maru);font-weight:900">お別れのあとに渡すカード</span></div>
+      <div class="scroll">
+        <div class="cv-wrap"><div class="card" id="card"></div></div>
+        <div class="cv-act">
+          <button class="btn primary" data-act="flip" id="flipBtn">裏を見る</button>
+          <button class="btn" data-act="cprint">カードを印刷</button>
+          <button class="btn plain" data-act="close">閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  </main>
+  </div></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const html = document.documentElement;
+  const params = new URLSearchParams(location.search);
+  const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+  const mqPC = matchMedia('(min-width: 820px) and (min-height: 560px)');
+  const KEY = 'nokosu-gallery-opening-seen';
+  const TOTAL = 46;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ── 9つのカテゴリと問いの数（app/js/questions.js の並びと数）。書けた数は架空の途中経過
+  const CATS = [
+    { id: 'me', name: 'わたしのこと', n: 5, done: 3 },
+    { id: 'family', name: '家族・大切な人', n: 4, done: 2 },
+    { id: 'money', name: 'お金と財産', n: 6, done: 0 },
+    { id: 'insurance', name: '保険・年金', n: 5, done: 2 },
+    { id: 'medical', name: '医療・介護', n: 8, done: 2 },
+    { id: 'funeral', name: '葬儀・お墓', n: 6, done: 1 },
+    { id: 'will', name: '相続・遺言', n: 5, done: 0 },
+    { id: 'pet', name: 'ペット', n: 4, done: 1 },
+    { id: 'words', name: '家族へのことば', n: 3, done: 1 },
+  ];
+  // ── 問い（題・選択肢・補足は app/js/questions.js から）
+  const QS = [
+    { id: 'me.docs', cat: 'me', pos: 4, title: '大切な書類の保管場所', label: '通帳・キャッシュカードの保管場所', type: 'text',
+      ph: '例：居間のたんす 右上の引き出し', chips: ['居間のたんす', '寝室の引き出し', '台所の戸棚'], hint: '' },
+    { id: 'money.banks', cat: 'money', pos: 1, title: '預貯金の口座', label: '金融機関名', type: 'text',
+      ph: '例：〇〇銀行、ゆうちょ銀行', chips: ['ゆうちょ銀行', '信用金庫'], hint: '口座番号・暗証番号は書かないでください。' },
+    { id: 'medical.lifeSupport', cat: 'medical', pos: 5, title: '回復の見込みがないときの延命治療', label: '選んでください', type: 'radio',
+      options: ['できるかぎり続けてほしい', '苦痛をやわらげる治療だけにしてほしい', '家族と医師に任せる', 'まだ決められない'], hint: '法的な拘束力はありません。' },
+    { id: 'pet.list', cat: 'pet', pos: 1, title: '一緒に暮らしている動物', label: '名前と種類', type: 'text',
+      ph: '例：柴犬のコロ', chips: [], hint: '' },
+  ];
+  const STAGES = [['now', '今すぐ'], ['incap', '判断がむずかしくなったら'], ['after', '亡くなったあと'], ['never', '見せない']];
+  const PEOPLE = [{ id: 'miki', name: '山田 美紀', short: '美紀さん', rel: '長女' }, { id: 'ken', name: '山田 健一', short: '健一さん', rel: '長男' }];
+  const GROUPS = [['d7', '7日以内'], ['d14', '14日以内'], ['m3', '3か月以内'], ['m4', '4か月以内'], ['m10', '10か月以内']];
+  // 手続き（文言と日数は app/js/logic.js の NAVI_BASE_TASKS。届け先は短くしたもの）
+  const PROCS = [
+    { id: 'death-cert', g: 'd7', days: 7, t: '死亡診断書（死体検案書）を受け取り、コピーを数枚とる', w: '病院・医師' },
+    { id: 'death-report', g: 'd7', days: 7, t: '死亡届を出す', w: '市区町村役場' },
+    { id: 'cremation', g: 'd7', days: 7, t: '火葬許可を申請する', w: '市区町村役場（死亡届と同時に）' },
+    { id: 'pension', g: 'd14', days: 10, t: '年金の受給を止める（受給権者死亡届）', w: '年金事務所（厚生年金は10日以内、国民年金は14日以内）' },
+    { id: 'health', g: 'd14', days: 14, t: '健康保険の資格喪失の手続きをし、資格確認書などを返す', w: '市区町村役場' },
+    { id: 'care', g: 'd14', days: 14, t: '介護保険の資格喪失届を出し、保険証を返す', w: '市区町村役場' },
+    { id: 'householder', g: 'd14', days: 14, t: '世帯主の変更届を出す', w: '市区町村役場' },
+    { id: 'renounce', g: 'm3', months: 3, t: '相続放棄・限定承認をするか決める', w: '家庭裁判所' },
+    { id: 'quasi-return', g: 'm4', months: 4, t: '準確定申告をする（亡くなった年の所得の申告）', w: '亡くなった方の住所地の税務署' },
+    { id: 'inheritance-tax', g: 'm10', months: 10, t: '相続税の申告と納付をする（必要な場合）', w: '亡くなった方の住所地の税務署' },
+  ];
+  // ── 友だち・趣味の仲間（架空）
+  const FRIENDS = [
+    { id: 'sato', name: '佐藤 文子', short: '文子さん', rel: '書道教室', glyph: 'fude',
+      word: '日曜のお稽古、二十年たのしかった。筆は文子さんに使ってほしい。', photo: '教室のアルバムは、居間の本棚の二段目', gift: '書道の筆と硯', chips: ['書道の筆', '硯', '半紙の束'] },
+    { id: 'naka', name: '中村 やす子', short: 'やす子さん', rel: '旅行仲間', glyph: 'tabi',
+      word: '北海道の旅のこと、また話したかった。', photo: '押し入れの青い箱に、旅行のアルバムが3冊', gift: '旅行のアルバム', chips: ['旅行のアルバム', '絵はがき'] },
+    { id: 'kimura', name: '木村 誠', short: '誠さん', rel: '囲碁の友だち', glyph: 'go',
+      word: '', photo: '', gift: '碁石と碁笥', chips: ['碁石と碁笥', '碁盤'] },
+  ];
+
+  const S = {
+    added: {}, saved: {}, draft: {}, qi: 0, last: null, lastNew: null,
+    person: 'miki',
+    stages: {
+      miki: { me: 'now', family: 'now', money: 'after', insurance: 'after', medical: 'incap', funeral: 'after', will: 'after', pet: 'now', words: 'after' },
+      ken: { me: 'now', family: 'now', money: 'after', insurance: 'after', medical: 'incap', funeral: 'after', will: 'after', pet: 'incap', words: 'never' },
+    },
+    death: params.get('d') || '', done: {},
+    friend: params.get('f') || 'sato', cardBack: false,
+  };
+  const catDone = (id) => CATS.find((c) => c.id === id).done + (S.added[id] || 0);
+  const count = () => CATS.reduce((n, c) => n + catDone(c.id), 0);
+  const rm = () => html.classList.contains('rm');
+  const catName = (id) => CATS.find((c) => c.id === id).name;
+  let current = null, opTimer = 0, toastTimer = 0, layerReturn = null, pickCat = null, busy = false;
+
+  // ── 小道具
+  function shape(id) {
+    const o = '<svg class="shp" viewBox="0 0 20 20" aria-hidden="true">';
+    const ci = '<circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/>';
+    if (id === 'now') return o + '<circle cx="10" cy="10" r="8.8" fill="currentColor"/></svg>';
+    if (id === 'incap') return o + ci + '<path d="M10 2a8 8 0 0 1 0 16z" fill="currentColor"/></svg>';
+    if (id === 'after') return o + ci + '</svg>';
+    return o + ci + '<path d="M4.5 15.5 15.5 4.5" stroke="currentColor" stroke-width="1.6"/></svg>';
+  }
+  const stageLabel = (id) => STAGES.find((s) => s[0] === id)[1];
+  // 墨の線の版と、少しずれて刷られた朱の版（2色刷り）
+  const GL = {
+    fude: { shu: '<path d="M38 6 45 13 24 34 17 27z"/>', ink: '<path d="M38 6 45 13 24 34 17 27z"/><path d="M17 27 24 34c-3 7-9 12-16 14 2-7 6-13 9-21z" fill="#1E1D1B"/><path d="M33 11l7 7"/>' },
+    tabi: { shu: '<rect x="8" y="18" width="40" height="28"/>', ink: '<rect x="8" y="18" width="40" height="28"/><path d="M21 18v-6h14v6M8 30h40"/><circle cx="16" cy="49" r="2.5" fill="#1E1D1B"/><circle cx="40" cy="49" r="2.5" fill="#1E1D1B"/>' },
+    go: { shu: '<circle cx="36" cy="22" r="12"/>', ink: '<circle cx="21" cy="30" r="12" fill="#1E1D1B"/><circle cx="36" cy="22" r="12"/>' },
+    plus: { shu: '', ink: '<path d="M28 14v28M14 28h28"/>' },
+  };
+  function glyph(id, cls = 'gl') {
+    const g = GL[id] || GL.plus;
+    return `<svg class="${cls}" viewBox="0 0 56 56" aria-hidden="true"><g fill="#E8452C" transform="translate(2.6 2)">${g.shu}</g><g fill="none" stroke="#1E1D1B" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">${g.ink}</g></svg>`;
+  }
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ── 日付（app/js/logic.js と同じ数え方）
+  const pk = (k) => { const [y, m, d] = k.split('-').map(Number); return { y, m, d }; };
+  const p2 = (n) => String(n).padStart(2, '0');
+  const kUTC = (t) => { const d = new Date(t); return `${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}`; };
+  const addDays = (k, n) => { const { y, m, d } = pk(k); return kUTC(Date.UTC(y, m - 1, d + n)); };
+  function monthsDeadline(k, n) {
+    const { y, m, d } = pk(addDays(k, 1));
+    const last = new Date(Date.UTC(y, m - 1 + n + 1, 0)).getUTCDate();
+    if (d > last) return kUTC(Date.UTC(y, m - 1 + n, last));
+    return addDays(kUTC(Date.UTC(y, m - 1 + n, d)), -1);
+  }
+  const diffDays = (a, b) => { const A = pk(a), B = pk(b); return Math.round((Date.UTC(B.y, B.m - 1, B.d) - Date.UTC(A.y, A.m - 1, A.d)) / 86400000); };
+  const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; };
+  const WEEK = '日月火水木金土';
+  function fmt(k, withYear) {
+    const { y, m, d } = pk(k);
+    const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+    return `${withYear || y !== new Date().getFullYear() ? y + '年' : ''}${m}月${d}日（${w}）`;
+  }
+  const md = () => { const t = pk(todayKey()); return `${t.m}月${t.d}日`; };
+  const ymd = () => { const t = pk(todayKey()); return `${t.y}年${t.m}月${t.d}日`; };
+
+  // ── 画面ごとの中身
+  const RENDER = {
+    start() { const s = $('.scr-start'); if (!s.classList.contains('playing')) s.classList.add('done'); },
+
+    home() {
+      const q = QS[0], done = !!S.saved[q.id];
+      $('#homeDate').textContent = md();
+      $('#homeQ').innerHTML = done ? '今日の1問は、<br>のこしました。' : esc(q.title);
+      $('#homeC').textContent = done ? `${catName(q.cat)}　${q.title}` : catName(q.cat);
+      $('#homeBtn').textContent = done ? 'もう1問書く' : '答える';
+      $('#mkTotal').innerHTML = `${TOTAL}問のうち <b>${count()}</b>問`;
+      $('#mk').innerHTML = CATS.map((c) => {
+        const n = catDone(c.id);
+        let pl = '';
+        for (let i = 0; i < c.n; i++) pl += `<i class="${i < n ? (S.lastNew === c.id && i === n - 1 ? 'on new' : 'on') : ''}"></i>`;
+        return `<li><span class="nm">${esc(c.name)}</span><span class="ct"><b>${n}</b>／${c.n}</span><span class="pl" aria-hidden="true">${pl}</span></li>`;
+      }).join('');
+      $('#shopCount').textContent = `カード ${FRIENDS.length}枚`;
+    },
+
+    write() {
+      const q = QS[S.qi];
+      const c = CATS.find((x) => x.id === q.cat);
+      $('#wPos').innerHTML = `${esc(c.name)}<br><b>${q.pos}</b>／${c.n}`;
+      $('#wQ').textContent = q.title;
+      const v = S.draft[q.id] ?? S.saved[q.id] ?? '';
+      const hint = q.hint ? `<p class="hint">${esc(q.hint)}</p>` : '';
+      const err = '<p class="err" id="err" hidden>選ぶか、書いてから保存します。</p>';
+      let h;
+      if (q.type === 'radio') {
+        h = `<fieldset class="opts"><legend class="sr">${esc(q.title)}</legend>` +
+          q.options.map((o) => `<label class="opt"><input type="radio" name="ans" value="${esc(o)}"${o === v ? ' checked' : ''}><span class="box" aria-hidden="true"></span>${esc(o)}</label>`).join('') +
+          `${hint}${err}</fieldset>`;
+      } else {
+        h = `<div class="field"><label class="lbl" for="ans">${esc(q.label)}</label>
+          <textarea class="input" id="ans" rows="2" placeholder="${esc(q.ph)}">${esc(v)}</textarea>
+          ${q.chips.length ? `<div class="chips" role="group" aria-label="よくある答え">${q.chips.map((x) => `<button class="chip" data-chip="${esc(x)}">${esc(x)}</button>`).join('')}</div>` : ''}
+          ${hint}${err}</div>`;
+      }
+      $('#wField').innerHTML = h;
+    },
+
+    saved() {
+      if (!S.last) { const q = QS[0]; S.saved[q.id] = '居間のたんす 右上の引き出し'; S.added[q.cat] = (S.added[q.cat] || 0) + 1; S.lastNew = q.cat; S.last = { q, v: S.saved[q.id], no: count() }; }
+      const { q, v, no } = S.last;
+      const segs = v.split(/[ 　]+/).filter(Boolean);
+      const tight = segs.every((x) => [...x].length <= 9);
+      const L = tight ? Math.max(...segs.map((x) => [...x].length)) : [...v].length;
+      const f = (L <= 7 ? 8.2 : L <= 9 ? 7 : L <= 22 ? 6.4 : 5.6);
+      const w = $('#work');
+      w.style.setProperty('--f', `calc(${f}cqi * var(--dk))`);
+      w.classList.toggle('tight', tight);
+      w.innerHTML = segs.map((x) => `<span>${esc(x)}</span>`).join('');
+      $('#caption').innerHTML = `<span class="no">${no}</span><span class="ti">${esc(q.title)}</span><span>${esc(catName(q.cat))}</span><span>${ymd()} 記す</span>`;
+      // 演出の間（約2.5秒）はボタンを押せない。二度押しで次の問いへ飛ばないように
+      const act = $('#sAct'); act.inert = true;
+      clearTimeout(S.actTimer); S.actTimer = setTimeout(() => { act.inert = false; }, 2550);
+      $('#sMsg').setAttribute('aria-label', `保存しました。のこしました。${q.title}：${v}。${TOTAL}問のうち${no}問め。`);
+    },
+
+    share() {
+      $('#people').innerHTML = PEOPLE.map((p) => `<button class="person" data-person="${p.id}" aria-pressed="${p.id === S.person}">${esc(p.short)}<small>${esc(p.rel)}</small></button>`).join('');
+      renderRows();
+    },
+
+    mosimo() { $('#dd').value = S.death; $('#dd').max = todayKey(); renderProcs(); },
+
+    friends() {
+      const tilt = ['-2.2deg', '1.6deg', '1.2deg', '-1.4deg'];
+      $('#rack').innerHTML = FRIENDS.map((f, i) => {
+        const has = !!(f.word || f.photo || f.gift);
+        const filled = [f.word, f.photo, f.gift].filter(Boolean).length;
+        return `<div class="pcw" style="--r:${tilt[i]}"><button class="pc" data-friend="${f.id}"><span class="pc-in">${glyph(f.glyph)}<span class="nm">${esc(f.short)}</span><span class="rl">${esc(f.rel)}</span><span class="st"><i class="${filled === 3 ? 'on' : ''}" aria-hidden="true"></i>${filled === 3 ? '書けた' : has ? `書きかけ ${filled}／3` : 'まだ'}</span></span></button></div>`;
+      }).join('') + `<div><button class="pc-add" data-act="addf">${glyph('plus', 'plus')}人を足す</button></div>`;
+    },
+
+    fedit() {
+      const f = FRIENDS.find((x) => x.id === S.friend) || FRIENDS[0];
+      $('#feName').textContent = `${f.name}さん`;
+      $('#feRel').textContent = f.rel;
+      $('#feWord').value = f.word; $('#fePhoto').value = f.photo; $('#feGift').value = f.gift;
+      $('#feWord').placeholder = '例：お稽古、たのしかった。';
+      $('#fePhoto').placeholder = '例：居間の本棚の二段目';
+      $('#feGift').placeholder = '例：書道の筆';
+      $('#feChips').innerHTML = f.chips.map((c) => `<button class="chip" data-gift="${esc(c)}">${esc(c)}</button>`).join('');
+    },
+  };
+
+  function renderRows() {
+    const st = S.stages[S.person];
+    const p = PEOPLE.find((x) => x.id === S.person);
+    $('#rows').innerHTML = CATS.map(({ id, name }) =>
+      `<li class="row"><span class="cat" id="c-${id}">${esc(name)}</span><button class="stage-btn" data-cat="${id}" aria-haspopup="dialog" aria-describedby="c-${id}">${shape(st[id])}<span>${stageLabel(st[id])}</span><span class="sr">（${esc(p.short)}に見せる時期を変える）</span></button></li>`).join('');
+    $('#hoBtn').textContent = `${p.short}の受け渡しシートを見る`;
+  }
+
+  function renderProcs() {
+    const d = S.death, today = todayKey();
+    let h = d ? '' : '<p class="m-empty">日付を入れると、それぞれの期限の日が出ます。</p>';
+    for (const [gid, gl] of GROUPS) {
+      h += `<section class="pg"><h2 class="pg-h">${gl}</h2><ul>`;
+      for (const p of PROCS.filter((x) => x.g === gid)) {
+        let due = '';
+        if (d) {
+          const k = p.days ? addDays(d, p.days - 1) : monthsDeadline(d, p.months);
+          const left = diffDays(today, k);
+          const lt = left < 0 ? `期限を${-left}日過ぎています` : left === 0 ? '今日まで' : `あと${left}日`;
+          due = `<span class="p-d">${fmt(k)}まで<span class="left">${lt}</span></span>`;
+        }
+        const ck = !!S.done[p.id];
+        h += `<li class="proc${ck ? ' done' : ''}"><label><input type="checkbox" data-proc="${p.id}"${ck ? ' checked' : ''}><span class="ck" aria-hidden="true"></span><span class="p-t">${esc(p.t)}</span>${due}<span class="p-w">${esc(p.w)}</span></label></li>`;
+      }
+      h += '</ul></section>';
+    }
+    $('#procs').innerHTML = h;
+  }
+
+  // ── 画面の切り替え
+  function go(name, opt = {}) {
+    const next = $(`.screen[data-screen="${name}"]`);
+    if (!next || busy) return;
+    closeLayer(true);
+    const prev = current;
+    RENDER[name]?.(opt);
+    const cross = prev && prev !== next && prev.dataset.world !== next.dataset.world;
+    $$('.screen').forEach((s) => s.classList.remove('turn-out', 'turn-in', 'under', 'cross-fade'));
+    next.classList.remove('enter');
+    next.hidden = false;
+    if (prev && prev !== next) {
+      if (cross && !rm()) {
+        // 図録のページをめくる：明るい世界へ行くときはシックなページが左へめくれ、戻るときは閉じてくる
+        busy = true;
+        if (next.dataset.world === 'bright') { next.classList.add('under'); prev.classList.add('turn-out'); }
+        else { prev.classList.add('under'); next.classList.add('turn-in'); }
+        setTimeout(() => {
+          prev.hidden = true;
+          prev.classList.remove('turn-out', 'under'); next.classList.remove('turn-in', 'under');
+          busy = false;
+        }, 820);
+      } else if (cross) {
+        next.classList.add('cross-fade');
+        setTimeout(() => { prev.hidden = true; next.classList.remove('cross-fade'); }, 420);
+      } else {
+        prev.hidden = true;
+        void next.offsetWidth; next.classList.add('enter');
+      }
+    } else { void next.offsetWidth; next.classList.add('enter'); }
+    const sc = $('.scroll', next); if (sc) sc.scrollTop = 0;
+    current = next;
+    html.style.setProperty('--world', next.dataset.world);
+    document.querySelector('meta[name="theme-color"]').content = next.dataset.world === 'bright' ? '#FFE066' : (name === 'saved' ? '#EFEEEA' : '#FFFFFF');
+    $$('.p-nav [data-go]').forEach((b) => b.setAttribute('aria-current', b.dataset.go === name || (name === 'fedit' && b.dataset.go === 'friends') ? 'page' : 'false'));
+    $$('.tabs [data-go]', next).forEach((b) => b.setAttribute('aria-current', b.dataset.go === name ? 'page' : 'false'));
+    if (!opt.noFocus) $('[data-focus]', next)?.focus({ preventScroll: true });
+  }
+
+  function startOpening() {
+    const s = $('.scr-start');
+    s.classList.remove('done', 'playing');
+    go('start', { noFocus: true });
+    s.classList.remove('done', 'enter');
+    void s.offsetWidth;
+    s.classList.add('playing');
+    clearTimeout(opTimer);
+    opTimer = setTimeout(endOpening, 2800);
+    try { localStorage.setItem(KEY, '1'); } catch (e) { /* 保存できなくても動く */ }
+  }
+  function endOpening() {
+    const s = $('.scr-start');
+    clearTimeout(opTimer);
+    if (!s.classList.contains('playing')) return;
+    const hadFocus = document.activeElement === $('.skip', s);
+    s.classList.remove('playing'); s.classList.add('done');
+    if (hadFocus) $('#startBtn').focus({ preventScroll: true });
+  }
+
+  // ── 書く・保存する
+  function answer() {
+    const q = QS[S.qi];
+    if (q.type === 'radio') return $('input[name="ans"]:checked')?.value || '';
+    return ($('#ans')?.value || '').trim();
+  }
+  function save() {
+    if (busy || current?.dataset.screen !== 'write') return;
+    const q = QS[S.qi], v = answer();
+    if (!v) { $('#err').hidden = false; ($('#ans') || $('input[name="ans"]'))?.focus(); return; }
+    if (!S.saved[q.id]) S.added[q.cat] = (S.added[q.cat] || 0) + 1;
+    S.saved[q.id] = v; delete S.draft[q.id];
+    S.lastNew = q.cat;
+    S.last = { q, v, no: count() };
+    go('saved');
+  }
+  const nextIndex = () => { for (let k = 1; k <= QS.length; k++) { const i = (S.qi + k) % QS.length; if (!S.saved[QS[i].id]) return i; } return (S.qi + 1) % QS.length; };
+
+  // ── 重なる面
+  function openLayer(id, from) {
+    const l = $('#' + id);
+    layerReturn = from || document.activeElement;
+    l.hidden = false;
+    if (current) current.inert = true;
+    const f = $('[aria-pressed="true"]', l) || $('button', l);
+    f?.focus({ preventScroll: true });
+  }
+  function closeLayer(silent) {
+    const open = $$('.layer:not([hidden])');
+    if (!open.length) return;
+    open.forEach((l) => { l.hidden = true; });
+    if (current) current.inert = false;
+    if (!silent && layerReturn && document.contains(layerReturn)) layerReturn.focus({ preventScroll: true });
+  }
+  function openPicker(cat, btn) {
+    pickCat = cat;
+    const p = PEOPLE.find((x) => x.id === S.person);
+    $('#pickT').textContent = `「${catName(cat)}」を${p.short}に見せるのは`;
+    const cur = S.stages[S.person][cat];
+    $('#pickO').innerHTML = STAGES.map(([id, l]) => `<button class="pick-o" data-stage="${id}" aria-pressed="${id === cur}">${shape(id)}<span>${l}</span></button>`).join('');
+    openLayer('picker', btn);
+  }
+  function openHandover(btn) {
+    const p = PEOPLE.find((x) => x.id === S.person);
+    const st = S.stages[S.person];
+    let h = `<p class="sh-k">受け渡しシート</p><h2 class="sh-name" id="hoT">${esc(p.name)}さんへ</h2><p class="sh-from">山田 和子の手帖から<br>${ymd()}</p>`;
+    for (const [sid, sl] of STAGES.slice(0, 3)) {
+      const cs = CATS.filter((c) => st[c.id] === sid);
+      if (!cs.length) continue;
+      h += `<section class="sh-s"><h3>${shape(sid)}${sl}</h3><ul>${cs.map((c) => `<li>${esc(c.name)}</li>`).join('')}</ul></section>`;
+    }
+    h += '<p class="sh-foot">「見せない」にした項目は、このシートには載りません。</p>';
+    $('#sheet').innerHTML = h;
+    openLayer('handover', btn);
+  }
+  function openBook(btn) {
+    const rows = [
+      ['me', 'お名前と生年月日', '山田 和子　昭和24年5月3日'],
+      ['me', '大切な書類の保管場所', S.saved['me.docs'] || '居間のたんす 右上の引き出し'],
+      ['money', '預貯金の口座', S.saved['money.banks'] || 'ゆうちょ銀行、〇〇銀行 駅前支店'],
+      ['medical', '回復の見込みがないときの延命治療', S.saved['medical.lifeSupport'] || '苦痛をやわらげる治療だけにしてほしい'],
+      ['pet', '一緒に暮らしている動物', S.saved['pet.list'] || '柴犬のコロ'],
+    ];
+    $('#bookList').innerHTML = rows.map(([c, k, v], i) => `<li><p class="ans">${esc(v)}</p><p class="lab"><b>${i + 1}</b>${esc(k)}<br>${esc(catName(c))}</p></li>`).join('');
+    openLayer('book', btn);
+  }
+  function renderCard() {
+    const f = FRIENDS.find((x) => x.id === S.friend) || FRIENDS[0];
+    const card = $('#card');
+    card.classList.toggle('back', S.cardBack);
+    card.innerHTML = `
+      <section class="face f" aria-label="表"${S.cardBack ? ' aria-hidden="true"' : ''}><div class="pp">
+        <p class="fa-to">${esc(f.rel)}の</p>
+        <p class="fa-name">${esc(f.name)}さんへ</p>
+        <p class="fa-word${f.word ? '' : ' empty'}">${f.word ? esc(f.word) : 'ひとことは、まだ書いていません。'}</p>
+        <p class="fa-from">${glyph(f.glyph, 'fa-gl')}<span>山田 和子</span></p>
+      </div></section>
+      <section class="face b fb" aria-label="裏"${S.cardBack ? '' : ' aria-hidden="true"'}><div class="pp">
+        <span class="fb-stamp" aria-hidden="true">${glyph(f.glyph, '')}</span>
+        <p class="fb-k">お渡しするもの</p>
+        <dl>
+          <dt>形見</dt><dd>${esc(f.gift || 'まだ書いていません')}</dd>
+          <dt>思い出の写真</dt><dd>${esc(f.photo || 'まだ書いていません')}</dd>
+          <dt>渡す人</dt><dd>山田 美紀（長女）</dd>
+        </dl>
+      </div></section>`;
+    $('#flipBtn').textContent = S.cardBack ? '表を見る' : '裏を見る';
+  }
+  function openCard(btn) { S.cardBack = false; renderCard(); openLayer('cardview', btn); $('#flipBtn').focus({ preventScroll: true }); }
+  function keepFriend() {
+    const f = FRIENDS.find((x) => x.id === S.friend);
+    if (!f || current?.dataset.screen !== 'fedit') return;
+    f.word = $('#feWord').value.trim(); f.photo = $('#fePhoto').value.trim(); f.gift = $('#feGift').value.trim();
+  }
+
+  // ── 文字の大きさ・動き
+  function setSize(v) {
+    html.dataset.size = v;
+    $$('button[data-size]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === v)));
+    try { localStorage.setItem('nokosu-gallery-size', v); } catch (e) { /* なくても動く */ }
+  }
+  function syncRM() { html.classList.toggle('rm', mqRM.matches || $('#rmToggle').checked || params.get('rm') === '1'); }
+  mqRM.addEventListener?.('change', syncRM);
+  $('#rmToggle').addEventListener('change', syncRM);
+  function fit() {
+    const sc = mqPC.matches ? Math.min(1, (innerHeight - 40) / 860) : 1;
+    html.style.setProperty('--sc', sc.toFixed(4));
+  }
+  addEventListener('resize', fit);
+
+  // ── 操作
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-go],[data-act],[data-size],[data-chip],[data-cat],[data-stage],[data-person],[data-friend],[data-gift]');
+    if (!t) return;
+    const d = t.dataset;
+    if (d.size) return setSize(d.size);
+    if (d.go) {
+      if (d.go === 'start') return startOpening();
+      if (d.go === 'friends') keepFriend();
+      return go(d.go);
+    }
+    if (d.chip) { const a = $('#ans'); a.value = d.chip + ' '; S.draft[QS[S.qi].id] = a.value; a.focus(); a.setSelectionRange(a.value.length, a.value.length); $('#err').hidden = true; return; }
+    if (d.gift) { const g = $('#feGift'); g.value = g.value.trim() ? `${g.value.trim()}、${d.gift}` : d.gift; g.focus(); return; }
+    if (d.friend) { S.friend = d.friend; return go('fedit'); }
+    if (d.cat) return openPicker(d.cat, t);
+    if (d.stage) {
+      S.stages[S.person][pickCat] = d.stage;
+      closeLayer(true); renderRows();
+      $(`.stage-btn[data-cat="${pickCat}"]`)?.focus({ preventScroll: true });
+      return;
+    }
+    if (d.person) { S.person = d.person; $$('.person').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.person === S.person))); renderRows(); return; }
+    switch (d.act) {
+      case 'skip': return endOpening();
+      case 'today': S.qi = S.saved[QS[0].id] ? nextIndex() : 0; return go('write');
+      case 'back': return go('home');
+      case 'later': toast('この問いは、あとでまた聞きます。'); S.qi = (S.qi + 1) % QS.length; return go('write');
+      case 'save': return save();
+      case 'next': S.qi = nextIndex(); return go('write');
+      case 'handover': return openHandover(t);
+      case 'book': return openBook(t);
+      case 'close': return closeLayer();
+      case 'print': return toast('見本なので、ここでは印刷しません。');
+      case 'file': return toast('見本なので、ここではファイルを作りません。');
+      case 'cprint': return toast('見本なので、ここでは印刷しません。');
+      case 'leave': return go('home');
+      case 'addf': return toast('見本なので、人は足せません。');
+      case 'card': keepFriend(); return openCard(t);
+      case 'flip': S.cardBack = !S.cardBack; renderCard(); $('#flipBtn').focus({ preventScroll: true }); return;
+      case 'panel-card':
+        if (current?.dataset.world !== 'bright') { go('fedit', { noFocus: true }); setTimeout(() => openCard(t), rm() ? 450 : 850); }
+        else { if (current.dataset.screen !== 'fedit') go('fedit', { noFocus: true }); openCard(t); }
+        return;
+    }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'ans') { S.draft[QS[S.qi].id] = e.target.value; $('#err').hidden = true; }
+    if (e.target.id === 'dd') { S.death = e.target.value; renderProcs(); }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.name === 'ans') $('#err').hidden = true;
+    if (e.target.dataset.proc) { S.done[e.target.dataset.proc] = e.target.checked; e.target.closest('.proc').classList.toggle('done', e.target.checked); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { if ($('.layer:not([hidden])')) closeLayer(); else if ($('.scr-start.playing')) endOpening(); }
+  });
+
+  // ── はじまり
+  let size = params.get('size');
+  if (!size) { try { size = localStorage.getItem('nokosu-gallery-size'); } catch (e) { size = null; } }
+  setSize(size === 'l' ? 'l' : 'm');
+  syncRM(); fit();
+  const first = params.get('s');
+  if (first === 'start' || params.get('op') === '1') startOpening();
+  else if (first) {
+    if (first === 'write' && params.get('q')) S.qi = Math.min(QS.length - 1, Number(params.get('q')) || 0);
+    if (first === 'saved' && params.get('q')) {
+      const q = QS[Math.min(QS.length - 1, Number(params.get('q')) || 0)];
+      const v = q.type === 'radio' ? q.options[1] : (q.ph || '').replace(/^例：/, '');
+      S.saved[q.id] = v; S.added[q.cat] = 1; S.lastNew = q.cat; S.last = { q, v, no: count() };
+    }
+    const scr = first === 'card' ? 'fedit' : first;
+    go(scr, { noFocus: true });
+    if (first === 'card') { if (params.get('back') === '1') { openCard($('[data-act="card"]')); S.cardBack = true; renderCard(); } else openCard($('[data-act="card"]')); }
+    if (params.get('sheet') === '1' && first === 'share') openHandover($('#hoBtn'));
+    if (params.get('sheet') === 'pick' && first === 'share') openPicker('money', $('.stage-btn'));
+    if (params.get('sheet') === 'book' && first === 'mosimo') openBook($('.m-read'));
+  } else {
+    let seen = false;
+    try { seen = localStorage.getItem(KEY) === '1'; } catch (e) { seen = false; }
+    if (seen) go('home', { noFocus: true }); else startOpening();
+  }
+})();
+</script>
+</body>
+</html>

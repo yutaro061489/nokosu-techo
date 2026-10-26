@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="ja" data-size="m">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FFD23C">
+<title>のこす手帖　C 大きな文字の広告</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Dela+Gothic+One&display=swap" rel="stylesheet">
+<style>
+/* ───────── 色と書体 ─────────
+   地1 黄  #FFD23C … 書く人の画面の地。広告の地色
+   墨  深緑 #0E3B2E … 文字と面。黒の代わりに、今のアプリの緑の系譜を濃くした色
+   紙  白  #FFFFFF … 入力欄・受け渡しシート・もしものとき（落ち着いた画面）
+   墨2 #3D5A50 … 補足の文字だけ（白地 7.6:1、黄地 5.3:1）
+   見出し・問い・数字 … Dela Gothic One（ポスター用の極太ゴシック）
+   本文・ボタン・入力 … BIZ UDPゴシック（モリサワの UD 書体）
+*/
+:root{
+  --kiiro:#FFD23C; --sumi:#0E3B2E; --kami:#FFFFFF; --sumi-2:#3D5A50;
+  --disp:"Dela Gothic One","BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",sans-serif;
+  --body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+  --ease-set:cubic-bezier(.2,.85,.1,1);   /* 組む：速く入って、ぴたりと止まる */
+  --ease-cut:cubic-bezier(.7,0,.2,1);     /* 切り替え：ためて、送る */
+}
+html{font-size:17px;-webkit-text-size-adjust:100%}
+html[data-size="l"]{font-size:21px}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--kami);color:var(--sumi);font-family:var(--body);line-height:1.6;line-break:strict;overflow-wrap:anywhere}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--sumi);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* ───────── 置き場所：スマホは全面、PC は枠＋横の切り替え ───────── */
+.panel{display:none}
+.app{position:fixed;inset:0;overflow:hidden;background:var(--kiiro);container-type:inline-size;isolation:isolate}
+@media (min-width:820px) and (min-height:560px){
+  .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:64px;padding:20px}
+  .device-wrap{flex:none;width:calc(410px * var(--sc,1));height:calc(864px * var(--sc,1))}
+  .device{width:410px;height:864px;padding:10px;background:var(--sumi);border-radius:56px;transform:scale(var(--sc,1));transform-origin:0 0}
+  .app{position:relative;inset:auto;width:390px;height:844px;border-radius:46px}
+  .panel{display:block;width:272px;font-size:16px;line-height:1.5}
+}
+.p-title{font-family:var(--disp);font-size:30px;line-height:1.1;margin:0}
+.p-sub{font-weight:700;margin:6px 0 28px;font-size:17px}
+.p-h{font-weight:700;margin:24px 0 8px;font-size:15px;color:var(--sumi-2)}
+.p-nav{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.p-nav button{width:100%;min-height:48px;display:flex;align-items:center;gap:12px;padding:6px 14px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);text-align:left;font-weight:700;font-size:16px}
+.p-nav button b{font-family:var(--disp);font-weight:400;font-size:18px;min-width:1.1em}
+.p-nav button[aria-current="page"]{background:var(--sumi);color:var(--kiiro)}
+.p-check{display:flex;align-items:center;gap:10px;min-height:48px;font-weight:700;cursor:pointer;margin-top:12px}
+.p-check input{width:24px;height:24px;accent-color:var(--sumi)}
+
+/* ───────── 画面の骨組み ───────── */
+.t-kiiro{--bg:var(--kiiro);--fg:var(--sumi)}
+.t-sumi{--bg:var(--sumi);--fg:var(--kiiro)}
+.t-kami{--bg:var(--kami);--fg:var(--sumi)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--fg)}
+.screen[hidden],.layer[hidden]{display:none}
+.bar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:68px;padding:max(10px,env(safe-area-inset-top)) 4cqi 10px 6cqi}
+.logo{font-family:var(--disp);font-size:1.1rem;line-height:1;white-space:nowrap}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:0 6cqi 28px;overscroll-behavior:contain}
+.t-sumi :focus-visible{outline-color:var(--kiiro)}
+
+/* 文字の大きさ */
+.size{display:flex;align-items:center;gap:6px}
+.size-l{font-weight:700;font-size:.9rem;margin-right:2px}
+.size button{min-width:52px;min-height:48px;padding:0 10px;border:2px solid var(--sumi);border-radius:8px;background:transparent;font-weight:700;font-size:.95rem;line-height:1.2}
+.size button[aria-pressed="true"]{background:var(--sumi);color:var(--kiiro)}
+.t-sumi .size button{border-color:var(--kiiro)}
+
+/* ボタン：押すと少しつぶれ、ばねで戻る（戻りは JS） */
+.btn{min-height:58px;min-width:48px;display:inline-flex;align-items:center;justify-content:center;gap:.4em;padding:.45em 1.1em;border:2px solid var(--fg);border-radius:8px;background:transparent;color:var(--fg);font-weight:700;font-size:1.05rem;line-height:1.3;text-align:center}
+.btn.primary{background:var(--fg);color:var(--bg)}
+.btn.plain{border-color:transparent;padding-inline:.6em;min-height:48px;text-decoration:underline;text-underline-offset:.2em}
+.btn,.chip,.opt,.person,.stage-btn,.tabs button,.size button,.p-nav button{transition:transform .08s ease-out}
+.btn:active,.chip:active,.opt:active,.person:active,.stage-btn:active,.tabs button:active,.size button:active{transform:scale(.95,.9)}
+html.rm .btn:active,html.rm .chip:active,html.rm .opt:active,html.rm .person:active,html.rm .stage-btn:active,html.rm .tabs button:active,html.rm .size button:active{transform:none}
+
+/* 大きな文字（組まれていく行） */
+.disp{font-family:var(--disp);font-weight:400;margin:0;letter-spacing:-.01em}
+.ln{display:block;overflow:hidden;font-size:var(--f);line-height:1.16;padding-top:.02em;white-space:nowrap}
+.ln>i{display:block;font-style:normal}
+.ln.band{margin-inline:-6cqi}
+.ln.band>i{background:var(--sumi);color:var(--kiiro);padding-inline:6cqi}
+.screen.enter{animation:enter .34s var(--ease-set) both}
+.screen.enter .ln>i{animation:rise .52s var(--ease-set) both;animation-delay:calc(80ms + var(--i) * 75ms)}
+
+/* 下のタブ */
+.tabs{flex:none;display:grid;grid-template-columns:repeat(3,1fr);background:var(--kami);color:var(--sumi);border-top:2px solid var(--sumi);padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{min-height:62px;border:0;background:none;font-weight:700;font-size:min(1rem,4.7cqi);line-height:1.2;padding:4px 2px;border-left:2px solid var(--sumi)}
+.tabs button:first-child{border-left:0}
+.tabs button[aria-current="page"]{background:var(--kiiro);box-shadow:inset 0 6px 0 var(--sumi)}
+.tabs button:focus-visible{outline-offset:-9px}
+
+/* ───────── 1. 入口 ───────── */
+.scr-start .scroll{display:flex;flex-direction:column;padding-top:2cqi}
+.scr-start .copy{margin-top:2cqi}
+.start-act{margin-top:auto;padding-top:28px;display:grid;gap:12px}
+.start-act .btn.primary{min-height:66px;font-size:1.25rem}
+.fact{margin:0;font-weight:700;font-size:.95rem}
+.skip{display:none}
+.scr-start.playing .skip{display:inline-flex}
+.scr-start.playing .bar .size{display:none}
+.cuts{position:absolute;inset:0;pointer-events:none;z-index:2}
+.cut{position:absolute;left:6cqi;right:6cqi;top:50%;transform:translateY(-50%);margin:0;opacity:0;visibility:hidden}
+.scr-start.screen .cut .ln>i{animation:none}
+.scr-start.playing .cut{visibility:visible;animation:cut .56s var(--ease-set) both;animation-delay:calc(var(--i) * .56s)}
+.scr-start.playing .copy .ln>i{animation:fromL .5s var(--ease-set) both;animation-delay:calc(1.62s + var(--i) * .12s)}
+.scr-start.playing .copy .ln:nth-child(even)>i{animation-name:fromR}
+.scr-start.playing .start-act{animation:fadeIn .4s 2.35s both}
+.scr-start.done .copy .ln>i{animation:none}
+
+/* ───────── 2. ホーム ───────── */
+.tally{display:flex;align-items:flex-end;gap:4cqi;margin-top:1cqi}
+.flip{display:flex;font-family:var(--disp);line-height:1;letter-spacing:-.02em}
+.flip .d{position:relative;display:block;perspective:500px}
+.flip .d b{display:block;font-weight:400;backface-visibility:hidden;transform-origin:50% 54%}
+.flip .d::after{content:"";position:absolute;left:-2px;right:-2px;top:54%;height:.035em;background:var(--bg)}
+.tally .flip{font-size:33cqi;margin-left:-1cqi}
+.tally-t{margin:0 0 4.5cqi;font-weight:700;font-size:1.15rem;line-height:1.35}
+.tally-t span{display:block;font-weight:400;font-size:.95rem}
+.ticks{display:block;width:100%;height:34px;margin-top:4px;color:var(--sumi)}
+.ticks .fresh{transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s .35s var(--ease-set) both}
+.scr-home .scroll{display:flex;flex-direction:column}
+.today{flex:1 0 auto;margin:22px -6cqi -28px;padding:14cqi 6cqi 32px;background:var(--sumi);color:var(--kiiro);clip-path:polygon(0 10cqi,100% 0,100% 100%,0 100%)}
+.today .disp{margin-bottom:24px}
+.today .btn{--fg:var(--kiiro);--bg:var(--sumi);width:100%;min-height:64px;font-size:1.15rem}
+.today :focus-visible{outline-color:var(--kiiro)}
+
+/* ───────── 3. 1問ずつ書く ───────── */
+.w-cat{font-weight:700;font-size:.95rem;text-align:right;line-height:1.3}
+.field{margin-top:26px;display:grid;gap:10px}
+.lbl{font-weight:700;font-size:1rem;line-height:1.45;padding:0;margin:0}
+.input{width:100%;min-height:64px;padding:12px 14px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);font-size:1.1rem;line-height:1.5;resize:vertical}
+.input::placeholder{color:#5b6f67}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:48px;padding:0 16px;border:2px solid var(--sumi);border-radius:999px;background:transparent;font-weight:700;font-size:.95rem}
+.hint{margin:0;font-size:.9rem;font-weight:700}
+.err{margin:0;font-weight:700;background:var(--sumi);color:var(--kiiro);padding:8px 12px;border-radius:6px}
+fieldset.opts{border:0;margin:26px 0 0;padding:0;display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;min-height:60px;padding:10px 14px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);font-weight:700;line-height:1.4;cursor:pointer}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .box{flex:none;width:26px;height:26px;border:2.5px solid currentColor;border-radius:50%;display:grid;place-items:center}
+.opt:has(input:checked){background:var(--sumi);color:var(--kiiro)}
+.opt:has(input:checked) .box::after{content:"";width:12px;height:12px;border-radius:50%;background:currentColor}
+.opt:has(input:focus-visible){outline:3px solid var(--sumi);outline-offset:3px}
+.actions{flex:none;display:flex;gap:10px;padding:12px 6cqi calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:2px solid var(--fg)}
+.actions .btn{flex:1}
+.actions .btn.primary{flex:1.7}
+.scr-write .actions .btn:not(.primary){background:var(--kami)}
+.scr-saved .actions{flex-wrap:wrap}
+.scr-saved .actions .btn{flex:1 1 9em;padding-inline:.6em}
+
+/* ───────── 4. 保存した瞬間 ───────── */
+.s-count{display:flex;align-items:flex-end;gap:.5em;font-weight:700;margin-bottom:22px}
+.s-count .flip{font-size:24cqi}
+.s-count>span{font-size:1.1rem;padding-bottom:.6em;color:var(--kami)}
+.scr-saved .scroll{display:flex;flex-direction:column;justify-content:center;padding-bottom:40px}
+.s-label{margin:0 0 10px;color:var(--kami);font-weight:700;font-size:1rem}
+.print-wrap{position:relative;padding:16px 0;--c:rgba(255,255,255,.75);
+  background:
+   linear-gradient(var(--c),var(--c)) 0 0/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) 0 0/2px 18px no-repeat,
+   linear-gradient(var(--c),var(--c)) 100% 0/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) 100% 0/2px 18px no-repeat,
+   linear-gradient(var(--c),var(--c)) 0 100%/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) 0 100%/2px 18px no-repeat,
+   linear-gradient(var(--c),var(--c)) 100% 100%/18px 2px no-repeat, linear-gradient(var(--c),var(--c)) 100% 100%/2px 18px no-repeat}
+.print{font-family:var(--disp);color:var(--kiiro);line-height:1.14;padding:0 3cqi;font-size:var(--f)}
+.pl{display:block;position:relative;white-space:nowrap}
+.pl::after{content:attr(data-t);position:absolute;inset:0;color:var(--kami);opacity:0;pointer-events:none}
+.scr-saved.enter .pl{animation:ink .62s var(--ease-set) both;animation-delay:calc(.44s + var(--i) * .15s)}
+.scr-saved.enter .pl::after{animation:reg .8s ease-out both;animation-delay:calc(.44s + var(--i) * .15s)}
+.s-msg{margin-top:26px;color:var(--kami)}
+.scr-saved.enter .s-msg .ln>i{animation-delay:calc(var(--d) + var(--i) * 90ms)}
+.scr-saved.enter .actions{animation:fadeIn .4s both;animation-delay:var(--da)}
+.scr-saved.enter.from-up{animation:up .46s var(--ease-cut) both;z-index:5}
+.screen.leaving{animation:leaveUp .46s var(--ease-cut) both;z-index:4}
+
+/* ───────── 5. 誰に・いつ見せるか ───────── */
+.people{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:24px}
+.person{min-height:72px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);font-weight:700;font-size:1.1rem;line-height:1.25;padding:8px}
+.person small{display:block;font-size:.9rem;font-weight:400}
+.person[aria-pressed="true"]{background:var(--sumi);color:var(--kiiro)}
+.rows{list-style:none;margin:18px 0 0;padding:0;border-top:2px solid var(--sumi)}
+.row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px;padding:10px 0;border-bottom:2px solid var(--sumi)}
+.row .cat{font-weight:700;font-size:1rem}
+.stage-btn{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:6px 12px;border:2px solid var(--sumi);border-radius:8px;background:var(--kiiro);font-weight:700;font-size:.95rem;line-height:1.3;text-align:left;margin-left:auto}
+.shp{flex:none;width:20px;height:20px}
+.s-note{margin:18px 0 12px;font-weight:700;font-size:.95rem}
+.scr-share .wide{width:100%}
+
+/* ───────── 6. もしものとき（動かさない） ───────── */
+.scr-mosimo.enter{animation:fadeIn .25s ease both}
+.calm-h{font-size:1.75rem;line-height:1.3;margin:4px 0 0;font-weight:700}
+.date{width:100%;min-height:60px;padding:8px 14px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);font-size:1.15rem;font-weight:700}
+.m-read{margin-top:12px;width:100%}
+.pg{margin-top:26px}
+.pg-h{margin:0 0 4px;font-size:1.15rem;font-weight:700;padding-bottom:4px;border-bottom:3px solid var(--sumi)}
+.pg ul{list-style:none;margin:0;padding:0}
+.proc{border-bottom:1px solid #9fb0a9;padding:8px 0}
+.proc label{display:grid;grid-template-columns:48px 1fr;gap:4px 8px;align-items:start;cursor:pointer;min-height:48px}
+.proc input{position:absolute;opacity:0;pointer-events:none}
+.ck{grid-row:1 / span 3;width:30px;height:30px;margin:9px;border:2.5px solid var(--sumi);border-radius:4px;display:grid;place-items:center}
+.proc input:checked + .ck{background:var(--sumi)}
+.proc input:checked + .ck::after{content:"";width:13px;height:7px;border:3px solid var(--kami);border-top:0;border-right:0;transform:translate(0,-2px) rotate(-45deg)}
+.proc input:focus-visible + .ck{outline:3px solid var(--sumi);outline-offset:3px}
+.p-t{font-weight:700;line-height:1.45;padding-top:9px}
+.p-w{grid-column:2;font-size:.9rem;color:var(--sumi-2)}
+.p-d{grid-column:2;font-weight:700;font-size:1rem}
+.p-d .left{font-weight:400;margin-left:.6em}
+.proc.done .p-t{text-decoration:line-through;text-decoration-thickness:2px}
+.m-empty{margin:20px 0 0;font-weight:700;padding:12px 14px;border:2px dashed var(--sumi);border-radius:8px}
+.m-note{margin:22px 0 0;font-size:.9rem;color:var(--sumi-2)}
+
+/* ───────── 重なる面 ───────── */
+.layer{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(14,59,46,.6)}
+.pick{background:var(--kami);color:var(--sumi);border-top:3px solid var(--sumi);padding:22px 6cqi calc(18px + env(safe-area-inset-bottom));display:grid;gap:10px;animation:sheetUp .3s var(--ease-set) both}
+.pick-t{margin:0 0 4px;font-weight:700;font-size:1.05rem}
+.pick-o{display:flex;align-items:center;gap:12px;min-height:58px;padding:8px 14px;border:2px solid var(--sumi);border-radius:8px;background:var(--kami);font-weight:700;text-align:left;line-height:1.35}
+.pick-o[aria-pressed="true"]{background:var(--sumi);color:var(--kiiro)}
+.pick-o[aria-pressed="true"]::after{content:"選んでいます";margin-left:auto;font-size:.9rem;font-weight:400}
+.layer.full{justify-content:flex-start;background:var(--bg);color:var(--fg)}
+.layer.full .scroll{padding-top:4px}
+.paper{background:var(--kami);color:var(--sumi);border:2px solid var(--sumi);padding:22px 18px 18px;margin:8px 0 20px;transform:rotate(-1.2deg);box-shadow:8px 8px 0 var(--sumi);animation:paperIn .5s var(--ease-set) both}
+.pp-k{margin:0;font-weight:700;font-size:.95rem;border-bottom:2px solid var(--sumi);padding-bottom:6px}
+.pp-name{font-family:var(--disp);font-weight:400;font-size:9cqi;line-height:1.2;margin:14px 0 2px}
+.pp-from{margin:0 0 10px;font-size:.9rem}
+.pp-s h3{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:1rem}
+.pp-s ul{margin:0;padding-left:28px}
+.pp-s li{line-height:1.6}
+.ho-act{display:grid;gap:10px}
+.book dl{margin:18px 0 0}
+.book dt{font-weight:700;font-size:.95rem;margin-top:16px;color:var(--sumi-2)}
+.book dd{margin:2px 0 0;font-weight:700;font-size:1.1rem;padding-bottom:10px;border-bottom:1px solid #9fb0a9}
+.book-h{font-size:1.5rem;line-height:1.3;margin:4px 0 4px}
+.toast{position:absolute;left:6cqi;right:6cqi;bottom:84px;z-index:30;margin:0;padding:12px 16px;border-radius:8px;background:var(--sumi);color:var(--kiiro);font-weight:700;text-align:center;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .25s var(--ease-set)}
+.toast.show{opacity:1;transform:none}
+html.rm .toast{transform:none}
+
+/* ───────── 動き ───────── */
+@keyframes enter{from{opacity:0;transform:translateX(7%)}}
+@keyframes rise{from{transform:translateY(112%)}}
+@keyframes fromL{from{transform:translateX(-105%)}}
+@keyframes fromR{from{transform:translateX(105%)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes cut{0%{opacity:0;transform:translateY(-38%) scale(1.06)}20%{opacity:1;transform:translateY(-50%)}80%{opacity:1;transform:translateY(-50%)}100%{opacity:0;transform:translateY(-62%)}}
+@keyframes cutFade{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes leaveUp{to{transform:translateY(-22%);opacity:.2}}
+@keyframes ink{0%{clip-path:inset(0 0 100% 0);transform:scale(1.07)}55%{clip-path:inset(0 0 0 0)}100%{clip-path:inset(0 0 0 0);transform:none}}
+@keyframes reg{0%{opacity:.85;transform:translate(.07em,-.05em)}100%{opacity:0;transform:none}}
+@keyframes grow{from{transform:scaleY(0)}}
+@keyframes sheetUp{from{transform:translateY(100%)}}
+@keyframes paperIn{from{opacity:0;transform:translateY(-6%) rotate(-5deg)}}
+
+/* 動きを減らす：移動と拡大を消し、フェードだけ残す */
+html.rm .screen.enter,html.rm .scr-saved.enter.from-up{animation:fadeIn .25s ease both}
+html.rm .screen.leaving{animation:none;opacity:0}
+html.rm .screen.enter .ln>i,html.rm .scr-start.playing .copy .ln>i{animation-name:fadeIn}
+html.rm .scr-start.done .copy .ln>i{animation:none}
+html.rm .scr-start.playing .cut{animation-name:cutFade;transform:translateY(-50%)}
+html.rm .scr-saved.enter .pl{animation-name:fadeIn}
+html.rm .scr-saved.enter .pl::after{animation:none}
+html.rm .ticks .fresh{animation-name:fadeIn}
+html.rm .pick{animation-name:fadeIn}
+html.rm .paper{animation-name:fadeIn}
+</style>
+</head>
+<body>
+<div class="stage">
+  <aside class="panel" aria-label="試作の操作">
+    <p class="p-title">のこす手帖</p>
+    <p class="p-sub">C　大きな文字の広告</p>
+    <nav aria-label="画面の切り替え">
+      <ol class="p-nav">
+        <li><button data-go="start"><b>1</b>入口（オープニング）</button></li>
+        <li><button data-go="home"><b>2</b>ホーム</button></li>
+        <li><button data-go="write"><b>3</b>1問ずつ書く</button></li>
+        <li><button data-go="saved"><b>4</b>保存した瞬間</button></li>
+        <li><button data-go="share"><b>5</b>誰に・いつ見せるか</button></li>
+        <li><button data-go="mosimo"><b>6</b>もしものとき</button></li>
+      </ol>
+    </nav>
+    <p class="p-h" id="pSize">文字の大きさ</p>
+    <div class="size" role="group" aria-labelledby="pSize">
+      <button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button>
+    </div>
+    <label class="p-check"><input type="checkbox" id="rmToggle">動きを減らして見る</label>
+  </aside>
+
+  <div class="device-wrap"><div class="device">
+  <main class="app" id="app">
+
+    <!-- 1. 入口 -->
+    <section class="screen scr-start t-kiiro" data-screen="start" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <button class="btn skip" data-act="skip">とばす</button>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="cuts" aria-hidden="true">
+        <p class="cut disp" style="--i:0"><span class="ln" style="--f:28cqi"><i>通帳、</i></span><span class="ln" style="--f:28cqi"><i>どこ？</i></span></p>
+        <p class="cut disp" style="--i:1"><span class="ln" style="--f:22cqi"><i>印鑑は？</i></span></p>
+        <p class="cut disp" style="--i:2"><span class="ln" style="--f:21cqi"><i>ペットの</i></span><span class="ln" style="--f:21cqi"><i>世話は？</i></span></p>
+      </div>
+      <div class="scroll">
+        <h1 class="copy disp" tabindex="-1" data-focus aria-label="のこす手帖">
+          <span class="ln" style="--f:29.3cqi;--i:0"><i>のこす</i></span>
+          <span class="ln band" style="--f:29.3cqi;--i:1"><i>手帖</i></span>
+        </h1>
+        <div class="start-act">
+          <button class="btn primary" id="startBtn" data-go="home">はじめる</button>
+          <p class="fact">無料、登録なし。中身はこのスマホの中だけ。</p>
+          <button class="btn" data-go="mosimo">もしものとき（ご家族の方）</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ホーム -->
+    <section class="screen scr-home t-kiiro" data-screen="home" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="sr" tabindex="-1" data-focus>ホーム</h1>
+        <div class="tally" role="img" id="tallyA">
+          <div class="flip" id="flipHome"></div>
+          <p class="tally-t" aria-hidden="true">問<br>書けた<span>全46問</span></p>
+        </div>
+        <div id="ticks"></div>
+        <div class="today">
+          <h2 class="disp" id="homeQ"></h2>
+          <button class="btn primary" id="homeBtn" data-act="today">今日の1問に答える</button>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 3. 1問ずつ書く -->
+    <section class="screen scr-write t-kiiro" data-screen="write" hidden>
+      <div class="bar">
+        <button class="btn plain" data-act="back">戻る</button>
+        <span class="w-cat" id="wCat"></span>
+      </div>
+      <div class="scroll">
+        <h1 class="disp" id="wQ" tabindex="-1" data-focus></h1>
+        <div id="wField"></div>
+      </div>
+      <div class="actions">
+        <button class="btn" data-act="later">あとで</button>
+        <button class="btn primary" data-act="save" id="saveBtn">保存する</button>
+      </div>
+    </section>
+
+    <!-- 4. 保存した瞬間 -->
+    <section class="screen scr-saved t-sumi" data-screen="saved" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+      </div>
+      <div class="scroll">
+        <div class="s-count" role="img" id="sCountA"><div class="flip" id="flipSaved" aria-hidden="true"></div><span aria-hidden="true">／46問</span></div>
+        <p class="s-label" id="sLabel"></p>
+        <div class="print-wrap"><p class="print" id="print"></p></div>
+        <h1 class="s-msg disp" id="sMsg" tabindex="-1" data-focus></h1>
+      </div>
+      <div class="actions" id="sAct">
+        <button class="btn" data-go="home">今日はここまで</button>
+        <button class="btn primary" data-act="next">次の1問へ</button>
+      </div>
+    </section>
+
+    <!-- 5. 誰に・いつ見せるか -->
+    <section class="screen scr-share t-kami" data-screen="share" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="disp" tabindex="-1" data-focus aria-label="誰に、いつ見せる？">
+          <span class="ln" style="--f:26cqi;--i:0"><i>誰に、</i></span>
+          <span class="ln" style="--f:26cqi;--i:1"><i>いつ、</i></span>
+          <span class="ln" style="--f:21.5cqi;--i:2"><i>見せる？</i></span>
+        </h1>
+        <div class="people" role="group" aria-label="見せる人" id="people"></div>
+        <ul class="rows" id="rows"></ul>
+        <p class="s-note">このスマホを開ける人は、全部読めます。</p>
+        <button class="btn primary wide" data-act="handover" id="hoBtn">受け渡しシートを見る</button>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 6. もしものとき -->
+    <section class="screen scr-mosimo t-kami" data-screen="mosimo" hidden>
+      <div class="bar">
+        <span class="logo">のこす手帖</span>
+        <div class="size" role="group" aria-label="文字の大きさ"><span class="size-l" aria-hidden="true">文字</span><button data-size="m" aria-pressed="true">標準</button><button data-size="l" aria-pressed="false">大</button></div>
+      </div>
+      <div class="scroll">
+        <h1 class="calm-h" tabindex="-1" data-focus>もしものとき</h1>
+        <div class="field">
+          <label class="lbl" for="dd">亡くなった日</label>
+          <input class="date" type="date" id="dd">
+        </div>
+        <button class="btn m-read" data-act="book">和子さんの手帖を読む</button>
+        <div id="procs"></div>
+        <p class="m-note">期限は一般的な目安です。数え方は届け先に確かめてください。</p>
+      </div>
+      <nav class="tabs" aria-label="画面"><button data-go="home">ホーム</button><button data-go="share">誰に・いつ</button><button data-go="mosimo">もしものとき</button></nav>
+    </section>
+
+    <!-- 時期を選ぶ -->
+    <div class="layer" id="picker" hidden>
+      <div class="pick" role="dialog" aria-modal="true" aria-labelledby="pickT">
+        <p class="pick-t" id="pickT"></p>
+        <div id="pickO" style="display:grid;gap:8px"></div>
+        <button class="btn" style="--fg:var(--sumi);--bg:var(--kami)" data-act="close">閉じる</button>
+      </div>
+    </div>
+
+    <!-- 受け渡しシートの見本 -->
+    <div class="layer full t-kiiro" id="handover" hidden role="dialog" aria-modal="true" aria-labelledby="hoT">
+      <div class="bar"><span class="logo">受け渡しシートの見本</span><button class="btn" data-act="close">閉じる</button></div>
+      <div class="scroll">
+        <article class="paper" id="paper"></article>
+        <div class="ho-act">
+          <button class="btn primary" data-act="print">受け渡しシートを印刷</button>
+          <button class="btn" style="background:var(--kami)" data-act="file">ファイルで渡す</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 手帖を読む（書き換えない） -->
+    <div class="layer full t-kami book" id="book" hidden role="dialog" aria-modal="true" aria-labelledby="bookT">
+      <div class="bar"><span class="logo">のこす手帖</span><button class="btn" data-act="close">閉じる</button></div>
+      <div class="scroll">
+        <h2 class="book-h" id="bookT">和子さんの手帖</h2>
+        <p class="hint">読むだけの表示です。書き換えはできません。</p>
+        <dl id="bookList"></dl>
+      </div>
+    </div>
+
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  </main>
+  </div></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const html = document.documentElement;
+  const params = new URLSearchParams(location.search);
+  const mqRM = matchMedia('(prefers-reduced-motion: reduce)');
+  const mqPC = matchMedia('(min-width: 820px) and (min-height: 560px)');
+  const KEY = 'nokosu-poster-opening-seen';
+  const TOTAL = 46;
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // ── 問い（文言は app/js/questions.js から。大きな文字の行は、問いを話しことばに組み直したもの）
+  const QS = [
+    { id: 'me.docs', cat: 'わたしのこと', copy: ['通帳、', 'どこに', 'ある？'], label: '通帳・キャッシュカードの保管場所', type: 'text',
+      ph: '例：居間のたんす 右上の引き出し', chips: ['居間のたんす', '寝室の引き出し', '台所の戸棚'], hint: '「どの引き出しか」だけで十分です。' },
+    { id: 'money.banks', cat: 'お金と財産', copy: ['口座は、', 'どこの', '銀行？'], label: '預貯金の口座（金融機関の名前）', type: 'text',
+      ph: '例：〇〇銀行、ゆうちょ銀行', chips: ['ゆうちょ銀行', '信用金庫'], hint: '口座番号・暗証番号は書かないでください。' },
+    { id: 'medical.lifeSupport', cat: '医療・介護', copy: ['延命治療、', 'どうして', 'ほしい？'], label: '回復の見込みがないときの延命治療', type: 'radio',
+      options: ['できるかぎり続けてほしい', '苦痛をやわらげる治療だけにしてほしい', '家族と医師に任せる', 'まだ決められない'], hint: '法的な拘束力はありません。' },
+    { id: 'pet.list', cat: 'ペット', copy: ['いっしょに', '暮らす', '動物は？'], label: '一緒に暮らしている動物（名前と種類）', type: 'text',
+      ph: '例：柴犬のコロ', chips: [], hint: '名前と種類だけでも登録できます。' },
+  ];
+  const CATS = [['me', 'わたしのこと'], ['family', '家族・大切な人'], ['money', 'お金と財産'], ['insurance', '保険・年金'], ['medical', '医療・介護'], ['funeral', '葬儀・お墓'], ['will', '相続・遺言'], ['pet', 'ペット'], ['words', '家族へのことば']];
+  const STAGES = [['now', '今すぐ'], ['incap', '判断がむずかしくなったら'], ['after', '亡くなったあと'], ['never', '見せない']];
+  const PEOPLE = [{ id: 'miki', name: '山田 美紀', short: '美紀さん', rel: '長女' }, { id: 'ken', name: '山田 健一', short: '健一さん', rel: '長男' }];
+  const GROUPS = [['d7', '7日以内'], ['d14', '14日以内'], ['m3', '3か月以内'], ['m4', '4か月以内'], ['m10', '10か月以内']];
+  // 手続き（文言と日数は app/js/logic.js の NAVI_BASE_TASKS。届け先は短くしたもの）
+  const PROCS = [
+    { id: 'death-cert', g: 'd7', days: 7, t: '死亡診断書（死体検案書）を受け取り、コピーを数枚とる', w: '病院・医師' },
+    { id: 'death-report', g: 'd7', days: 7, t: '死亡届を出す', w: '市区町村役場' },
+    { id: 'cremation', g: 'd7', days: 7, t: '火葬許可を申請する', w: '市区町村役場（死亡届と同時に）' },
+    { id: 'pension', g: 'd14', days: 10, t: '年金の受給を止める（受給権者死亡届）', w: '年金事務所（厚生年金は10日以内、国民年金は14日以内）' },
+    { id: 'health', g: 'd14', days: 14, t: '健康保険の資格喪失の手続きをし、資格確認書などを返す', w: '市区町村役場' },
+    { id: 'care', g: 'd14', days: 14, t: '介護保険の資格喪失届を出し、保険証を返す', w: '市区町村役場' },
+    { id: 'householder', g: 'd14', days: 14, t: '世帯主の変更届を出す', w: '市区町村役場' },
+    { id: 'renounce', g: 'm3', months: 3, t: '相続放棄・限定承認をするか決める', w: '家庭裁判所' },
+    { id: 'quasi-return', g: 'm4', months: 4, t: '準確定申告をする（亡くなった年の所得の申告）', w: '亡くなった方の住所地の税務署' },
+    { id: 'inheritance-tax', g: 'm10', months: 10, t: '相続税の申告と納付をする（必要な場合）', w: '亡くなった方の住所地の税務署' },
+  ];
+
+  const S = {
+    base: 12, saved: {}, draft: {}, qi: 0, last: null, fresh: false,
+    person: 'miki',
+    stages: {
+      miki: { me: 'now', family: 'now', money: 'after', insurance: 'after', medical: 'incap', funeral: 'after', will: 'after', pet: 'now', words: 'after' },
+      ken: { me: 'now', family: 'now', money: 'after', insurance: 'after', medical: 'incap', funeral: 'after', will: 'after', pet: 'incap', words: 'never' },
+    },
+    death: params.get('d') || '', done: {},
+  };
+  const count = () => S.base + Object.keys(S.saved).length;
+  const rm = () => html.classList.contains('rm');
+  let current = null, opTimer = 0, toastTimer = 0, layerReturn = null, pickCat = null;
+
+  // ── 小道具
+  const units = (s) => [...s].reduce((n, ch) => n + (/[\x20-\x7e]/.test(ch) ? 0.58 : 1), 0);
+  function lines(arr, w = 88, cap = 26) {
+    return arr.map((t, i) => `<span class="ln" style="--f:${Math.min(cap, w / units(t)).toFixed(2)}cqi;--i:${i}"><i>${esc(t)}</i></span>`).join('');
+  }
+  function chunk(s) {
+    s = s.trim().replace(/[\s　]+/g, ' ');
+    const words = s.split(' ');
+    if (words.length > 1 && words.length <= 4 && words.every((w) => units(w) <= 9)) return words;
+    const L = units(s);
+    const rows = L <= 6 ? 1 : L <= 14 ? 2 : L <= 27 ? 3 : 4;
+    const n = Math.max(3, Math.min(14, Math.ceil(L / rows)));
+    const out = []; let cur = '', cu = 0;
+    for (const ch of s) {
+      const u = /[\x20-\x7e]/.test(ch) ? 0.58 : 1;
+      if (cu + u > n + 0.01 && cur) { out.push(cur.trim()); cur = ''; cu = 0; }
+      if (cur === '' && ch === ' ') continue;
+      cur += ch; cu += u;
+    }
+    if (cur.trim()) out.push(cur.trim());
+    for (let i = 1; i < out.length; i++) { while (out[i] && /^[、。，．）」』？！ー]/.test(out[i])) { out[i - 1] += out[i][0]; out[i] = out[i].slice(1); } }
+    return out.filter(Boolean);
+  }
+  function shape(id) {
+    const o = '<svg class="shp" viewBox="0 0 20 20" aria-hidden="true">';
+    const sq = '<rect x="2" y="2" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"/>';
+    if (id === 'now') return o + '<rect x="1" y="1" width="18" height="18" fill="currentColor"/></svg>';
+    if (id === 'incap') return o + sq + '<path d="M2 18 18 2v16z" fill="currentColor"/></svg>';
+    if (id === 'after') return o + sq + '</svg>';
+    return o + sq + '<path d="M4 16 16 4" stroke="currentColor" stroke-width="2.5"/></svg>';
+  }
+  const stageLabel = (id) => STAGES.find((s) => s[0] === id)[1];
+
+  // ── めくれる数字
+  function renderFlip(el, n) {
+    el.innerHTML = String(n).split('').map((d) => `<span class="d"><b>${d}</b></span>`).join('');
+    el.dataset.v = n;
+  }
+  function flipTo(el, n) {
+    const old = String(el.dataset.v || ''), nw = String(n);
+    if (old.length !== nw.length) { renderFlip(el, n); return; }
+    const ds = $$('.d b', el);
+    [...nw].forEach((c, i) => {
+      if (old[i] === c) return;
+      const b = ds[i];
+      if (rm()) {
+        b.animate([{ opacity: 1 }, { opacity: 0, offset: .4 }, { opacity: 0, offset: .45 }, { opacity: 1 }], { duration: 400 });
+        setTimeout(() => { b.textContent = c; }, 170);
+        return;
+      }
+      // 上へめくれて消え、下から次の数字がめくれて出る。最後に少し行き過ぎて戻る
+      b.animate([
+        { transform: 'rotateX(0deg)', easing: 'cubic-bezier(.6,0,1,1)' },
+        { transform: 'rotateX(90deg)', offset: .4 },
+        { transform: 'rotateX(-90deg)', offset: .401, easing: 'cubic-bezier(.2,.9,.3,1)' },
+        { transform: 'rotateX(14deg)', offset: .8 },
+        { transform: 'rotateX(0deg)' },
+      ], { duration: 520, delay: i * 70 });
+      setTimeout(() => { b.textContent = c; }, i * 70 + 208);
+    });
+    el.dataset.v = n;
+  }
+  // ── ばねで戻る
+  function spring(el) {
+    if (rm() || !el.animate) return;
+    el.animate([{ transform: 'scale(.95,.9)' }, { transform: 'scale(1.045,1.04)', offset: .42 }, { transform: 'scale(.99,1)', offset: .72 }, { transform: 'scale(1)' }], { duration: 440, easing: 'ease-out' });
+  }
+  document.addEventListener('pointerup', (e) => {
+    const b = e.target.closest('.btn,.chip,.opt,.person,.stage-btn,.tabs button,.size button,.pick-o');
+    if (b) spring(b);
+  });
+
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // ── 日付（app/js/logic.js と同じ数え方）
+  const pk = (k) => { const [y, m, d] = k.split('-').map(Number); return { y, m, d }; };
+  const p2 = (n) => String(n).padStart(2, '0');
+  const kUTC = (t) => { const d = new Date(t); return `${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}`; };
+  const addDays = (k, n) => { const { y, m, d } = pk(k); return kUTC(Date.UTC(y, m - 1, d + n)); };
+  function monthsDeadline(k, n) {
+    const { y, m, d } = pk(addDays(k, 1));
+    const last = new Date(Date.UTC(y, m - 1 + n + 1, 0)).getUTCDate();
+    if (d > last) return kUTC(Date.UTC(y, m - 1 + n, last));
+    return addDays(kUTC(Date.UTC(y, m - 1 + n, d)), -1);
+  }
+  const diffDays = (a, b) => { const A = pk(a), B = pk(b); return Math.round((Date.UTC(B.y, B.m - 1, B.d) - Date.UTC(A.y, A.m - 1, A.d)) / 86400000); };
+  const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`; };
+  const WEEK = '日月火水木金土';
+  function fmt(k) {
+    const { y, m, d } = pk(k);
+    const w = WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+    return `${y !== new Date().getFullYear() ? y + '年' : ''}${m}月${d}日（${w}）`;
+  }
+
+  // ── 画面ごとの中身
+  const RENDER = {
+    start() { const s = $('.scr-start'); if (!s.classList.contains('playing')) s.classList.add('done'); },
+
+    home() {
+      const n = count();
+      renderFlip($('#flipHome'), n);
+      $('#tallyA').setAttribute('aria-label', `全46問のうち、${n}問 書けた`);
+      let t = '<svg class="ticks" viewBox="0 0 460 40" preserveAspectRatio="none" aria-hidden="true">';
+      for (let i = 0; i < TOTAL; i++) {
+        const x = i * 10 + 1;
+        t += i < n
+          ? `<rect${S.fresh && i === n - 1 ? ' class="fresh"' : ''} x="${x}" y="0" width="7.5" height="40" fill="currentColor"/>`
+          : `<rect x="${x + .9}" y="1" width="5.7" height="38" fill="none" stroke="currentColor" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
+      }
+      $('#ticks').innerHTML = t + '</svg>';
+      S.fresh = false;
+      const done = !!S.saved[QS[0].id];
+      $('#homeQ').innerHTML = lines(done ? ['今日の1問、', '書けた。'] : QS[0].copy, 88, 22);
+      $('#homeQ').setAttribute('aria-label', done ? '今日の1問、書けた。' : QS[0].copy.join(''));
+      $('#homeBtn').textContent = done ? 'もう1問書く' : '今日の1問に答える';
+    },
+
+    write() {
+      const q = QS[S.qi];
+      $('#wCat').textContent = q.cat;
+      $('#wQ').innerHTML = lines(q.copy);
+      $('#wQ').setAttribute('aria-label', q.copy.join(''));
+      const v = S.draft[q.id] ?? S.saved[q.id] ?? '';
+      let h = '';
+      if (q.type === 'radio') {
+        h = `<fieldset class="opts field"><legend class="lbl">${esc(q.label)}</legend>` +
+          q.options.map((o) => `<label class="opt"><input type="radio" name="ans" value="${esc(o)}"${o === v ? ' checked' : ''}><span class="box" aria-hidden="true"></span>${esc(o)}</label>`).join('') +
+          `<p class="hint">${esc(q.hint)}</p><p class="err" id="err" hidden>選ぶか、書いてから保存します。</p></fieldset>`;
+      } else {
+        h = `<div class="field"><label class="lbl" for="ans">${esc(q.label)}</label>
+          <textarea class="input" id="ans" rows="2" placeholder="${esc(q.ph)}">${esc(v)}</textarea>
+          ${q.chips.length ? `<div class="chips" role="group" aria-label="よくある答え">${q.chips.map((c) => `<button class="chip" data-chip="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : ''}
+          <p class="hint">${esc(q.hint)}</p><p class="err" id="err" hidden>選ぶか、書いてから保存します。</p></div>`;
+      }
+      $('#wField').innerHTML = h;
+    },
+
+    saved() {
+      if (!S.last) { S.saved[QS[0].id] = '居間のたんす 右上の引き出し'; S.last = { q: QS[0], v: S.saved[QS[0].id] }; S.fresh = true; }
+      const { q, v } = S.last;
+      $('#sLabel').textContent = q.label;
+      const ls = chunk(v);
+      const n = Math.max(...ls.map(units));
+      const pr = $('#print');
+      pr.style.setProperty('--f', Math.min(24, 82 / (n + 0.2)).toFixed(2) + 'cqi');
+      pr.innerHTML = ls.map((t, i) => `<span class="pl" data-t="${esc(t)}" style="--i:${i}">${esc(t)}</span>`).join('');
+      const tMsg = rm() ? 200 : 440 + ls.length * 150 + 260;
+      const m = $('#sMsg');
+      m.innerHTML = lines(['家族に、1つ', 'のこしました。'], 66, 14);
+      m.setAttribute('aria-label', `保存しました。家族に、1つ のこしました。${q.label}：${v}`);
+      m.style.setProperty('--d', tMsg + 'ms');
+      $('#sAct').style.setProperty('--da', (tMsg + 520) + 'ms');
+      const fl = $('#flipSaved');
+      renderFlip(fl, count() - 1);
+      $('#sCountA').setAttribute('aria-label', `全46問のうち${count()}問`);
+      setTimeout(() => flipTo(fl, count()), tMsg + 120);
+    },
+
+    share() {
+      $('#people').innerHTML = PEOPLE.map((p) => `<button class="person" data-person="${p.id}" aria-pressed="${p.id === S.person}">${esc(p.short)}<small>${esc(p.rel)}</small></button>`).join('');
+      renderRows();
+    },
+
+    mosimo() { $('#dd').value = S.death; $('#dd').max = todayKey(); renderProcs(); },
+  };
+
+  function renderRows() {
+    const st = S.stages[S.person];
+    const p = PEOPLE.find((x) => x.id === S.person);
+    $('#rows').innerHTML = CATS.map(([id, name]) =>
+      `<li class="row"><span class="cat" id="c-${id}">${esc(name)}</span><button class="stage-btn" data-cat="${id}" aria-haspopup="dialog" aria-describedby="c-${id}">${shape(st[id])}<span>${stageLabel(st[id])}</span><span class="sr">（${esc(p.short)}に見せる時期を変える）</span></button></li>`).join('');
+    $('#hoBtn').textContent = `${p.short}の受け渡しシートを見る`;
+  }
+
+  function renderProcs() {
+    const d = S.death, today = todayKey();
+    let h = d ? '' : '<p class="m-empty">日付を入れると、それぞれの期限の日が出ます。</p>';
+    for (const [gid, gl] of GROUPS) {
+      h += `<section class="pg"><h2 class="pg-h">${gl}</h2><ul>`;
+      for (const p of PROCS.filter((x) => x.g === gid)) {
+        let due = '';
+        if (d) {
+          const k = p.days ? addDays(d, p.days - 1) : monthsDeadline(d, p.months);
+          const left = diffDays(today, k);
+          const lt = left < 0 ? `期限を${-left}日過ぎています` : left === 0 ? '今日まで' : `あと${left}日`;
+          due = `<span class="p-d">${fmt(k)}まで<span class="left">${lt}</span></span>`;
+        }
+        const ck = !!S.done[p.id];
+        h += `<li class="proc${ck ? ' done' : ''}"><label><input type="checkbox" data-proc="${p.id}"${ck ? ' checked' : ''}><span class="ck" aria-hidden="true"></span><span class="p-t">${esc(p.t)}</span>${due}<span class="p-w">${esc(p.w)}</span></label></li>`;
+      }
+      h += '</ul></section>';
+    }
+    $('#procs').innerHTML = h;
+  }
+
+  // ── 画面の切り替え
+  function go(name, opt = {}) {
+    const next = $(`.screen[data-screen="${name}"]`);
+    if (!next) return;
+    closeLayer(true);
+    const prev = current;
+    RENDER[name]?.(opt);
+    if (prev && prev !== next) {
+      if (opt.up && !rm()) {
+        prev.classList.add('leaving');
+        setTimeout(() => { prev.hidden = true; prev.classList.remove('leaving'); }, 470);
+      } else prev.hidden = true;
+    }
+    next.hidden = false;
+    next.classList.remove('enter', 'from-up');
+    void next.offsetWidth;
+    if (opt.up) next.classList.add('from-up');
+    next.classList.add('enter');
+    const sc = $('.scroll', next); if (sc) sc.scrollTop = 0;
+    current = next;
+    $$('.p-nav [data-go]').forEach((b) => b.setAttribute('aria-current', b.dataset.go === name ? 'page' : 'false'));
+    $$('.tabs [data-go]', next).forEach((b) => b.setAttribute('aria-current', b.dataset.go === name ? 'page' : 'false'));
+    if (!opt.noFocus) $('[data-focus]', next)?.focus({ preventScroll: true });
+  }
+
+  function startOpening() {
+    const s = $('.scr-start');
+    s.classList.remove('done', 'playing');
+    go('start', { noFocus: true });
+    s.classList.remove('done', 'enter');
+    void s.offsetWidth;
+    s.classList.add('playing');
+    clearTimeout(opTimer);
+    opTimer = setTimeout(endOpening, 2900);
+    try { localStorage.setItem(KEY, '1'); } catch (e) { /* 保存できなくても動く */ }
+  }
+  function endOpening() {
+    const s = $('.scr-start');
+    clearTimeout(opTimer);
+    if (!s.classList.contains('playing')) return;
+    const hadFocus = document.activeElement === $('.skip', s);
+    s.classList.remove('playing'); s.classList.add('done');
+    if (hadFocus) $('#startBtn').focus({ preventScroll: true });
+  }
+
+  // ── 書く・保存する
+  function answer() {
+    const q = QS[S.qi];
+    if (q.type === 'radio') return $('input[name="ans"]:checked')?.value || '';
+    return ($('#ans')?.value || '').trim();
+  }
+  function save() {
+    const q = QS[S.qi], v = answer();
+    if (!v) { const e = $('#err'); e.hidden = false; ($('#ans') || $('input[name="ans"]'))?.focus(); return; }
+    S.saved[q.id] = v; delete S.draft[q.id];
+    S.last = { q, v }; S.fresh = true;
+    setTimeout(() => go('saved', { up: true }), rm() ? 0 : 170);
+  }
+  const nextIndex = () => { for (let k = 1; k <= QS.length; k++) { const i = (S.qi + k) % QS.length; if (!S.saved[QS[i].id]) return i; } return (S.qi + 1) % QS.length; };
+
+  // ── 重なる面
+  function openLayer(id, from) {
+    const l = $('#' + id);
+    layerReturn = from || document.activeElement;
+    l.hidden = false;
+    if (current) current.inert = true;
+    $('button, [tabindex]', l)?.focus({ preventScroll: true });
+    const f = $('[aria-pressed="true"]', l); if (f) f.focus({ preventScroll: true });
+  }
+  function closeLayer(silent) {
+    const open = $$('.layer:not([hidden])');
+    if (!open.length) return;
+    open.forEach((l) => { l.hidden = true; });
+    if (current) current.inert = false;
+    if (!silent && layerReturn && document.contains(layerReturn)) layerReturn.focus({ preventScroll: true });
+  }
+  function openPicker(cat, btn) {
+    pickCat = cat;
+    const p = PEOPLE.find((x) => x.id === S.person);
+    const name = CATS.find((c) => c[0] === cat)[1];
+    $('#pickT').textContent = `「${name}」を${p.short}に見せるのは`;
+    const cur = S.stages[S.person][cat];
+    $('#pickO').innerHTML = STAGES.map(([id, l]) => `<button class="pick-o" data-stage="${id}" aria-pressed="${id === cur}">${shape(id)}<span>${l}</span></button>`).join('');
+    openLayer('picker', btn);
+  }
+  function openHandover(btn) {
+    const p = PEOPLE.find((x) => x.id === S.person);
+    const st = S.stages[S.person];
+    const tk = pk(todayKey());
+    let h = `<p class="pp-k">受け渡しシート</p><h2 class="pp-name" id="hoT">${esc(p.name)}さんへ</h2><p class="pp-from">山田 和子の手帖から　${tk.y}年${tk.m}月${tk.d}日</p>`;
+    for (const [sid, sl] of STAGES.slice(0, 3)) {
+      const cs = CATS.filter((c) => st[c[0]] === sid);
+      if (!cs.length) continue;
+      h += `<section class="pp-s"><h3>${shape(sid)}${sl}</h3><ul>${cs.map((c) => `<li>${esc(c[1])}</li>`).join('')}</ul></section>`;
+    }
+    $('#paper').innerHTML = h;
+    openLayer('handover', btn);
+  }
+  function openBook(btn) {
+    const rows = [
+      ['お名前と生年月日', '山田 和子　昭和24年5月3日'],
+      ['大切な書類の保管場所', S.saved['me.docs'] || '居間のたんす 右上の引き出し'],
+      ['預貯金の口座', S.saved['money.banks'] || 'ゆうちょ銀行、〇〇銀行 駅前支店'],
+      ['回復の見込みがないときの延命治療', S.saved['medical.lifeSupport'] || '苦痛をやわらげる治療だけにしてほしい'],
+      ['一緒に暮らしている動物', S.saved['pet.list'] || '柴犬のコロ'],
+    ];
+    $('#bookList').innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+    openLayer('book', btn);
+  }
+
+  // ── 文字の大きさ・動き
+  function setSize(v) {
+    html.dataset.size = v;
+    $$('[data-size]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === v)));
+    try { localStorage.setItem('nokosu-poster-size', v); } catch (e) { /* なくても動く */ }
+  }
+  function syncRM() { html.classList.toggle('rm', mqRM.matches || $('#rmToggle').checked || params.get('rm') === '1'); }
+  mqRM.addEventListener?.('change', syncRM);
+  $('#rmToggle').addEventListener('change', syncRM);
+
+  function fit() {
+    const sc = mqPC.matches ? Math.min(1, (innerHeight - 40) / 864) : 1;
+    html.style.setProperty('--sc', sc.toFixed(4));
+  }
+  addEventListener('resize', fit);
+
+  // ── 操作
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-go],[data-act],[data-size],[data-chip],[data-cat],[data-stage],[data-person]');
+    if (!t) return;
+    const d = t.dataset;
+    if (d.size) return setSize(d.size);
+    if (d.go) {
+      if (d.go === 'start') return startOpening();
+      if (d.go === 'saved' && !S.last) { S.qi = 0; }
+      return go(d.go);
+    }
+    if (d.chip) { const a = $('#ans'); a.value = d.chip + ' '; S.draft[QS[S.qi].id] = a.value; a.focus(); a.setSelectionRange(a.value.length, a.value.length); $('#err').hidden = true; return; }
+    if (d.cat) return openPicker(d.cat, t);
+    if (d.stage) {
+      S.stages[S.person][pickCat] = d.stage;
+      closeLayer(true); renderRows();
+      $(`.stage-btn[data-cat="${pickCat}"]`)?.focus({ preventScroll: true });
+      return;
+    }
+    if (d.person) { S.person = d.person; $$('.person').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.person === S.person))); renderRows(); return; }
+    switch (d.act) {
+      case 'skip': return endOpening();
+      case 'today': S.qi = S.saved[QS[0].id] ? nextIndex() : 0; return go('write');
+      case 'back': if (S.qi > 0) { S.qi -= 1; return go('write'); } return go('home');
+      case 'later': toast('この問いは、あとでまた聞きます。'); S.qi = (S.qi + 1) % QS.length; return go('write');
+      case 'save': return save();
+      case 'next': S.qi = nextIndex(); return go('write');
+      case 'handover': return openHandover(t);
+      case 'book': return openBook(t);
+      case 'close': return closeLayer();
+      case 'print': return toast('見本なので、ここでは印刷しません。');
+      case 'file': return toast('見本なので、ここではファイルを作りません。');
+    }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'ans') { S.draft[QS[S.qi].id] = e.target.value; $('#err').hidden = true; }
+    if (e.target.id === 'dd') { S.death = e.target.value; renderProcs(); }
+  });
+  document.addEventListener('change', (e) => {
+    if (e.target.name === 'ans') $('#err').hidden = true;
+    if (e.target.dataset.proc) { S.done[e.target.dataset.proc] = e.target.checked; e.target.closest('.proc').classList.toggle('done', e.target.checked); }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { if ($('.layer:not([hidden])')) closeLayer(); else if ($('.scr-start.playing')) endOpening(); }
+  });
+
+  // ── はじまり
+  let size = params.get('size');
+  if (!size) { try { size = localStorage.getItem('nokosu-poster-size'); } catch (e) { size = null; } }
+  setSize(size === 'l' ? 'l' : 'm');
+  syncRM(); fit();
+  const first = params.get('s');
+  if (first === 'start' || params.get('op') === '1') startOpening();
+  else if (first) {
+    if (first === 'write' && params.get('q')) S.qi = Math.min(QS.length - 1, Number(params.get('q')) || 0);
+    go(first, { noFocus: true });
+    if (params.get('sheet') === '1' && first === 'share') openHandover($('#hoBtn'));
+    if (params.get('sheet') === 'pick' && first === 'share') openPicker('money', $('.stage-btn'));
+    if (params.get('sheet') === 'book' && first === 'mosimo') openBook($('.m-read'));
+  } else {
+    let seen = false;
+    try { seen = localStorage.getItem(KEY) === '1'; } catch (e) { seen = false; }
+    if (seen) go('home', { noFocus: true }); else startOpening();
+  }
+})();
+</script>
+</body>
+</html>

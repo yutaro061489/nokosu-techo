@@ -1,0 +1,1125 @@
+<!doctype html>
+<html lang="ja" data-size="std">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FAFAF7">
+<meta name="color-scheme" content="light">
+<title>のこす手帖 和紙と墨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────
+   和紙と墨（2版）
+   シックな世界：和紙・墨・朱の3色だけ（朱は落款と「今日」の1マスだけ）
+   明るい世界　：手ぬぐい・千代紙の柄。山吹・若竹＋墨（紅白にしない）
+   縦書きは、入口・今日の1問・保存した紙の3か所だけ
+   ───────────────────────────────────────────── */
+:root{
+  /* シックな世界 */
+  --washi:#FAFAF7;      /* 和紙。ほぼ白 */
+  --sumi:#2B2B29;       /* 墨。和紙の上で 13.6:1。主ボタンの地 */
+  --usuzumi:#5A5955;    /* 薄墨（墨の濃淡）。補足の文字 6.6:1 */
+  --shu:#B23A2A;        /* 朱。落款と「今日」の1マスだけ */
+  --line:#85847F;       /* 入力欄の線（墨の濃淡）。3.4:1 */
+  --rule:rgba(43,43,41,.14); /* 罫（墨の濃淡）。飾り */
+  /* 明るい世界 */
+  --yamabuki:#F2B53A;   /* 山吹。面と柄。墨の文字 7.7:1 */
+  --wakatake:#3C7A55;   /* 若竹（濃いめ）。白抜き・白地の文字とも 5.1:1 */
+  --wakatake-l:#9CCBA9; /* 若竹の淡。柄だけ */
+  --paper:#FFFFFF;
+
+  --f-ui:"BIZ UDPGothic","Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;
+  --f-min:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-maru:"Zen Maru Gothic","BIZ UDPGothic",sans-serif;
+  --tq:1.62rem;         /* 縦書きの問いの大きさ */
+  --fiber:none;
+  color-scheme:light;
+}
+html{font-size:18px;-webkit-text-size-adjust:100%}
+html[data-size="lg"]{font-size:22px}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEDEA;color:var(--sumi);font-family:var(--f-ui);line-height:1.7;min-height:100vh;word-break:auto-phrase;overflow-wrap:anywhere}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--sumi);outline-offset:3px}
+[data-world="bright"] :focus-visible{outline-color:var(--wakatake)}
+h1:focus-visible{outline-offset:6px}
+h1,h2,h3{font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ───────── 机（PC） ───────── */
+.desk{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:48px;padding:20px}
+.phone-slot{position:relative;flex:none}
+.phone{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;background:var(--washi);border:1px solid rgba(43,43,41,.35);border-radius:40px;overflow:hidden;isolation:isolate}
+.panel{width:250px;flex:none;display:grid;gap:22px;align-content:start;font-size:16px;line-height:1.5}
+.panel h1{margin:0;font-family:var(--f-min);font-weight:800;font-size:22px;line-height:1.45}
+.panel h2{margin:0 0 8px;font-size:16px;font-weight:700;color:var(--usuzumi)}
+.panel ol{list-style:none;margin:0;padding:0;border-top:1px solid rgba(43,43,41,.25)}
+.panel ol button{width:100%;min-height:48px;text-align:left;padding:6px 4px;border:0;border-bottom:1px solid rgba(43,43,41,.25);background:none;font-size:16px;display:flex;gap:10px;align-items:center}
+.panel ol button .n{font-family:var(--f-min);font-weight:700;min-width:1.4em;color:var(--usuzumi)}
+.panel ol button[aria-current="true"]{font-weight:700;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
+.panel .bright-list button[aria-current="true"]{color:var(--wakatake)}
+.panel .seg{display:flex;border:1.5px solid var(--sumi);overflow:hidden}
+.panel .seg button{flex:1;min-height:48px;border:0;background:#fff;font-size:16px}
+.panel .seg button[aria-pressed="true"]{background:var(--sumi);color:#fff;font-weight:700}
+.panel .plain{min-height:48px;border:1.5px solid var(--sumi);background:#fff;font-size:16px}
+@media (max-width:760px){
+  body{background:var(--washi)}
+  .desk{display:block;padding:0}
+  .panel{display:none}
+  .phone-slot{width:100vw !important;height:100dvh !important}
+  .phone{position:fixed;inset:0;width:100%;height:100dvh;border:0;border-radius:0;transform:none !important}
+}
+
+/* ───────── 画面の共通 ───────── */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;visibility:hidden;opacity:0}
+.screen.on{visibility:visible;opacity:1}
+.screen[data-world="chic"]{background:var(--washi)}
+#s-start,#s-saved{background:var(--washi) var(--fiber)}   /* 和紙の繊維は入口と保存した紙だけ */
+.screen[data-world="bright"]{background:var(--paper)}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.pad{padding:0 20px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 4px 20px;min-height:68px;flex:none}
+.wordmark{font-family:var(--f-min);font-weight:800;font-size:1.12rem;letter-spacing:.12em;line-height:1;margin:0}
+.sizebtn{min-height:48px;padding:0 12px;border:1.5px solid var(--line);background:transparent;font-size:.875rem;white-space:nowrap}
+.back{min-height:48px;min-width:48px;padding:0 10px 0 4px;margin-left:-8px;border:0;background:none;display:inline-flex;align-items:center;gap:6px;font-size:1rem}
+.back::before{content:"";width:.55em;height:.55em;border:solid currentColor;border-width:0 0 2.5px 2.5px;transform:rotate(45deg);margin-left:8px}
+.ttl{font-family:var(--f-min);font-weight:800;font-size:1.5rem;line-height:1.4;margin:0;letter-spacing:.04em}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:.35em 1.2em;border-radius:0;border:1.5px solid var(--sumi);background:transparent;font-size:1rem;font-weight:700;line-height:1.3;text-align:center}
+.btn.main{background:var(--sumi);color:#fff}
+.btn.quiet{border-color:var(--line);font-weight:400}
+.btn.wide{width:100%}
+.btn:active{background:rgba(43,43,41,.08)}
+.btn.main:active{background:#000}
+.chev{flex:none;width:.6em;height:.6em;border:solid currentColor;border-width:2.5px 2.5px 0 0;transform:rotate(45deg);margin-right:6px}
+
+/* 落款（朱） */
+.rakkan{display:inline-grid;place-items:center;width:44px;height:44px;background:var(--shu);color:#fff;border-radius:3px;font-family:var(--f-min);font-weight:800;font-size:16px;line-height:1.05;writing-mode:vertical-rl;letter-spacing:.06em;filter:url(#rough);flex:none}
+.rakkan.s{width:36px;height:36px;font-size:15px}
+
+/* 見せる時期の印（色でなく形で見分ける。墨1色） */
+.mark{display:inline-flex;align-items:center;gap:.4em;white-space:nowrap;font-size:.95rem}
+.mark::before{content:"";width:.9em;height:.9em;border:1.5px solid var(--sumi);border-radius:50%;flex:none;box-sizing:border-box}
+.mark.now::before{background:var(--sumi)}
+.mark.incapacity::before{background:linear-gradient(90deg,var(--sumi) 50%,transparent 50%)}
+.mark.never::before{background:linear-gradient(135deg,transparent 45%,var(--sumi) 45% 58%,transparent 58%)}
+.mark.never{color:var(--usuzumi)}
+
+/* ───────── 1 入口 ───────── */
+#s-start .stage{flex:1;display:flex;flex-direction:column;padding:30px 24px calc(24px + env(safe-area-inset-bottom))}
+.skip{position:absolute;top:18px;right:16px;z-index:5;min-height:48px;padding:0 18px;border:1.5px solid var(--line);background:var(--washi);font-size:.95rem}
+.start-v{flex:1;display:flex;flex-direction:row-reverse;justify-content:flex-start;align-items:flex-start;padding:56px 6px 0 0;min-height:0}
+.tag{font-family:var(--f-min);font-weight:800;font-size:2.3rem;line-height:1.5;margin:0;display:flex;flex-direction:row-reverse;gap:.35em}
+.tag:focus{outline:none}
+.tag span{display:block;writing-mode:vertical-rl;letter-spacing:.12em}
+.tag span:nth-child(2){padding-top:2.2em}
+.tag i{font-style:normal;display:inline-block}
+.start-seal{font-style:normal;padding-top:8.3em;margin-right:-.1em}
+.start-word{writing-mode:vertical-rl;font-family:var(--f-min);font-weight:700;font-size:1rem;letter-spacing:.3em;color:var(--usuzumi);margin-right:auto;align-self:flex-start}
+.start-foot{display:grid;gap:10px;padding-top:20px}
+.start-foot p{margin:0 0 4px;font-size:.95rem;color:var(--usuzumi)}
+
+/* ───────── 2 ホーム ───────── */
+.todayfield{display:flex;flex-direction:row-reverse;align-items:flex-start;margin:14px 0 0;
+  background:repeating-linear-gradient(to left,transparent 0 calc(var(--tq)*2 - 1px),var(--rule) calc(var(--tq)*2 - 1px) calc(var(--tq)*2));
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:18px 0}
+.tq{writing-mode:vertical-rl;font-family:var(--f-min);font-weight:800;font-size:var(--tq);line-height:2;letter-spacing:.08em;margin:0;height:calc(var(--tq)*11.6)}
+.tq-side{writing-mode:vertical-rl;font-size:.92rem;line-height:calc(var(--tq)*2);color:var(--usuzumi);height:calc(var(--tq)*11.6);display:flex;flex-direction:row;align-items:center;letter-spacing:.08em;margin:0}
+.tq-side .rakkan{margin-top:14px}
+.todayact{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0 0}
+.todayact .btn{min-width:8.5em}
+.todayact .later{font-family:var(--f-min);font-weight:700;font-size:1.2rem}
+.prog{margin:44px 0 0}
+.prog h2{font-family:var(--f-min);font-weight:800;font-size:1.3rem;margin:0 0 10px;letter-spacing:.04em}
+.masu{margin:0;padding:0;list-style:none;border-top:1px solid var(--rule)}
+.masu li{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 0;border-bottom:1px solid var(--rule)}
+.masu .lab{flex:none;width:7.6em;font-size:.9rem;color:var(--usuzumi);line-height:1.3}
+.masu .cells{display:flex;flex-wrap:wrap;gap:4px}
+.masu .cells i{display:block;width:18px;height:18px;border:1px solid rgba(43,43,41,.45)}
+.masu .cells i.on{background:var(--sumi);border-color:var(--sumi)}
+.masu .cells i.new{background:var(--shu);border-color:var(--shu)}
+.links{margin:40px 0 0;border-top:1px solid rgba(43,43,41,.3)}
+.links button{display:flex;align-items:center;gap:14px;width:100%;min-height:68px;padding:10px 2px;border:0;border-bottom:1px solid rgba(43,43,41,.3);background:none;text-align:left;font-size:1.05rem;line-height:1.4}
+.links button span{flex:1}
+.shiori{display:flex;align-items:center;gap:16px;width:100%;min-height:96px;margin:30px 0 40px;padding:12px 2px;border:0;background:none;text-align:left;font-size:1.05rem;line-height:1.4}
+.shiori span{flex:1}
+.sw{flex:none;width:30px;height:76px;background:var(--asa);position:relative;clip-path:polygon(0 0,100% 0,100% 100%,50% 86%,0 100%)}
+
+/* ───────── 3 書く ───────── */
+.whead{display:flex;align-items:center;gap:8px;padding:12px 16px 6px 20px;min-height:68px;flex:none}
+.whead .where{flex:1;font-size:.92rem;color:var(--usuzumi);line-height:1.35;text-align:right}
+.wq{padding:6px 20px 0}
+.wq h1{font-family:var(--f-min);font-weight:800;font-size:1.5rem;line-height:1.5;margin:0 0 22px;letter-spacing:.03em}
+.wform{padding:0 20px 18px}
+.field{display:grid;gap:6px;margin:0 0 18px}
+.field>label,.field>.lab{font-weight:700;font-size:1rem}
+.field input[type=text],.field input[type=date],.field textarea{width:100%;min-height:56px;padding:12px 14px;border:1.5px solid var(--line);border-radius:0;background:#fff;font-size:1.05rem;line-height:1.6}
+.field textarea{min-height:128px;resize:vertical}
+.field textarea.short{min-height:92px}
+.field ::placeholder{color:#6E6D68;opacity:1}
+.opts{border-top:1px solid rgba(43,43,41,.3)}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:10px 4px;border:0;border-bottom:1px solid rgba(43,43,41,.3);background:none;text-align:left;line-height:1.45;font-size:1.02rem}
+.opt .mk{width:26px;height:26px;flex:none;border:1.5px solid var(--sumi);display:grid;place-items:center}
+.opt[role="radio"] .mk{border-radius:50%}
+.opt[aria-checked="true"]{font-weight:700}
+.opt[aria-checked="true"] .mk{background:var(--sumi)}
+.opt[role="radio"][aria-checked="true"] .mk::after{content:"";width:10px;height:10px;border-radius:50%;background:#fff}
+.opt[role="checkbox"][aria-checked="true"] .mk::after{content:"";width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+.must{margin:0 20px 14px;font-size:.95rem;font-weight:700}
+.err{margin:0 20px 14px;font-size:1rem;font-weight:700;color:var(--sumi);padding:10px 12px;border:1.5px solid var(--sumi)}
+.wfoot{display:grid;grid-template-columns:1fr 1fr 1.6fr;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid rgba(43,43,41,.3);background:var(--washi);flex:none}
+.wfoot .btn{padding:.3em .4em}
+
+/* ───────── 4 保存した瞬間 ───────── */
+#s-saved .stage{flex:1;overflow-y:auto;display:flex;flex-direction:column;justify-content:safe center;padding:40px 24px calc(26px + env(safe-area-inset-bottom))}
+.sheetv{display:flex;flex-direction:row-reverse;align-items:flex-start;min-height:330px;padding:10px 0;
+  background:repeating-linear-gradient(to left,transparent 0 calc(2.6rem - 1px),var(--rule) calc(2.6rem - 1px) 2.6rem);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.sv-q{writing-mode:vertical-rl;font-family:var(--f-min);font-weight:700;font-size:1.02rem;line-height:2.6rem;margin:0;color:var(--usuzumi);max-height:330px;letter-spacing:.06em}
+.sv-a{writing-mode:vertical-rl;font-family:var(--f-min);font-weight:700;font-size:1.36rem;line-height:2.6rem;margin:0;max-height:330px;letter-spacing:.06em}
+.sv-date{writing-mode:vertical-rl;font-size:.9rem;line-height:2.6rem;color:var(--usuzumi);margin:0;display:flex;flex-direction:row;align-items:center;max-height:330px;letter-spacing:.06em}
+.sv-date .rakkan{margin-top:12px}
+.done-msg{margin-top:28px}
+.done-msg h1{font-family:var(--f-min);font-weight:800;font-size:1.75rem;line-height:1.4;margin:0;letter-spacing:.06em}
+.done-msg h1:focus{outline:none}
+.done-msg p{margin:4px 0 22px;font-size:1.02rem}
+.done-msg .row{display:grid;grid-template-columns:1.35fr 1fr;gap:10px}
+.done-msg .row .btn{padding:.3em .5em}
+
+/* ───────── 5 誰に・いつ ───────── */
+.who{display:grid;grid-template-columns:1fr 1fr;margin:16px 20px 0;border:1.5px solid var(--sumi)}
+.who button{min-height:60px;border:0;background:transparent;font-size:1rem;line-height:1.35;padding:6px 8px}
+.who button+button{border-left:1.5px solid var(--sumi)}
+.who button[aria-pressed="true"]{background:var(--sumi);color:#fff;font-weight:700}
+.note{margin:12px 20px 0;font-size:.95rem;color:var(--usuzumi)}
+.rows{margin:18px 20px 0;border-top:1px solid rgba(43,43,41,.3)}
+.rows button{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:8px 2px;border:0;border-bottom:1px solid rgba(43,43,41,.3);background:none;text-align:left;line-height:1.4}
+.rows .nmw{flex:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px}
+.sheet-go{padding:24px 20px 40px}
+
+.overlay{position:absolute;inset:0;z-index:20;display:none}
+.overlay.on{display:block}
+.overlay .dim{position:absolute;inset:0;background:rgba(43,43,41,.38)}
+.bsheet{position:absolute;left:0;right:0;bottom:0;background:var(--washi);border-top:1.5px solid var(--sumi);padding:20px 20px calc(18px + env(safe-area-inset-bottom));max-height:88%;overflow:auto}
+.bsheet h2{font-family:var(--f-min);font-weight:800;font-size:1.2rem;margin:0 0 12px;line-height:1.5}
+.bsheet h2:focus{outline:none}
+
+/* 受け渡しシート見本（横組み） */
+.handsheet{margin:14px 20px 20px;background:#fff;border:1px solid rgba(43,43,41,.4);padding:20px 18px 18px}
+.handsheet h2{font-family:var(--f-min);font-weight:800;font-size:1.25rem;margin:0 0 10px;letter-spacing:.08em}
+.hs-to{font-family:var(--f-min);font-weight:700;font-size:1.15rem;margin:0 0 14px;padding-bottom:8px;border-bottom:1.5px solid var(--sumi)}
+.handsheet dl{margin:0}
+.handsheet dt{margin:0 0 2px;font-weight:700}
+.handsheet dd{margin:0 0 14px;line-height:1.6}
+.hs-fill{margin-top:6px;font-size:.92rem;color:var(--usuzumi)}
+.hs-fill span{display:block;border-bottom:1px solid var(--line);height:2em;margin-bottom:8px}
+.hs-from{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:14px 0 0;font-family:var(--f-min);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 36px}
+
+/* ───────── 6 もしものとき ───────── */
+.dateform{margin:14px 20px 4px;padding:14px 0 6px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.empty{margin:18px 20px 0;color:var(--usuzumi)}
+.group{margin:28px 20px 0}
+.group h2{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-family:var(--f-min);font-weight:800;font-size:1.15rem;margin:0;padding:0 0 6px;border-bottom:1.5px solid var(--sumi)}
+.group h2 span{font-family:var(--f-ui);font-weight:700;font-size:.95rem}
+.task{display:flex;gap:14px;align-items:flex-start;width:100%;min-height:64px;padding:12px 2px;border:0;border-bottom:1px solid rgba(43,43,41,.3);background:none;text-align:left;line-height:1.5}
+.task .box{width:28px;height:28px;flex:none;border:1.5px solid var(--sumi);display:grid;place-items:center;margin-top:1px}
+.task[aria-checked="true"] .box{background:var(--sumi)}
+.task[aria-checked="true"] .box::after{content:"";width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:translateY(-2px) rotate(45deg)}
+.task .t{display:block;font-weight:700}
+.task .w{display:block;font-size:.9rem;color:var(--usuzumi)}
+.task .done{display:none;font-size:.85rem;border:1.5px solid currentColor;padding:0 6px;margin-left:6px;font-weight:700}
+.task[aria-checked="true"] .done{display:inline-block}
+.caution{margin:18px 20px 0;font-size:.9rem;color:var(--usuzumi)}
+.readbtn{margin:22px 20px 40px}
+
+/* ───────── 7 明るい世界：手ぬぐい・千代紙（山吹・若竹） ───────── */
+.band{position:relative;flex:none;height:116px;background:var(--asa);display:flex;align-items:flex-start;justify-content:space-between;padding:14px 14px 0}
+.band .pill{min-height:48px;padding:0 16px 0 10px;border:0;border-radius:999px;background:#fff;color:var(--sumi);font-size:1rem;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.band .pill.back::before{margin-left:6px}
+.band .sizebtn{background:#fff;border-color:#fff;border-radius:999px}
+[data-world="bright"] h1.fttl{font-family:var(--f-maru);font-weight:700;font-size:1.5rem;line-height:1.4;margin:20px 20px 0}
+[data-world="bright"] h1.fttl:focus{outline:none}
+.tenugui{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:18px 14px 6px}
+.tg-b{min-width:0;min-height:48px;border:0;background:none;padding:0 0 4px;display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:center;line-height:1.3}
+.tg{position:relative;height:96px;border-radius:4px;display:grid;place-items:center;transition:transform .35s cubic-bezier(.3,1.5,.5,1)}
+.tg b{background:#fff;padding:3px 10px;border-radius:3px;font-family:var(--f-maru);font-weight:700;font-size:1rem;line-height:1.3}
+.tg-b .rel{font-size:.875rem}
+.tg-b[aria-pressed="true"] .tg{transform:translateY(-5px);box-shadow:0 0 0 3px #fff,0 0 0 6px var(--sumi)}
+.tg-b[aria-pressed="true"] .tg::after{content:"";position:absolute;right:-6px;top:-8px;width:26px;height:26px;border-radius:50%;background:var(--sumi);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Cpath d='M7 13.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+.pat-asa{background:var(--asa)}
+.pat-ichi{background:repeating-conic-gradient(var(--wakatake-l) 0 25%,#fff 0 50%) 0 0/24px 24px}
+.pat-mame{background:radial-gradient(circle,var(--wakatake) 3.4px,transparent 4px) 0 0/20px 20px,radial-gradient(circle,var(--wakatake) 3.4px,transparent 4px) 10px 10px/20px 20px,#fff}
+.fform{padding:16px 20px 10px}
+.fform .field>label,.fform .field>.lab{font-family:var(--f-maru);font-weight:700}
+.fform .field input[type=text],.fform .field textarea{border-color:#8B8B86;border-radius:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:52px;padding:8px 16px;border:1.5px solid var(--sumi);border-radius:999px;background:#fff;display:inline-flex;align-items:center;gap:8px;font-size:1rem}
+.chip .mk{width:18px;height:18px;border:1.5px solid currentColor;border-radius:50%;flex:none;display:grid;place-items:center}
+.chip[aria-checked="true"]{background:var(--yamabuki);border-color:var(--yamabuki);font-weight:700}
+.chip[aria-checked="true"] .mk::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--sumi)}
+.bbtn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:.3em .6em;border-radius:999px;border:1.5px solid var(--sumi);background:#fff;font-size:1rem;font-weight:700;font-family:var(--f-maru);line-height:1.3;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.bbtn.take{background:var(--wakatake);border-color:var(--wakatake);color:#fff}
+.bbtn.wide{width:100%}
+.bbtn:active{transform:scale(.97)}
+.fgo{display:grid;gap:10px;padding:6px 20px 40px}
+
+/* カードの見本（一筆箋） */
+.ippitsu{position:relative;margin:22px 20px 0;background:#fff;border:1.5px solid var(--sumi);border-radius:6px;overflow:hidden}
+.ippitsu .strip{height:30px}
+.ippitsu .in{padding:16px 18px 16px}
+.ippitsu .to{font-family:var(--f-maru);font-weight:700;font-size:1.25rem;margin:0 0 10px}
+.ippitsu .msg{font-family:var(--f-maru);font-weight:500;font-size:1.15rem;line-height:1.7;margin:0 0 14px}
+.ippitsu dl{margin:0;display:grid;gap:10px}
+.ippitsu dt{font-size:.9rem;font-weight:700;color:var(--wakatake)}
+.ippitsu dd{margin:0}
+.ippitsu .from-b{margin:12px 0 0;text-align:right;font-family:var(--f-maru);font-weight:700}
+.ippitsu .when-b{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1.5px dashed rgba(43,43,41,.4);font-size:.95rem}
+.ippitsu .when-b b{background:var(--yamabuki);padding:1px 10px;border-radius:999px}
+.cardbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px 20px 40px}
+
+/* 世界の切り替え：ページの端の影（めくる紙の厚み） */
+.pageedge{position:absolute;top:0;bottom:0;left:0;width:28px;z-index:7;pointer-events:none;display:none;
+  background:linear-gradient(to left,rgba(43,43,41,.16),rgba(43,43,41,0))}
+
+/* トースト */
+.toast{position:absolute;left:16px;right:16px;bottom:92px;z-index:30;background:var(--sumi);color:#fff;padding:14px 16px;display:none;line-height:1.5;font-size:1rem}
+.toast.on{display:block}
+
+@media (prefers-reduced-motion:reduce){
+  .bbtn,.tg{transition:none}
+  .bbtn:active{transform:none}
+  .tg-b[aria-pressed="true"] .tg{transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- にじみ（保存の瞬間）と、落款の縁のかすれ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="nijimi" x="-20%" y="-10%" width="140%" height="120%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="5" result="n"/>
+      <feDisplacementMap id="nj-d" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feGaussianBlur id="nj-b" in="d" stdDeviation="0" result="b"/>
+      <feMorphology id="nj-m" in="SourceAlpha" operator="dilate" radius="0" result="sp"/>
+      <feGaussianBlur in="sp" stdDeviation="2.2" result="spb"/>
+      <feFlood id="nj-f" flood-color="#2B2B29" flood-opacity="0"/>
+      <feComposite in2="spb" operator="in" result="halo"/>
+      <feMerge><feMergeNode in="halo"/><feMergeNode in="b"/></feMerge>
+    </filter>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="8" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="desk">
+  <div class="phone-slot" id="slot">
+    <div class="phone" id="phone">
+
+      <!-- 1 入口 -->
+      <section class="screen" id="s-start" data-world="chic" aria-label="はじめる">
+        <button class="skip" id="skip" hidden>とばす</button>
+        <div class="stage">
+          <div class="start-v">
+            <h1 class="tag" id="tag" tabindex="-1"><span>のこす</span><span>手帖</span><em class="start-seal" aria-hidden="true"><b class="rakkan s">手帖</b></em></h1>
+            <div class="start-word" aria-hidden="true" hidden></div>
+          </div>
+          <div class="start-foot" id="start-foot">
+            <p>登録なし。中身はこのスマホの中だけ。</p>
+            <button class="btn main wide" data-go="home">はじめる</button>
+            <button class="btn wide" data-go="moshimo">もしものとき（ご家族の方）</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 ホーム -->
+      <section class="screen" id="s-home" data-world="chic" aria-label="ホーム">
+        <div class="topbar">
+          <h1 class="wordmark" tabindex="-1">のこす手帖<span class="sr">（山田 和子さん）</span></h1>
+          <button class="sizebtn" data-size-toggle>文字を大きく</button>
+        </div>
+        <div class="scroll"><div class="pad">
+          <div class="todayfield" id="todayfield"></div>
+          <div class="todayact" id="todayact"></div>
+          <section class="prog" aria-labelledby="prog-h">
+            <h2 id="prog-h"></h2>
+            <ul class="masu" id="masu"></ul>
+          </section>
+          <div class="links">
+            <button data-go="addr"><span>誰に・いつ見せるか</span><i class="chev" aria-hidden="true"></i></button>
+            <button data-go="moshimo"><span>もしものとき</span><i class="chev" aria-hidden="true"></i></button>
+          </div>
+          <button class="shiori" data-go="friends"><i class="sw" aria-hidden="true"></i><span>友だち・趣味の仲間へ</span><i class="chev" aria-hidden="true"></i></button>
+        </div></div>
+      </section>
+
+      <!-- 3 書く -->
+      <section class="screen" id="s-write" data-world="chic" aria-label="1問ずつ書く">
+        <div class="whead">
+          <button class="back" data-go="home">ホーム</button>
+          <div class="where" id="w-where"></div>
+        </div>
+        <div class="scroll" id="w-scroll">
+          <div class="wq"><h1 id="w-title" tabindex="-1"></h1></div>
+          <div class="wform" id="w-form"></div>
+          <p class="must" id="w-must" hidden></p>
+          <p class="err" id="w-err" role="alert" hidden>選ぶか、書いてから保存します。</p>
+        </div>
+        <div class="wfoot">
+          <button class="btn" data-act="w-back">戻る</button>
+          <button class="btn quiet" data-act="w-later">あとで</button>
+          <button class="btn main" data-act="w-save" id="w-save">保存する</button>
+        </div>
+      </section>
+
+      <!-- 4 保存した瞬間 -->
+      <section class="screen" id="s-saved" data-world="chic" aria-label="のこしました">
+        <div class="stage">
+          <div class="sheetv" aria-hidden="true">
+            <p class="sv-q" id="sv-q"></p>
+            <p class="sv-a"><span id="sv-a"></span></p>
+            <p class="sv-date" id="sv-date"></p>
+          </div>
+          <div class="done-msg" id="done-msg" role="status">
+            <h1 id="done-h" tabindex="-1" aria-label="保存しました">のこしました</h1>
+            <p id="done-n"></p>
+            <div class="row">
+              <button class="btn" data-act="end-today">今日はここまで</button>
+              <button class="btn main" data-act="next-q">もう1問</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5 誰に・いつ見せるか -->
+      <section class="screen" id="s-addr" data-world="chic" aria-label="誰に・いつ見せるか">
+        <div class="whead">
+          <button class="back" data-go="home">ホーム</button>
+          <button class="sizebtn" data-size-toggle style="margin-left:auto">文字を大きく</button>
+        </div>
+        <div class="scroll">
+          <div class="pad"><h1 class="ttl" tabindex="-1">誰に・いつ見せるか</h1></div>
+          <div class="who" id="who"></div>
+          <p class="note">この端末を開ける人は、全部読めます。</p>
+          <div class="rows" id="addr-rows"></div>
+          <div class="sheet-go"><button class="btn wide" data-go="sheet">受け渡しシートの見本</button></div>
+        </div>
+      </section>
+
+      <!-- 5b 受け渡しシート -->
+      <section class="screen" id="s-sheet" data-world="chic" aria-label="受け渡しシートの見本">
+        <div class="whead">
+          <button class="back" data-go="addr">誰に・いつ</button>
+        </div>
+        <div class="scroll">
+          <div class="pad"><h1 class="ttl" tabindex="-1">受け渡しシートの見本</h1></div>
+          <div class="handsheet" id="handsheet"></div>
+          <div class="two">
+            <button class="btn main" data-act="print">印刷する</button>
+            <button class="btn" data-act="file">ファイルで渡す</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 もしものとき -->
+      <section class="screen" id="s-moshimo" data-world="chic" aria-label="もしものとき">
+        <div class="whead">
+          <button class="back" data-go="home">ホーム</button>
+          <button class="sizebtn" data-size-toggle style="margin-left:auto">文字を大きく</button>
+        </div>
+        <div class="scroll">
+          <div class="pad"><h1 class="ttl" tabindex="-1">もしものとき</h1></div>
+          <div class="dateform">
+            <div class="field">
+              <label for="death">亡くなった日</label>
+              <input type="date" id="death">
+            </div>
+          </div>
+          <div id="tasks" aria-live="polite"></div>
+          <p class="caution">期限は一般的な目安です。窓口で確かめてください。</p>
+          <div class="readbtn"><button class="btn wide" data-act="read">和子さんの手帖を読む</button></div>
+        </div>
+      </section>
+
+      <!-- 7 友だち・趣味の仲間へ（明るい世界） -->
+      <section class="screen" id="s-friends" data-world="bright" aria-label="友だち・趣味の仲間へ">
+        <div class="band">
+          <button class="pill back" data-go="home">手帖にもどる</button>
+          <button class="sizebtn" data-size-toggle>文字を大きく</button>
+        </div>
+        <div class="scroll">
+          <h1 class="fttl" tabindex="-1">友だち・趣味の仲間へ</h1>
+          <div class="tenugui" id="tenugui" role="group" aria-label="渡す相手"></div>
+          <div class="fform" id="fform"></div>
+          <div class="fgo">
+            <button class="bbtn take wide" data-go="card">カードを見る</button>
+            <button class="bbtn wide" data-act="add-friend">仲間を足す</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7b カードの見本（明るい世界） -->
+      <section class="screen" id="s-card" data-world="bright" aria-label="お別れのあとに渡すカード">
+        <div class="band">
+          <button class="pill back" data-go="friends">仲間の一覧</button>
+          <button class="sizebtn" data-size-toggle>文字を大きく</button>
+        </div>
+        <div class="scroll">
+          <h1 class="fttl" id="card-h" tabindex="-1">カードの見本</h1>
+          <div class="ippitsu" id="ippitsu"></div>
+          <div class="cardbtns">
+            <button class="bbtn take" data-act="print">印刷する</button>
+            <button class="bbtn" data-act="file">ファイルで渡す</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="overlay" id="ov"><div class="dim" data-act="close-ov"></div><div class="bsheet" id="bsheet" role="dialog" aria-modal="true" aria-labelledby="bs-h"></div></div>
+      <div class="pageedge" id="pageedge" aria-hidden="true"></div>
+      <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <aside class="panel" aria-label="試作の操作">
+    <h1>のこす手帖<br>試作　和紙と墨</h1>
+    <div>
+      <h2>シックな世界</h2>
+      <ol id="nav">
+        <li><button data-p="start"><span class="n">1</span>入口</button></li>
+        <li><button data-p="home"><span class="n">2</span>ホーム</button></li>
+        <li><button data-p="write"><span class="n">3</span>1問ずつ書く</button></li>
+        <li><button data-p="saved"><span class="n">4</span>保存した瞬間</button></li>
+        <li><button data-p="addr"><span class="n">5</span>誰に・いつ見せるか</button></li>
+        <li><button data-p="sheet"><span class="n">5</span>受け渡しシート</button></li>
+        <li><button data-p="moshimo"><span class="n">6</span>もしものとき</button></li>
+      </ol>
+    </div>
+    <div>
+      <h2>明るい世界</h2>
+      <ol class="bright-list">
+        <li><button data-p="friends"><span class="n">7</span>友だち・趣味の仲間へ</button></li>
+        <li><button data-p="card"><span class="n">7</span>カードの見本</button></li>
+      </ol>
+    </div>
+    <div>
+      <h2>文字の大きさ</h2>
+      <div class="seg"><button data-size="std" aria-pressed="true">標準</button><button data-size="lg" aria-pressed="false">大</button></div>
+    </div>
+    <button class="plain" id="replay">オープニングをもう一度</button>
+  </aside>
+</div>
+
+<script>
+(() => {
+'use strict';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* ───────── 和紙：楮の繊維を細い曲線で散らし、ごく薄い雲肌を重ねる（入口と保存した紙だけ） ───────── */
+function washiFiber() {
+  let seed = 20261025; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const T = 420; let p = '';
+  const r1 = (n) => n.toFixed(1);
+  for (let i = 0; i < 120; i++) {
+    const x = rnd() * T, y = rnd() * T, len = 14 + rnd() * rnd() * 90, ang = rnd() * Math.PI * 2, bend = (rnd() - .5) * len * .7;
+    const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
+    const mx = (x + x2) / 2 + Math.cos(ang + Math.PI / 2) * bend, my = (y + y2) / 2 + Math.sin(ang + Math.PI / 2) * bend;
+    const w = (.3 + rnd() * .55).toFixed(2), o = (.03 + rnd() * .05).toFixed(3);
+    for (const dx of [-T, 0, T]) for (const dy of [-T, 0, T]) {
+      const xs = [x, x2, mx].map((v) => v + dx), ys = [y, y2, my].map((v) => v + dy);
+      if (Math.max(...xs) < -2 || Math.min(...xs) > T + 2 || Math.max(...ys) < -2 || Math.min(...ys) > T + 2) continue;
+      p += `<path d='M${r1(x + dx)} ${r1(y + dy)}Q${r1(mx + dx)} ${r1(my + dy)} ${r1(x2 + dx)} ${r1(y2 + dy)}' stroke-width='${w}' stroke-opacity='${o}'/>`;
+    }
+  }
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${T}' height='${T}'><filter id='m' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .49 0 0 0 0 .45 0 0 0 1.6 -.62'/></filter><rect width='${T}' height='${T}' filter='url(#m)' opacity='.09'/><g fill='none' stroke='#6F6C64' stroke-linecap='round'>${p}</g></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+document.documentElement.style.setProperty('--fiber', washiFiber());
+
+/* ───────── 麻の葉（手ぬぐい・千代紙の柄）。山吹の地に白の線（紅白にしない） ───────── */
+function asanoha(a, ground, line, sw) {
+  const hh = a * Math.sqrt(3) / 2, W = a, H = 2 * hh;
+  const f = (p) => `${p[0].toFixed(2)},${p[1].toFixed(2)}`;
+  let d = '';
+  for (let r = -1; r <= 2; r++) {
+    const oT = (((r % 2) + 2) % 2) * a / 2, oB = ((((r + 1) % 2) + 2) % 2) * a / 2;
+    const pts = [];
+    for (let i = -2; i <= 3; i++) { pts.push([oT + i * a, r * hh]); pts.push([oB + i * a, (r + 1) * hh]); }
+    pts.sort((p, q) => p[0] - q[0]);
+    for (let k = 0; k + 2 < pts.length; k++) {
+      const A = pts[k], B = pts[k + 1], C = pts[k + 2];
+      const c = [(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3];
+      d += `M${f(A)}L${f(B)}L${f(C)}Z M${f(c)}L${f(A)}M${f(c)}L${f(B)}M${f(c)}L${f(C)}`;
+    }
+  }
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H.toFixed(2)}' viewBox='0 0 ${W} ${H.toFixed(2)}'><rect width='100%' height='100%' fill='${ground}'/><path d='${d}' fill='none' stroke='${line}' stroke-width='${sw}' stroke-linecap='round'/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+document.documentElement.style.setProperty('--asa', asanoha(26, '#F2B53A', 'rgba(255,255,255,.8)', 1.25));
+
+/* ───────── 本物のデータ（app/js/questions.js より） ───────── */
+const CATS = [
+  { id: 'me', name: 'わたしのこと' }, { id: 'family', name: '家族・大切な人' }, { id: 'money', name: 'お金と財産' },
+  { id: 'insurance', name: '保険・年金' }, { id: 'medical', name: '医療・介護' }, { id: 'funeral', name: '葬儀・お墓' },
+  { id: 'will', name: '相続・遺言' }, { id: 'pet', name: 'ペット' }, { id: 'words', name: '家族へのことば' },
+];
+const catName = (id) => CATS.find((c) => c.id === id).name;
+const PEOPLE_OPTS = ['山田 美紀さん（長女）', '山田 健一さん（長男）'];
+const Q = [
+  ['me', 'fields', 'お名前と生年月日', '戸籍に書かれている漢字で書いておくと、手続きのときに確かめやすくなります。', ['氏名', '生年月日']],
+  ['me', 'text', '本籍地はどこですか', '相続では、生まれてからの戸籍をすべて集めます。都道府県と市区町村だけでも助かります。', '例：長野県松本市'],
+  ['me', 'radio', 'いまの暮らし方', '世帯主の変更届が必要かどうかの目安になります。', ['ひとりで暮らしている', '配偶者と暮らしている', '子どもの家族と暮らしている', '施設で暮らしている', 'その他']],
+  ['me', 'docs', '大切な書類の保管場所', '「どの引き出しか」だけで十分です。番号は書かなくてかまいません。', ['マイナンバーカード', '通帳・キャッシュカード', '年金証書・基礎年金番号通知書', '実印・印鑑登録証', '不動産の権利証（登記識別情報）', 'その他']],
+  ['me', 'textarea', '自分史のメモ（好きなもの・大事にしてきたこと）', '書きたいときに、少しずつ。ひとことでもかまいません。'],
+  ['family', 'fields', '連絡してほしい家族・大切な人', '名前と続柄だけでも登録できます。', ['お名前', '続柄']],
+  ['family', 'radio', '入院や急なときに、まず連絡してほしい人', '登録した人から選びます。', PEOPLE_OPTS],
+  ['family', 'radio', '亡くなったことを知らせてほしい範囲', '家族葬にしたい場合も、知らせる範囲を決めておくと家族が迷いません。', ['家族・親族だけ', '親しい友人まで', '年賀状をやりとりしている人まで', '家族に任せる']],
+  ['family', 'check', '知らせてほしい人の連絡先がわかるもの', '置き場所がわかれば、家族が連絡先を探せます。', ['年賀状・はがきの束', 'スマホの連絡先', '住所録・手帳', 'パソコンの住所録', '特にない']],
+  ['money', 'fields', '預貯金の口座', '「〇〇銀行に口座がある」だけで十分です。口座番号・暗証番号は書かないでください。', ['金融機関名', '支店名']],
+  ['money', 'fields', '株式・投資信託などの口座', '証券会社の名前だけでもかまいません。ネット証券は郵便物が届かないことがあるので特に大切です。', ['証券会社・金融機関']],
+  ['money', 'check', '持っている不動産', '固定資産税の通知書の保管場所を書いておくと、家族が調べやすくなります。', ['自宅（土地・建物）', '自宅（マンション）', '自宅以外の土地', '貸している建物', '持っていない']],
+  ['money', 'check', '借入れ・保証人', '借入れや保証人は、家族が「相続放棄」をするかの判断（3か月以内）に関わります。ない場合も「ない」と残しておきましょう。', ['ない', '住宅ローン', '自動車ローン', 'カードローン・キャッシング', '誰かの保証人になっている', 'その他']],
+  ['money', 'fields', 'クレジットカード', 'カード会社の名前だけで大丈夫です。カード番号は書かないでください。', ['カード会社・カード名']],
+  ['money', 'textarea', '貴金属・美術品・貸金庫など', 'あるかどうかと、置いてある場所だけで十分です。'],
+  ['insurance', 'fields', '入っている保険・共済', '保険会社の名前と、保険証券の場所がわかれば請求できます。生命保険の請求は3年以内が目安です。', ['保険会社・共済', '保険証券の保管場所']],
+  ['insurance', 'check', '受け取っている年金', '亡くなったあとは年金の受給を止める届けが必要です（厚生年金は10日以内、国民年金は14日以内）。', ['国民年金（老齢基礎年金）', '厚生年金', '共済年金', '企業年金・個人年金', 'まだ受け取っていない']],
+  ['insurance', 'text', '年金証書・基礎年金番号がわかる書類の保管場所', '番号そのものは書かず、置き場所だけを書きます。', '例：居間の書類箱'],
+  ['insurance', 'radio', '加入している健康保険', '亡くなったあと、資格喪失の届けを出す先がわかります。', ['国民健康保険', '後期高齢者医療制度', '勤め先の健康保険', '家族の扶養に入っている', 'わからない']],
+  ['insurance', 'radio', '介護保険の認定', '認定を受けていなくても、65歳以上なら介護保険証が届いています。', ['受けていない', '要支援', '要介護', 'わからない']],
+  ['medical', 'fields', 'かかりつけの医療機関', '病院の名前だけでも大丈夫です。', ['病院・診療所の名前', '電話番号']],
+  ['medical', 'textarea', '持病・飲んでいる薬', '「お薬手帳は台所の棚」のように、置き場所だけでも役に立ちます。'],
+  ['medical', 'text', 'アレルギー', '薬や食べ物のアレルギーがあれば。ない場合は「なし」と書いておきます。', ''],
+  ['medical', 'radio', '病名や余命を知らせてほしいか', '気持ちが変わったら、いつでも書き直せます。', ['病名も余命も知りたい', '病名だけ知りたい', '家族に任せる', '知りたくない', 'まだ決められない']],
+  ['medical', 'radio', '回復の見込みがないときの延命治療', '家族や医療者と話し合う「人生会議（ACP）」のきっかけにしてください。', ['できるかぎり続けてほしい', '苦痛をやわらげる治療だけにしてほしい', '家族と医師に任せる', 'まだ決められない']],
+  ['medical', 'radio', '臓器提供の意思', '正式な意思表示は、マイナンバーカード・運転免許証・資格確認書の意思表示欄、意思表示カード、インターネットでの登録でできます。', ['提供したい', '提供しない', 'カード・免許証などに記入済み', '決めていない']],
+  ['medical', 'radio', '介護が必要になったら、どこで過ごしたいか', '理想を書いておくだけで大丈夫です。', ['できるだけ自宅で', '施設で', '家族と相談して決めたい', '決めていない']],
+  ['medical', 'radio', '判断がむずかしくなったとき、医療の相談をしてほしい人', '病院から意思を聞かれたときに、代わりに話してほしい人です。', PEOPLE_OPTS],
+  ['funeral', 'radio', '希望する葬儀のかたち', '迷っていれば「家族に任せる」でかまいません。', ['一般葬（広く知らせる）', '家族葬（身内と親しい人だけ）', '一日葬（通夜をしない）', '火葬式・直葬（式をしない）', '家族に任せる']],
+  ['funeral', 'radio', '宗教・宗派', '仏教なら宗派も書いておくと、お寺との相談がスムーズです。', ['仏教', '神道', 'キリスト教', '無宗教', 'わからない']],
+  ['funeral', 'fields', '菩提寺・教会などの連絡先', '付き合いのあるお寺や教会があれば。名前だけでも大丈夫です。', ['お寺・教会などの名前', '電話番号']],
+  ['funeral', 'radio', '葬儀社の会員・互助会への加入', '会員証の場所も書いておくと、積立金を使い忘れずにすみます。', ['入っている', '入っていない', 'わからない']],
+  ['funeral', 'text', '遺影に使ってほしい写真', '「〇年の旅行の写真」「アルバムの最初のページ」のように書きます。', ''],
+  ['funeral', 'radio', 'お墓・納骨の希望', '墓じまいを考えている場合は「決めていない」にしてメモを残しても大丈夫です。', ['先祖代々のお墓に入る', '購入済みのお墓がある', '樹木葬・納骨堂', '散骨', '決めていない']],
+  ['will', 'radio', '遺言書はありますか', 'この手帖には法的効力がありません。財産の分け方は遺言書で決めます。', ['自筆で書いた遺言書がある', '公正証書遺言がある', 'これから書く予定', '書いていない']],
+  ['will', 'radio', '遺言書の保管方法', '法務局の「自筆証書遺言書保管制度」を使うと、家庭裁判所の検認が不要になります。', ['法務局の保管制度を利用している', '公証役場に原本がある（公正証書遺言）', '自宅に保管している', '専門家に預けている', '遺言書はない']],
+  ['will', 'text', '遺言書（または保管証・正本）の置き場所', '自宅で見つかった自筆の遺言書は、開封せずに家庭裁判所で検認を受けます。', ''],
+  ['will', 'text', '相談している専門家・遺言執行者', '事務所名だけでも大丈夫です。', '例：〇〇司法書士事務所'],
+  ['will', 'textarea', '財産について家族に伝えておきたい気持ち', 'ここに書いた内容に法的効力はありません。分け方を決めたい場合は遺言書を作ってください。'],
+  ['pet', 'fields', '一緒に暮らしている動物', '名前と種類だけでも登録できます。', ['名前', '種類']],
+  ['pet', 'radio', '世話をお願いしたい人', '引き受けてもらえるか、事前に話しておけると安心です。', PEOPLE_OPTS],
+  ['pet', 'textarea', 'ごはん・薬・くせなど', 'いつものごはんの銘柄や、苦手なことなど。'],
+  ['pet', 'radio', 'ペット保険', '', ['入っている', '入っていない', 'ペットはいない']],
+  ['words', 'textarea', '家族に伝えたい感謝', '特定の人に宛てた手紙は「手紙」の画面で書けます。'],
+  ['words', 'textarea', '覚えていてほしいこと', '家の言い伝え、得意料理の作り方、なんでも。'],
+  ['words', 'textarea', '形見分けの希望', '「時計は長男に」など。法的効力はないので、高価なものは遺言書に書いてください。'],
+].map(([cat, type, title, hint, extra], i) => ({ i, cat, type, title, hint, extra }));
+Q.forEach((q) => { q.n = Q.filter((x) => x.cat === q.cat && x.i <= q.i).length; });
+const TOTAL = Q.length; // 46
+
+/* 書く画面で、問いの下ではなく保存の前に置く、外せない事実だけ */
+const MUST = { 9: '口座番号・暗証番号は書きません。', 13: 'カード番号は書きません。', 34: 'この手帖には法的効力がありません。', 38: 'ここに書いたことに法的効力はありません。', 45: '法的効力はありません。高価なものは遺言書に書きます。' };
+
+/* 見本の答え（架空：山田 和子さん） */
+const SAMPLE = {
+  0: '山田 和子（やまだ かずこ）／昭和26年4月3日', 1: '長野県松本市', 2: 'ひとりで暮らしている', 4: '庭の山野草と、朝のラジオ体操。',
+  5: '山田 美紀（長女）、山田 健一（長男）', 6: '山田 美紀さん（長女）', 11: '自宅（土地・建物）', 12: 'ない',
+  15: 'ひまわり生命／証券は居間の書類箱', 20: '松本中央クリニック', 39: 'ミケ（三毛猫）', 43: '毎朝の電話、ありがとう。',
+};
+const TODAY_SAMPLE = '通帳・キャッシュカードは、居間のたんすの右上の引き出し';
+
+/* ───────── 状態 ───────── */
+const S = {
+  done: new Map(Object.entries(SAMPLE).map(([k, v]) => [Number(k), v])),
+  today: 3, todaySaved: false, ended: false, lastNew: -1,
+  cur: 3, mode: 'today', trail: [],
+  person: 0,
+  stages: [
+    { me: 'now', family: 'now', money: 'incapacity', insurance: 'incapacity', medical: 'now', funeral: 'after', will: 'after', pet: 'now', words: 'after' },
+    { me: 'after', family: 'after', money: 'after', insurance: 'after', medical: 'incapacity', funeral: 'after', will: 'after', pet: 'never', words: 'after' },
+  ],
+  checked: new Set(),
+  friend: 0,
+  screen: null,
+};
+const PEOPLE = [{ name: '山田 美紀', rel: '長女', short: '美紀' }, { name: '山田 健一', rel: '長男', short: '健一' }];
+const STAGES = [
+  { id: 'now', label: '今すぐ', can: '今すぐ読めます' }, { id: 'incapacity', label: '判断がむずかしくなったら', can: '判断がむずかしくなったら読めます' },
+  { id: 'after', label: '亡くなったあと', can: '亡くなったあとに読めます' }, { id: 'never', label: '見せない', can: '読めません' },
+];
+const stageOf = (id) => STAGES.find((s) => s.id === id);
+const mark = (id) => `<span class="mark ${id}">${stageOf(id).label}</span>`;
+
+/* 友だち・趣味の仲間（架空） */
+const FRIENDS = [
+  { to: '佐藤 文子さん', nm: '文子さん', rel: '書道教室', pat: 'asa', msg: '水曜のお稽古、二十年ありがとう。文子さんの「永」の字が好きでした。', photo: '居間の本棚、緑の表紙のアルバム', keep: '羊毛の大筆と、端渓の硯', by: 0 },
+  { to: '旅の会のみなさん', nm: '旅の会', rel: '旅行の仲間', pat: 'ichi', msg: 'あの宿の朝ごはんの話を、またしてください。', photo: '旅行のアルバム（赤い表紙の六冊）', keep: 'アルバムを、一冊ずつ', by: 0 },
+  { to: '田中 正夫さん', nm: '正夫さん', rel: '囲碁の友だち', pat: 'mame', msg: '最後の一局は、わたしの勝ちのままです。', photo: '寝室の押し入れ、上の段の箱', keep: '碁石と碁笥', by: 1 },
+];
+
+/* 日付（漢数字・縦書き用） */
+const KD = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+const kan = (n) => n < 10 ? KD[n] : n === 10 ? '十' : n < 20 ? '十' + KD[n - 10] : KD[Math.floor(n / 10)] + '十' + (n % 10 ? KD[n % 10] : '');
+const WEEK = ['日', '月', '火', '水', '木', '金', '土'];
+const NOW = new Date();
+const todayV = () => `${kan(NOW.getMonth() + 1)}月${kan(NOW.getDate())}日`;
+
+/* ───────── 画面の切り替え ───────── */
+const SCREENS = ['start', 'home', 'write', 'saved', 'addr', 'sheet', 'moshimo', 'friends', 'card'];
+const worldOf = (n) => $('#s-' + n).dataset.world;
+let busy = false;
+async function go(name, opts = {}) {
+  if (!SCREENS.includes(name) || busy) return;
+  const from = S.screen;
+  if (from && from !== name && worldOf(from) !== worldOf(name) && !opts.instant && !reduce.matches) {
+    busy = true;
+    try { await turnPage(from, name); } finally { busy = false; }
+    return;
+  }
+  show(name, opts);
+}
+function settle(name, prev, opts = {}) {
+  const next = $('#s-' + name);
+  S.screen = name;
+  document.querySelector('meta[name="theme-color"]').content = next.dataset.world === 'bright' ? '#F2B53A' : '#FAFAF7';
+  $$('.panel ol button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.p === name)));
+  // 画面を移ったら、その画面の見出しへフォーカスを移す（読み上げの人が迷わない）
+  if (opts.focus !== false && prev && prev !== next) { const h = $('h1[tabindex]', next); h && h.focus({ preventScroll: true }); }
+}
+function show(name, opts = {}) {
+  const prev = S.screen && $('#s-' + S.screen);
+  const next = $('#s-' + name);
+  RENDER[name] && RENDER[name](opts);
+  hideToast();
+  if (prev && prev !== next) prev.classList.remove('on');
+  next.classList.add('on');
+  if (prev !== next) {
+    if (!opts.instant && !opts.noFade) next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' });
+    const sc = $('.scroll', next); if (sc && !opts.keepScroll) sc.scrollTop = 0;
+  }
+  settle(name, prev, opts);
+}
+
+/* 2つの世界の行き来：紙を1枚めくる。行きは手ぬぐいの頁が右からかぶさり、帰りは右へめくれて和紙の頁が出る。
+   画面全体を柄や色で覆う瞬間はない。動きを減らす設定では、ふつうのフェードだけ */
+async function turnPage(from, to) {
+  const A = $('#s-' + from), B = $('#s-' + to), edge = $('#pageedge');
+  const W = $('#phone').offsetWidth;
+  const toBright = worldOf(to) === 'bright';
+  hideToast();
+  RENDER[to] && RENDER[to]({});
+  const sc = $('.scroll', B); if (sc && toBright) sc.scrollTop = 0;
+  const top = toBright ? B : A;          // 動く頁
+  B.classList.add('on');
+  top.style.zIndex = '6';
+  edge.style.display = 'block';
+  const dur = 520, ease = 'cubic-bezier(.55,.05,.3,1)';
+  const open = 'inset(0px 0px 0px 0px)', shut = `inset(0px 0px 0px ${W}px)`;
+  const kf = toBright ? [{ clipPath: shut }, { clipPath: open }] : [{ clipPath: open }, { clipPath: shut }];
+  const ek = toBright ? [{ transform: `translateX(${W - 28}px)` }, { transform: 'translateX(-28px)' }] : [{ transform: 'translateX(-28px)' }, { transform: `translateX(${W - 28}px)` }];
+  await Promise.all([
+    top.animate(kf, { duration: dur, easing: ease, fill: 'forwards' }).finished,
+    edge.animate(ek, { duration: dur, easing: ease, fill: 'forwards' }).finished,
+  ]);
+  A.classList.remove('on');
+  top.style.zIndex = '';
+  top.getAnimations().forEach((a) => a.cancel());
+  edge.getAnimations().forEach((a) => a.cancel());
+  edge.style.display = 'none';
+  settle(to, A);
+}
+
+/* ───────── 描画 ───────── */
+const RENDER = {
+  home() {
+    const t = Q[S.today];
+    const saved = S.todaySaved;
+    $('#todayfield').innerHTML = `<h2 class="tq">${esc(t.title)}</h2>
+      <p class="tq-side">${todayV()}　今日の1問${saved ? '<span class="rakkan s" role="img" aria-label="書きました">和子</span>' : ''}</p>`;
+    $('#todayact').innerHTML = saved
+      ? `<span class="later">${S.ended ? 'また明日。' : '今日の1問は書きました。'}</span><button class="btn" data-act="next-q">もう1問</button>`
+      : `<span></span><button class="btn main" data-act="write-today">書く</button>`;
+    $('#prog-h').textContent = `${S.done.size}問、のこしました`;
+    $('#masu').innerHTML = CATS.map((c) => {
+      const qs = Q.filter((q) => q.cat === c.id);
+      const n = qs.filter((q) => S.done.has(q.i)).length;
+      return `<li><span class="lab">${c.name}<span class="sr"> ${n}／${qs.length}問</span></span><span class="cells" aria-hidden="true">${qs.map((q) => `<i class="${S.done.has(q.i) ? (q.i === S.lastNew ? 'new' : 'on') : ''}"></i>`).join('')}</span></li>`;
+    }).join('');
+  },
+  write() { renderWrite(); },
+  addr() {
+    $('#who').innerHTML = PEOPLE.map((p, i) => `<button data-act="person" data-i="${i}" aria-pressed="${i === S.person}">${p.short}さん（${p.rel}）</button>`).join('');
+    $('#addr-rows').innerHTML = CATS.map((c) => {
+      const st = S.stages[S.person][c.id];
+      return `<button data-act="stage" data-c="${c.id}"><span class="nmw"><span>${c.name}</span>${mark(st)}</span><span class="sr">、変える</span><i class="chev" aria-hidden="true"></i></button>`;
+    }).join('');
+  },
+  sheet() {
+    const p = PEOPLE[S.person]; const st = S.stages[S.person];
+    const by = (id) => CATS.filter((c) => st[c.id] === id).map((c) => c.name).join('、') || 'なし';
+    $('#handsheet').innerHTML = `<h2>受け渡しシート</h2>
+      <p class="hs-to">${p.name} 様（${p.rel}）</p>
+      <dl>${STAGES.map((s) => `<dt>${mark(s.id)}</dt><dd>${by(s.id)}</dd>`).join('')}</dl>
+      <div class="hs-fill">手帖のファイルの置き場所<span></span>渡した日<span></span></div>
+      <p class="hs-from">山田 和子<span class="rakkan s" aria-hidden="true">和子</span></p>`;
+  },
+  moshimo() {
+    const v = $('#death').value;
+    if (v) renderTasks(v); else $('#tasks').innerHTML = '<p class="empty">日付を入れると、期限が出ます。</p>';
+  },
+  friends() {
+    $('#tenugui').innerHTML = FRIENDS.map((f, i) => `<button class="tg-b" data-act="friend" data-i="${i}" aria-pressed="${i === S.friend}">
+      <span class="tg pat-${f.pat}"><b>${esc(f.nm)}</b></span><span class="rel">${esc(f.rel)}</span></button>`).join('');
+    const f = FRIENDS[S.friend];
+    $('#fform').innerHTML = `
+      <div class="field"><label for="f-msg">${esc(f.to)}へのひとこと</label><textarea id="f-msg" data-k="msg">${esc(f.msg)}</textarea></div>
+      <div class="field"><label for="f-photo">思い出の写真の置き場所</label><textarea class="short" id="f-photo" data-k="photo">${esc(f.photo)}</textarea></div>
+      <div class="field"><label for="f-keep">形見に渡したい物</label><textarea class="short" id="f-keep" data-k="keep">${esc(f.keep)}</textarea></div>
+      <div class="field"><span class="lab" id="f-by">お別れのあとに渡してくれる人</span>
+        <div class="chips" role="radiogroup" aria-labelledby="f-by">${PEOPLE.map((p, i) => `<button type="button" class="chip" role="radio" aria-checked="${i === f.by}" data-act="by" data-i="${i}"><span class="mk" aria-hidden="true"></span>${p.short}さん（${p.rel}）</button>`).join('')}</div></div>`;
+    rove($('#fform'));
+  },
+  card() {
+    const f = FRIENDS[S.friend]; const by = PEOPLE[f.by];
+    $('#card-h').textContent = `${f.to}へのカード`;
+    $('#ippitsu').innerHTML = `<div class="strip pat-${f.pat}" aria-hidden="true"></div><div class="in">
+      <p class="to">${esc(f.to)}へ</p>
+      <p class="msg">${esc(f.msg)}</p>
+      <dl><div><dt>思い出の写真</dt><dd>${esc(f.photo)}</dd></div><div><dt>形見にどうぞ</dt><dd>${esc(f.keep)}</dd></div></dl>
+      <p class="from-b">山田 和子より</p>
+      <div class="when-b"><span>${by.short}さん（${by.rel}）が渡します</span><b>お別れのあとに</b></div></div>`;
+    $('#ippitsu').animate(reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateY(40px)', opacity: 0 }, { transform: 'translateY(-4px)', opacity: 1, offset: .7 }, { transform: 'none', opacity: 1 }], { duration: reduce.matches ? 300 : 480, delay: 80, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'backwards' });
+  },
+  saved() {}, start() {},
+};
+
+/* 書く画面 */
+function renderWrite() {
+  const q = Q[S.cur];
+  const qs = Q.filter((x) => x.cat === q.cat);
+  $('#w-where').textContent = `${catName(q.cat)}　${q.n}／${qs.length}`;
+  $('#w-title').textContent = q.title;
+  $('#w-save').textContent = S.mode === 'today' ? '保存する' : '次へ';
+  $('#w-err').hidden = true;
+  const m = MUST[q.i]; $('#w-must').textContent = m || ''; $('#w-must').hidden = !m;
+  const f = $('#w-form');
+  const id = (k) => `f${q.i}_${k}`;
+  const optRows = (opts, one) => `<div class="opts" role="${one ? 'radiogroup' : 'group'}" aria-labelledby="${id('l')}">${opts.map((o) => `<button type="button" class="opt" role="${one ? 'radio' : 'checkbox'}" aria-checked="false" data-opt="${one ? 'one' : 'many'}"><span class="mk" aria-hidden="true"></span><span>${esc(o)}</span></button>`).join('')}</div>`;
+  let h = '';
+  if (q.type === 'docs') {
+    h = `<div class="field"><span class="lab" id="${id('l')}">書類</span>${optRows(q.extra.slice(0, 5), true)}</div>
+      <div class="field"><label for="${id('p')}">保管場所</label><input type="text" id="${id('p')}" placeholder="例：居間のたんすの右上の引き出し"></div>`;
+  } else if (q.type === 'fields') {
+    h = q.extra.map((l, k) => `<div class="field"><label for="${id(k)}">${l}</label><input type="text" id="${id(k)}"></div>`).join('');
+  } else if (q.type === 'text') {
+    h = `<div class="field"><label for="${id('t')}">答え</label><input type="text" id="${id('t')}" placeholder="${esc(q.extra || '')}"></div>`;
+  } else if (q.type === 'textarea') {
+    h = `<div class="field"><label for="${id('t')}">答え</label><textarea id="${id('t')}"></textarea></div>`;
+  } else {
+    const one = q.type === 'radio';
+    h = `<div class="field"><span class="lab" id="${id('l')}">${one ? 'ひとつ選ぶ' : 'いくつでも選ぶ'}</span>${optRows(q.extra, one)}</div>`;
+  }
+  f.innerHTML = h;
+  rove(f);
+}
+function readAnswer() {
+  const f = $('#w-form');
+  const picked = $$('.opt[aria-checked="true"]', f).map((c) => c.textContent.trim());
+  const vals = $$('input,textarea', f).map((e) => e.value.trim()).filter(Boolean);
+  return [...picked, ...vals].join('は、');
+}
+function nextUnanswered(from) {
+  for (let k = 1; k <= TOTAL; k++) { const i = (from + k) % TOTAL; if (!S.done.has(i)) return i; }
+  return -1;
+}
+
+/* ラジオの並び：Tab では選んでいる1つにだけ止まり、矢印キーで選び直す */
+function rove(root) {
+  $$('[role="radiogroup"]', root).forEach((g) => {
+    const items = $$('[role="radio"]', g);
+    const cur = items.find((r) => r.getAttribute('aria-checked') === 'true') || items[0];
+    items.forEach((r) => r.tabIndex = r === cur ? 0 : -1);
+  });
+}
+document.addEventListener('keydown', (e) => {
+  const r = e.target.closest && e.target.closest('[role="radio"]');
+  if (!r || !['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+  const g = r.closest('[role="radiogroup"]'); if (!g) return;
+  e.preventDefault();
+  const items = $$('[role="radio"]', g);
+  const step = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : -1;
+  const nx = items[(items.indexOf(r) + step + items.length) % items.length];
+  nx.click(); nx.focus();
+});
+
+/* ───────── いちばん大事な瞬間：墨がすっと紙にしみ込み、落款が押される（約1.6秒） ───────── */
+let saving = false;
+function canSee(cat) {
+  return PEOPLE.map((p, i) => `${p.short}さんは${stageOf(S.stages[i][cat]).can}。`).join('');
+}
+async function save(answer) {
+  if (saving) return; saving = true;
+  const q = Q[S.today];
+  if (!S.todaySaved) { S.done.set(q.i, answer || TODAY_SAMPLE); S.todaySaved = true; S.lastNew = q.i; }
+  const ans = S.done.get(q.i) || TODAY_SAMPLE;
+  $('#sv-q').textContent = q.title;
+  $('#sv-a').textContent = ans;
+  $('#sv-date').innerHTML = `${todayV()}<span class="rakkan" id="sv-seal">和子</span>`;
+  $('#done-n').textContent = canSee(q.cat);
+  const ink = $('#sv-a'), seal = $('#sv-seal'), msg = $('#done-msg');
+  [ink, seal, msg].forEach((e) => e.getAnimations().forEach((a) => a.cancel()));
+  ink.style.opacity = '0'; seal.style.opacity = '0'; msg.style.opacity = '0';
+  show('saved', { noFade: true, focus: false });
+  const A = (el, kf, o) => el.animate(kf, { fill: 'forwards', ...o }).finished;
+  if (reduce.matches) {
+    await A(ink, [{ opacity: 0 }, { opacity: 1 }], { duration: 450, delay: 100 });
+    await A(seal, [{ opacity: 0 }, { opacity: 1 }], { duration: 250 });
+    await A(msg, [{ opacity: 0 }, { opacity: 1 }], { duration: 250 });
+  } else {
+    await wait(120);
+    await bleed(ink, 800);
+    if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) { try { navigator.vibrate(12); } catch (e) {} }
+    await A(seal, [{ opacity: 0, transform: 'scale(1.12)' }, { opacity: 1, transform: 'scale(.98)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], { duration: 280, easing: 'cubic-bezier(.5,0,.4,1)' });
+    await A(msg, [{ opacity: 0 }, { opacity: 1 }], { duration: 350, delay: 60, easing: 'ease-out' });
+  }
+  [ink, seal, msg].forEach((e) => { e.style.opacity = '1'; });
+  saving = false;
+  $('#done-h').focus({ preventScroll: true });
+}
+/* にじみ：濡れた墨が少しひろがり、紙に吸われて落ち着く。終わったらフィルターを外して、くっきり読めるようにする */
+function bleed(el, dur) {
+  return new Promise((res) => {
+    const d = $('#nj-d'), b = $('#nj-b'), m = $('#nj-m'), fl = $('#nj-f');
+    el.style.filter = 'url(#nijimi)';
+    const t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - t, 3);
+      el.style.opacity = String(Math.min(1, t * 4));
+      el.style.color = t < .5 ? '#151514' : '';
+      d.setAttribute('scale', (4.2 * (1 - e)).toFixed(2));
+      b.setAttribute('stdDeviation', (1.1 * (1 - e)).toFixed(2));
+      m.setAttribute('radius', (1.6 * Math.sin(Math.PI * Math.min(1, t * 1.15))).toFixed(2));
+      fl.setAttribute('flood-opacity', (0.26 * Math.sin(Math.PI * t)).toFixed(3));
+      if (t < 1) requestAnimationFrame(step);
+      else { el.style.filter = ''; el.style.color = ''; res(); }
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+/* 続けて書く「次へ」 */
+function saveAndNext() {
+  const q = Q[S.cur];
+  if (!S.done.has(q.i)) { S.done.set(q.i, readAnswer()); S.lastNew = q.i; }
+  const nx = nextUnanswered(q.i);
+  if (nx < 0) { toast('46問すべて書きました。'); go('home'); return; }
+  S.trail.push(S.cur); S.cur = nx;
+  toast(`保存しました。${S.done.size}問目です。`);
+  renderWrite();
+  const sc = $('#w-scroll'); sc.scrollTop = 0;
+  sc.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+  $('#w-title').focus({ preventScroll: true });
+}
+
+/* ───────── もしものとき：期限（app/js/logic.js と同じ数え方）。日付を変えたらすぐ出し直す ───────── */
+const pad = (n) => String(n).padStart(2, '0');
+const parse = (k) => { const [y, m, d] = k.split('-').map(Number); return { y, m, d }; };
+const fromUTC = (t) => { const d = new Date(t); return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`; };
+const addDays = (k, n) => { const { y, m, d } = parse(k); return fromUTC(Date.UTC(y, m - 1, d + n)); };
+function monthsDeadline(k, n) {
+  const s = addDays(k, 1); const { y, m, d } = parse(s);
+  const last = new Date(Date.UTC(y, m - 1 + n + 1, 0)).getUTCDate();
+  if (d > last) return fromUTC(Date.UTC(y, m - 1 + n, last));
+  return addDays(fromUTC(Date.UTC(y, m - 1 + n, d)), -1);
+}
+const isKey = (k) => /^\d{4}-\d{2}-\d{2}$/.test(k || '');
+const ja = (k, yr = true) => { const { y, m, d } = parse(k); return `${yr ? y + '年' : ''}${m}月${d}日（${WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]}）`; };
+const due = (k, t) => t.days ? addDays(k, t.days - 1) : monthsDeadline(k, t.months);
+const GROUPS = [
+  { label: '7日以内', days: 7, tasks: [['死亡届を出す', '市区町村役場。葬儀社が代わりに出してくれることもあります'], ['火葬許可を申請する', '市区町村役場（死亡届と同時に）']] },
+  { label: '14日以内', days: 14, tasks: [['年金の受給を止める', '年金事務所。国民年金は14日以内、厚生年金は10日以内（{p10}まで）'], ['健康保険の資格喪失の手続きをする', '市区町村役場']] },
+  { label: '3か月以内', months: 3, tasks: [['相続放棄・限定承認をするか決める', '家庭裁判所']] },
+  { label: '4か月以内', months: 4, tasks: [['準確定申告をする', '亡くなった方の住所地の税務署']] },
+  { label: '10か月以内', months: 10, tasks: [['相続税の申告と納付をする（必要な場合）', '亡くなった方の住所地の税務署']] },
+];
+function renderTasks(k) {
+  if (!isKey(k)) { $('#tasks').innerHTML = '<p class="empty">日付を入れると、期限が出ます。</p>'; return; }
+  const p10 = ja(addDays(k, 9), false);
+  $('#tasks').innerHTML = GROUPS.map((g, gi) => `<section class="group"><h2>${g.label}<span>${ja(due(k, g))}まで</span></h2>
+    ${g.tasks.map(([t, w], ti) => { const id = `${gi}-${ti}`; return `<button class="task" role="checkbox" aria-checked="${S.checked.has(id)}" data-act="task" data-id="${id}">
+      <span class="box" aria-hidden="true"></span><span><span class="t">${t}<span class="done">済み</span></span><span class="w">${w.replace('{p10}', p10)}</span></span></button>`; }).join('')}</section>`).join('');
+}
+['input', 'change'].forEach((ev) => $('#death').addEventListener(ev, (e) => renderTasks(e.target.value)));
+
+/* ───────── 入口のオープニング（3秒以内・初回だけ・とばせる） ───────── */
+let opening = [];
+function splitTag() {
+  $$('#tag > span').forEach((s) => { if (!s.querySelector('i')) s.innerHTML = [...s.textContent].map((c) => `<i>${c}</i>`).join(''); });
+}
+function playOpening() {
+  splitTag();
+  show('start', { noFade: true, focus: false });
+  const scr = $('#s-start'); const skip = $('#skip');
+  opening.forEach((a) => a.cancel()); opening = [];
+  skip.hidden = false;
+  const add = (el, kf, o) => { const a = el.animate(kf, { fill: 'backwards', easing: 'ease-out', ...o }); opening.push(a); return a; };
+  const cols = $$('#tag > span', scr);
+  const ink = reduce.matches
+    ? [{ opacity: 0 }, { opacity: 1 }]
+    : [{ opacity: 0, filter: 'blur(5px)' }, { opacity: .85, filter: 'blur(1.4px)', offset: .45 }, { opacity: 1, filter: 'blur(0)' }];
+  let t = 300;
+  cols.forEach((c, ci) => {
+    if (ci === 1) t = 1350;
+    $$('i', c).forEach((ch) => { add(ch, ink, { duration: 520, delay: t }); t += ci === 0 ? 62 : 70; });
+  });
+  add($('.rakkan', scr), reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'scale(1.12)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 260, delay: 2200, easing: 'cubic-bezier(.5,0,.4,1)' });
+  add($('.start-word', scr), [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 2300 });
+  add($('#start-foot'), [{ opacity: 0 }, { opacity: 1 }], { duration: 400, delay: 2450 });
+  const end = () => { skip.hidden = true; try { localStorage.setItem('nokosu-washi-opened', '1'); } catch (e) {} };
+  Promise.all(opening.map((a) => a.finished)).then(end, () => {});
+}
+function skipOpening() { opening.forEach((a) => { try { a.finish(); } catch (e) {} }); $('#skip').hidden = true; try { localStorage.setItem('nokosu-washi-opened', '1'); } catch (e) {} $('#start-foot .btn').focus({ preventScroll: true }); }
+
+/* ───────── 下から出るシート（時期を選ぶ）。開いている間は後ろを inert にして、フォーカスを閉じ込める ───────── */
+let lastFocus = null;
+const behind = () => [...$$('.screen'), $('.panel'), $('#toast')];
+function openStageSheet(cat, from) {
+  lastFocus = from || document.activeElement;
+  const p = PEOPLE[S.person]; const cur = S.stages[S.person][cat];
+  $('#bsheet').innerHTML = `<h2 id="bs-h" tabindex="-1">${catName(cat)}を、${p.short}さんに<br>いつ見せますか</h2>
+    <div class="opts" role="radiogroup" aria-labelledby="bs-h">${STAGES.map((s) => `<button class="opt" role="radio" aria-checked="${s.id === cur}" data-act="pick-stage" data-c="${cat}" data-s="${s.id}"><span class="mk" aria-hidden="true"></span>${s.label}</button>`).join('')}</div>
+    <button class="btn wide" data-act="close-ov" style="margin-top:16px">閉じる</button>`;
+  rove($('#bsheet'));
+  behind().forEach((el) => el && (el.inert = true));
+  const ov = $('#ov'); ov.classList.add('on');
+  $('.bsheet', ov).animate(reduce.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ transform: 'translateY(100%)' }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  $('.dim', ov).animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250 });
+  $('.opt[aria-checked="true"]', ov)?.focus();
+}
+function closeSheet() {
+  behind().forEach((el) => el && (el.inert = false));
+  $('#ov').classList.remove('on');
+  lastFocus && lastFocus.isConnected && lastFocus.focus();
+}
+
+/* トースト（3秒で消える） */
+let toastT = 0;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(hideToast, 3000); }
+function hideToast() { $('#toast').classList.remove('on'); }
+
+/* 文字の大きさ */
+function setSize(sz) {
+  sz = sz === 'l' || sz === 'lg' ? 'lg' : 'std';
+  document.documentElement.dataset.size = sz;
+  $$('.panel .seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.size === sz)));
+  $$('[data-size-toggle]').forEach((b) => { b.textContent = sz === 'lg' ? '文字を標準に' : '文字を大きく'; });
+  try { localStorage.setItem('nokosu-washi-size', sz); } catch (e) {}
+}
+
+/* 友だちの入力を覚える */
+document.addEventListener('input', (e) => {
+  const k = e.target.dataset && e.target.dataset.k;
+  if (k && S.screen === 'friends') FRIENDS[S.friend][k] = e.target.value;
+});
+
+/* ───────── 操作 ───────── */
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button, [data-act]');
+  if (!t) return;
+  if (t.dataset.go) { go(t.dataset.go); return; }
+  if (t.hasAttribute('data-size-toggle')) { setSize(document.documentElement.dataset.size === 'lg' ? 'std' : 'lg'); return; }
+  if (t.matches('button[data-size]')) { setSize(t.dataset.size); return; }
+  if (t.dataset.opt) {
+    const grp = t.parentElement;
+    if (t.dataset.opt === 'one') { $$('.opt', grp).forEach((c) => { c.setAttribute('aria-checked', String(c === t)); c.tabIndex = c === t ? 0 : -1; }); }
+    else t.setAttribute('aria-checked', String(t.getAttribute('aria-checked') !== 'true'));
+    $('#w-err').hidden = true;
+    return;
+  }
+  if (t.dataset.p) { panelGo(t.dataset.p); return; }
+  switch (t.dataset.act) {
+    case 'write-today': S.mode = S.todaySaved ? 'more' : 'today'; S.cur = S.todaySaved ? nextUnanswered(S.today) : S.today; S.trail = []; go('write'); break;
+    case 'next-q': { const nx = nextUnanswered(S.today); if (nx < 0) { go('home'); break; } S.mode = 'more'; S.trail = []; S.cur = nx; S.ended = false; go('write'); break; }
+    case 'end-today': S.ended = true; go('home'); break;
+    case 'w-save': {
+      const a = readAnswer();
+      if (!a) { const er = $('#w-err'); er.hidden = false; er.scrollIntoView({ block: 'nearest' }); break; }
+      if (S.mode === 'today') save(a); else saveAndNext();
+      break;
+    }
+    case 'w-back':
+      if (S.trail.length) { S.cur = S.trail.pop(); renderWrite(); $('#w-title').focus({ preventScroll: true }); } else go('home');
+      break;
+    case 'w-later': toast('この問いは、あとで書く問いに入れました。'); setTimeout(() => go('home'), 900); break;
+    case 'person': S.person = Number(t.dataset.i); RENDER.addr(); $$('#who button')[S.person].focus(); break;
+    case 'stage': openStageSheet(t.dataset.c, t); break;
+    case 'pick-stage': {
+      S.stages[S.person][t.dataset.c] = t.dataset.s;
+      $$('.opt', $('#bsheet')).forEach((o) => { o.setAttribute('aria-checked', String(o === t)); o.tabIndex = o === t ? 0 : -1; });
+      RENDER.addr();
+      lastFocus = $(`#addr-rows [data-c="${t.dataset.c}"]`);
+      setTimeout(closeSheet, reduce.matches ? 150 : 260);
+      break;
+    }
+    case 'close-ov': closeSheet(); break;
+    case 'friend': S.friend = Number(t.dataset.i); RENDER.friends(); $$('#tenugui .tg-b')[S.friend].focus(); break;
+    case 'by': FRIENDS[S.friend].by = Number(t.dataset.i); $$('.chip', t.parentElement).forEach((c) => { c.setAttribute('aria-checked', String(c === t)); c.tabIndex = c === t ? 0 : -1; }); break;
+    case 'add-friend': toast('見本なので、ここまでです。'); break;
+    case 'print': toast('見本なので、印刷はしません。'); break;
+    case 'file': toast('見本なので、ファイルは作りません。'); break;
+    case 'read': toast('見本なので、手帖はここまでです。'); break;
+    case 'task': { const id = t.dataset.id; const on = !S.checked.has(id); on ? S.checked.add(id) : S.checked.delete(id); t.setAttribute('aria-checked', String(on)); break; }
+  }
+});
+$('#skip').addEventListener('click', (e) => { e.stopPropagation(); skipOpening(); });
+$('#s-start').addEventListener('pointerdown', (e) => { if (!$('#skip').hidden && !e.target.closest('#skip')) skipOpening(); });
+$('#replay').addEventListener('click', () => playOpening());
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#ov').classList.contains('on')) closeSheet(); });
+
+function panelGo(p) {
+  if (p === 'start') { splitTag(); go('start'); return; }
+  if (p === 'write') { S.mode = S.todaySaved ? 'more' : 'today'; S.cur = S.todaySaved ? nextUnanswered(S.today) : S.today; S.trail = []; go('write'); return; }
+  if (p === 'saved') { if (S.screen && worldOf(S.screen) === 'bright') show('home', { instant: true, focus: false }); S.mode = 'today'; S.cur = S.today; save(S.done.get(S.today) || TODAY_SAMPLE); return; }
+  go(p);
+}
+
+/* PC：スマホの枠を画面の高さに合わせて縮める */
+function fit() {
+  const slot = $('#slot'), ph = $('#phone');
+  if (innerWidth <= 760) { slot.style.width = ''; slot.style.height = ''; ph.style.transform = ''; return; }
+  const s = Math.min(1, (innerHeight - 40) / 850);
+  slot.style.width = 390 * s + 'px'; slot.style.height = 844 * s + 'px';
+  ph.style.transform = `scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+/* はじめ：初めてならオープニング → 入口。2回目からはホームを開く */
+let sz = 'std'; try { sz = localStorage.getItem('nokosu-washi-size') || 'std'; } catch (e) {}
+const qs = new URLSearchParams(location.search);
+if (qs.get('size')) sz = qs.get('size');
+setSize(sz);
+splitTag();
+const startAt = qs.get('s');
+let seen = false; try { seen = localStorage.getItem('nokosu-washi-opened') === '1'; } catch (e) {}
+if (startAt === 'opening') playOpening();
+else if (startAt && SCREENS.includes(startAt)) {
+  if (startAt === 'saved' || startAt === 'write') panelGo(startAt);
+  else show(startAt, { instant: true, focus: false });
+}
+else if (!seen) playOpening();
+else show('home', { instant: true, focus: false });
+})();
+</script>
+</body>
+</html>
